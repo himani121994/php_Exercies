@@ -6,7 +6,9 @@
     <title>Document</title>
 </head>
 <body bgcolor="pink">
+
     <h1>hellow himani</h1>
+    
     <a href="about.php">About</a>|
 </body>
 </html>
