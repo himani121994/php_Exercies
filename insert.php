@@ -13,23 +13,23 @@
     <div class="container">
        <h1>Please fill this form</h1>
    
-<form>
+<form mathod="post" action="save.php">
   <div class="mb-3">
     <label for="exampleInputEmail1" class="form-label">Roll number</label>
-    <input type="email" class="form-control" name="roln"  aria-describedby="emailHelp">
+    <input type="text" class="form-control" name="roln"  aria-describedby="emailHelp">
 
   </div>
   <div class="mb-3">
   <label for="exampleInputEmail1" class="form-label">Full name</label>
-  <input type="email" class="form-control" name="nm"  aria-describedby="emailHelp">
+  <input type="text" class="form-control" name="nm"  aria-describedby="emailHelp">
   </div>
   <div class="mb-3">
   <label for="exampleInputEmail1" class="form-label">City</label>
-  <input type="email" class="form-control" name="ct"  aria-describedby="emailHelp">
+  <input type="text" class="form-control" name="ct"  aria-describedby="emailHelp">
   </div>
   <div class="mb-3">
   <label for="exampleInputEmail1" class="form-label">Fees</label>
-  <input type="email" class="form-control" name="fs" aria-describedby="emailHelp">
+  <input type="text" class="form-control" name="fs" aria-describedby="emailHelp">
   </div>
   <button type="submit" class="btn btn-primary">Submit</button>
 </form> 
