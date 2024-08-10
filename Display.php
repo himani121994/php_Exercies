@@ -11,8 +11,18 @@
     include "include/navbar.php";
     ?>
     <div class="container">
-       <h1>Update table</h1>
+       <h1>Display table</h1>
    
+<?php
+ 
+ $con= new mysqli("localhost","root","","curd");
+ $sql="select * from student";
+
+ 
+
+?>
+
+
        <table class="table">
   <thead>
     <tr>
