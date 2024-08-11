@@ -13,50 +13,46 @@
         <h1>Display Student Table</h1>
 
         <?php
-        // Connect to the database
-        $con = new mysqli("localhost", "root", "", "curd");
+$con = new mysqli("localhost", "root", "", "curd");
 
-        // Check connection
-        if ($con->connect_error) {
-            die("Connection failed: " . $con->connect_error);
-        }
+if ($con->connect_error) {
+    die("Connection failed: " . $con->connect_error);
+}
 
-        // Query to select all records from the student table
-        $sql = "SELECT * FROM student";
-        $result = $con->query($sql);
+$sql = "SELECT * FROM student";
+$result = $con->query($sql);
 
-        if ($result->num_rows > 0) {
-            echo '<table class="table">';
-            echo '<thead>';
-            echo '<tr>';
-            echo '<th scope="col">#</th>';
-            echo '<th scope="col">Roll Number</th>';
-            echo '<th scope="col">Name</th>';
-            echo '<th scope="col">City</th>';
-            echo '<th scope="col">Fees</th>';
-            echo '</tr>';
-            echo '</thead>';
-            echo '<tbody>';
+if ($result->num_rows > 0) {
+    echo '<table class="table">';
+    echo '<thead>';
+    echo '<tr>';
+    echo '<th scope="col">#</th>';
+    echo '<th scope="col">Roll Number</th>';
+    echo '<th scope="col">Name</th>';
+    echo '<th scope="col">City</th>';
+    echo '<th scope="col">Fees</th>';
+    echo '</tr>';
+    echo '</thead>';
+    echo '<tbody>';
 
-            // Output data of each row
-            while ($row = $result->fetch_assoc()) {
-                echo '<tr>';
-                echo '<th scope="row">' . $row["id"] . '</th>';
-                echo '<td>' . $row["roll_number"] . '</td>';
-                echo '<td>' . $row["student_name"] . '</td>';
-                echo '<td>' . $row["student_city"] . '</td>';
-                echo '<td>' . $row["student_fees"] . '</td>';
-                echo '</tr>';
-            }
+    while ($row = $result->fetch_assoc()) {
+        echo '<tr>';
+        echo '<th scope="row">' . $row["student_id"] . '</th>';
+        echo '<td>' . $row["roll_number"] . '</td>';
+        echo '<td>' . $row["name"] . '</td>';
+        echo '<td>' . $row["city"] . '</td>';
+        echo '<td>' . $row["fees"] . '</td>';
+        echo '</tr>';
+    }
 
-            echo '</tbody>';
-            echo '</table>';
-        } else {
-            echo "<p>No records found.</p>";
-        }
+    echo '</tbody>';
+    echo '</table>';
+} else {
+    echo "<p>No records found.</p>";
+}
 
-        // Close the database connection
-        $con->close();
+$con->close();
+
         ?>
     </div>
 
