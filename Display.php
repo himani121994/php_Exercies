@@ -43,6 +43,7 @@ if ($result->num_rows > 0) {
         echo '<td>' . $row["Student_city"] . '</td>';
         echo '<td>' . $row["student_fees"] . '</td>';
         echo '</tr>';
+        
     }
 
     echo '</tbody>';
