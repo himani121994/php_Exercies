@@ -39,9 +39,9 @@ if ($result->num_rows > 0) {
         echo '<tr>';
         echo '<th scope="row">' . $row["student_id"] . '</th>';
         echo '<td>' . $row["roll_number"] . '</td>';
-        echo '<td>' . $row["name"] . '</td>';
-        echo '<td>' . $row["city"] . '</td>';
-        echo '<td>' . $row["fees"] . '</td>';
+        echo '<td>' . $row["Student_name"] . '</td>';
+        echo '<td>' . $row["Student_city"] . '</td>';
+        echo '<td>' . $row["student_fees"] . '</td>';
         echo '</tr>';
     }
 
