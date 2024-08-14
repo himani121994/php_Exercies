@@ -1,0 +1,5 @@
+javascript : 
+{
+    == : "type conversion user for comparision";
+    === : "not use type conversion for comparision"
+}
