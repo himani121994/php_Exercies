@@ -3,3 +3,9 @@ javascript :
     == : "type conversion user for comparision";
     === : "not use type conversion for comparision"
 }
+
+c++ : 
+{
+   >> : "this is the right shift oparater /"
+   << : "right shif oparater *"
+}
