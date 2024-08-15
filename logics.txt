@@ -10,4 +10,5 @@ c++ :
    << : "right shif oparater *"
    And : its reprasent &&;
    & : its represent comparision;
+   or : its represent ||;
 }
