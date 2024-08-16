@@ -12,4 +12,9 @@ c++ :
    & : its represent comparision;
    or : its represent ||;
    recursion : when a funtion calling itself;
+   type ::
+    direct recursion : when function is called itself directly.
+    type of direct recursion:- tail recursion ,head recursion, tree recursion and nested recursion;
+                               tail recursion : 
+    indirect recursion : when a function calls in other function that evencually calles the original function.
 }
