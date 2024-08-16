@@ -11,5 +11,5 @@ c++ :
    And : its reprasent &&;
    & : its represent comparision;
    or : its represent ||;
-   
+   recursion : when a funtion calling itself;
 }
