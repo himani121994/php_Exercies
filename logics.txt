@@ -15,6 +15,10 @@ c++ :
    type ::
     direct recursion : when function is called itself directly.
     type of direct recursion:- tail recursion ,head recursion, tree recursion and nested recursion;
-                               tail recursion : 
+        1 tail recursion : when the function called itself and in the procces it will not return anything and offter complete 
+        give the all result like :- 3 2 1;  desending order
+        2 head recursion : when the function called itself and in the procces it will not return anything and offter complete 
+        give the all result like :- 1 2 3 ; assending order
+        3 tree recursion : 
     indirect recursion : when a function calls in other function that evencually calles the original function.
 }
