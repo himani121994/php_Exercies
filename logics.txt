@@ -22,3 +22,7 @@ c++ :
         3 tree recursion : 
     indirect recursion : when a function calls in other function that evencually calles the original function.
 }
+
+MongoDB{
+    Aggregation operations allow you to group, sort, perform calculations, analyze data, and much more
+}
