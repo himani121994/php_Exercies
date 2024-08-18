@@ -43,5 +43,5 @@ Don't confuse this _id expression with the _id ObjectId provided to each documen
 }
 
 sql {
-  
+  The SELECT DISTINCT statement is used to return only distinct (different) values.
 }
