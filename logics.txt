@@ -44,4 +44,8 @@ Don't confuse this _id expression with the _id ObjectId provided to each documen
 
 sql {
   The SELECT DISTINCT statement is used to return only distinct (different) values.
+
+  The WHERE clause is used to filter records.
+
+It is used to extract only those records that fulfill a specified condition.
 }
