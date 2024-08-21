@@ -9,6 +9,12 @@ javascript :
       return this.x;
    }
    var bigInteger =  234567890123456789012345678901234567890;
+
+   hoistedFunction();  // Outputs " Hello world! " even when the function is declared after calling
+
+function hoistedFunction(){ 
+  console.log(" Hello world! ");
+} 
 }
       
 // Collection of data as an ordered list
