@@ -1,7 +1,18 @@
 javascript : 
 {
     == : "type conversion user for comparision";
-    === : "not use type conversion for comparision"
+    === : "not use type conversion for comparision";
+    var obj1 = {
+   x:  43,
+   y:  "Hello world!",
+   z: function(){
+      return this.x;
+   }
+}
+      
+// Collection of data as an ordered list
+     
+var array1 = [5, "Hello", true, 4.1]; 
 }
 
 c++ : 
@@ -51,5 +62,5 @@ It is used to extract only those records that fulfill a specified condition.
 }
 
 {
-  
+
 }
