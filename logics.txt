@@ -4,13 +4,13 @@ javascript :
     === : "not use type conversion for comparision";
 
 practice : - 
-
     var obj1 = {
    x:  43,
    y:  "Hello world!",
    z: function(){
       return this.x;
    }
+   === bigint =====
    var bigInteger =  234567890123456789012345678901234567890;
    hoistedFunction();  // Outputs " Hello world! " even when the function is declared after calling
 function hoistedFunction(){ 
