@@ -101,6 +101,11 @@ Special collection and index types: It supports time-to-live (TTL) collections f
 File storage: It supports an easy-to-use protocol for storing large files and file metadata.
 Sharding: Sharding is the process of splitting data up across machines.
 
+MongoDB groups collections into databases. MongoDB can host several databases, each grouping together collections. 
+Some reserved database names are as follows:
+admin
+local
+config
 ==========================================================================================
 Aggregation $group :
 This aggregation stage groups documents by the unique _id expression provided.
