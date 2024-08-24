@@ -83,6 +83,17 @@ Binary data is a string of arbitrary bytes.
 Code
 {"x" : function() { /* ... */ }}
 
+Once a document is stored in the database, it can be changed using one of several update methods: updateOne, updateMany, and replaceOne. updateOne and updateMany each takes a filter document as their first parameter and a modifier document, which describes changes to make, as the second parameter. replaceOne also takes a filter as the first parameter, but as the second parameter replaceOne expects a document with which it will replace the document matching the filter.
+
+For example, in order to replace a document:
+
+{
+   "_id" : ObjectId("4b2b9f67a1f631733d917a7a"),
+   "name" : "alice",
+   "friends" : 24,
+   "enemies" : 2
+}
+
 ==========================================================================================
 Aggregation $group :
 This aggregation stage groups documents by the unique _id expression provided.
