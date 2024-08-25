@@ -115,7 +115,7 @@ Don't confuse this _id expression with the _id ObjectId provided to each documen
 Explain the process of Sharding.
 Sharding is the process of splitting data up across machines. We also use the term “partitioning” sometimes to describe this concept. We can store more data and handle more load without requiring larger or more powerful machines, by putting a subset of data on each machine.
 In the figure below, RS0 and RS1 are shards. MongoDB’s sharding allows you to create a cluster of many machines (shards) and break up a collection across them, putting a subset of data on each shard. This allows your application to grow beyond the resource limits of a standalone server or replica set.
-
+==========================================================================================
 sql {
   The SELECT DISTINCT statement is used to return only distinct (different) values.
 
