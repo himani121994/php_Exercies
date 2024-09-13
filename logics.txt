@@ -123,8 +123,6 @@ What are Geospatial Indexes in MongoDB?
        "type" : "Point",
        "coordinates" : [50, 2]
    }
-
-   
 }
 ==========================================================================================
 sql {
