@@ -1,0 +1,821 @@
+// import React, { useEffect, useState } from 'react';
+// import {
+//     Table,
+//     TableBody,
+//     TableCell,
+//     TableContainer,
+//     TableHead,
+//     TableRow,
+//     TablePagination,
+//     TextField,
+//     Paper,
+//     Button,
+// } from '@mui/material';
+// import { api } from '../../Db.connection';
+
+// const Sales = () => {
+//     const [tabIndex, setTabIndex] = useState(0);
+//     const [data, setData] = useState([]);
+//     const [filter, setFilter] = useState('');
+//     const [page, setPage] = useState(0);
+//     const [rowsPerPage, setRowsPerPage] = useState(5);
+//     const [enrollments, setEnrollments] = useState([]);
+//     const [incomeData, setIncomeData] = useState([]);
+//     const [loading, setLoading] = useState(true);
+
+//     useEffect(() => {
+//         api.get('/UserPrograms', {
+//             params: {
+//                 filter: '{"where": {"status": "active"}, "include": [{"relation": "invoice"}, {"relation": "customer", "scope": {"include": "payments"}}], "order": "createdAt DESC"}',
+//                 access_token: localStorage.getItem('accessToken')
+//             }
+//         })
+//             .then((response) => {
+//                 setEnrollments(response.data);
+//                 setLoading(false);
+//             })
+//             .catch((error) => {
+//                 console.error('Error fetching data:', error);
+//                 setLoading(false);
+//             });
+
+//         api.get('/Payments', {
+//             params: {
+//                 filter: JSON.stringify({
+//                     include: ['customer', 'program'],
+//                     order: 'paidOn DESC',
+//                 }),
+//                 access_token: localStorage.getItem('accessToken'),
+//             },
+//         })
+//             .then((response) => {
+//                 setIncomeData(response.data);
+//                 setLoading(false);
+//             })
+//             .catch((error) => {
+//                 console.error('Error fetching data:', error);
+//                 setLoading(false);
+//             });
+//     }, []);
+
+//     const handleTabChange = (index) => {
+//         setTabIndex(index);
+//     };
+
+//     const handleFilterChange = (event) => {
+//         setFilter(event.target.value);
+//     };
+
+//     const enrollmentsData = enrollments.filter((row) => {
+//         return row.customer && (
+//             row.customer.name.toLowerCase().includes(filter.toLowerCase()) ||
+//             row.invoice.status.toLowerCase().includes(filter.toLowerCase())
+//         );
+//     });
+
+//     const filteredData = incomeData.filter((row) => {
+//         return row.customer && (
+//             row.customer.name.toLowerCase().includes(filter.toLowerCase()) ||
+//             row.invoice.status.toLowerCase().includes(filter.toLowerCase())
+//         );
+//     });
+
+//     const handleChangePage = (event, newPage) => {
+//         setPage(newPage);
+//     };
+
+//     const handleChangeRowsPerPage = (event) => {
+//         setRowsPerPage(parseInt(event.target.value, 10));
+//         setPage(0);
+//     };
+
+//     return (
+//         <div>
+//             {/* Buttons for switching between "Enrollments" and "Income" */}
+//             <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+//                 <Button
+//                     variant="text"
+//                     onClick={() => handleTabChange(0)}
+//                 >
+//                     Enrollments
+//                 </Button>
+//                 <Button
+//                     variant="text"
+//                     onClick={() => handleTabChange(1)}
+//                 >
+//                     Income
+//                 </Button>
+//             </div>
+//             <hr style={{ marginTop: "-16px" }} />
+
+//             <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
+//                 <TextField
+//                     id="standard-basic"
+//                     label="Search"
+//                     variant="standard"
+//                     onChange={handleFilterChange}
+//                 />
+//             </div>
+
+
+//             {tabIndex === 0 && (
+//                 <Paper>
+//                     <TableContainer>
+//                         <Table>
+//                             <TableHead>
+//                                 <TableRow>
+//                                     <TableCell>No</TableCell>
+//                                     <TableCell>Date</TableCell>
+//                                     <TableCell>User</TableCell>
+//                                     <TableCell>Enrolled In</TableCell>
+//                                     <TableCell>Status</TableCell>
+//                                     <TableCell>Amount</TableCell>
+//                                 </TableRow>
+//                             </TableHead>
+//                             <TableBody>
+//                                 {!loading ? (
+//                                     enrollmentsData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row, index) => (
+//                                         <TableRow key={index}>
+//                                             <TableCell>{index + 1}</TableCell>
+//                                             <TableCell>{row.createdAt}</TableCell>
+//                                             <TableCell>{row.customer.name}</TableCell>
+//                                             <TableCell>{row.invoice.purchaseProgram.title}</TableCell>
+//                                             <TableCell>{row.invoice.status}</TableCell>
+//                                             <TableCell>{row.dueAmount}</TableCell>
+//                                         </TableRow>
+//                                     ))
+//                                 ) : (
+//                                     <TableRow>
+//                                         <TableCell colSpan={6}>Loading...</TableCell>
+//                                     </TableRow>
+//                                 )}
+//                             </TableBody>
+//                         </Table>
+//                     </TableContainer>
+//                     <TablePagination
+//                         rowsPerPageOptions={[5, 10, 15, 20, 25]}
+//                         component="div"
+//                         count={enrollmentsData.length}
+//                         rowsPerPage={rowsPerPage}
+//                         page={page}
+//                         onPageChange={handleChangePage}
+//                         onRowsPerPageChange={handleChangeRowsPerPage}
+//                     />
+//                 </Paper>
+//             )}
+//             {tabIndex === 1 && (
+//                 <Paper>
+//                     <TableContainer>
+//                         <Table>
+//                             <TableHead>
+//                                 <TableRow>
+//                                     <TableCell>No</TableCell>
+//                                     <TableCell>Date</TableCell>
+//                                     <TableCell>User</TableCell>
+//                                     <TableCell>Enrolled In</TableCell>
+//                                     <TableCell>Amount</TableCell>
+//                                 </TableRow>
+//                             </TableHead>
+//                             <TableBody>
+//                                 {!loading ? (
+//                                     filteredData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row, index) => (
+//                                         <TableRow key={index}>
+//                                             <TableCell>{index + 1}</TableCell>
+//                                             <TableCell>{row.createdAt}</TableCell>
+//                                             <TableCell>{row.customer.name}</TableCell>
+//                                             <TableCell>{row.program.title}</TableCell>
+//                                             <TableCell>{row.amount}</TableCell>
+//                                         </TableRow>
+//                                     ))
+//                                 ) : (
+//                                     <TableRow>
+//                                         <TableCell colSpan={6}>Loading...</TableCell>
+//                                     </TableRow>
+//                                 )}
+//                             </TableBody>
+//                         </Table>
+//                     </TableContainer>
+//                     <TablePagination
+//                         rowsPerPageOptions={[5, 10, 15, 20, 25]}
+//                         component="div"
+//                         count={filteredData.length}
+//                         rowsPerPage={rowsPerPage}
+//                         page={page}
+//                         onPageChange={handleChangePage}
+//                         onRowsPerPageChange={handleChangeRowsPerPage}
+//                     />
+//                 </Paper>
+//             )}
+//         </div>
+//     );
+// };
+
+// export default Sales;
+
+
+// Sales.jsx
+import React, { useEffect, useState } from 'react';
+import { Button, TextField } from '@mui/material';
+import { api } from '../../Db.connection';
+import ReusableTable from '../../component/ResuableTable';
+
+const Sales = () => {
+    const [tabIndex, setTabIndex] = useState(0);
+    const [filter, setFilter] = useState('');
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [enrollments, setEnrollments] = useState([]);
+    const [incomeData, setIncomeData] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        api.get('/UserPrograms', {
+            params: {
+                filter: '{"where": {"status": "active"}, "include": [{"relation": "invoice"}, {"relation": "customer", "scope": {"include": "payments"}}], "order": "createdAt DESC"}',
+                access_token: localStorage.getItem('accessToken'),
+            },
+        })
+            .then((response) => {
+                setEnrollments(response.data);
+                setLoading(false);
+            })
+            .catch((error) => {
+                console.error('Error fetching data:', error);
+                setLoading(false);
+            });
+
+        api.get('/Payments', {
+            params: {
+                filter: JSON.stringify({
+                    include: ['customer', 'program'],
+                    order: 'paidOn DESC',
+                }),
+                access_token: localStorage.getItem('accessToken'),
+            },
+        })
+            .then((response) => {
+                setIncomeData(response.data);
+                setLoading(false);
+            })
+            .catch((error) => {
+                console.error('Error fetching data:', error);
+                setLoading(false);
+            });
+    }, []);
+
+    const handleFilterChange = (event) => {
+        setFilter(event.target.value);
+    };
+
+    const handleTabChange = (index) => setTabIndex(index);
+
+    const handleChangePage = (event, newPage) => setPage(newPage);
+
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
+    };
+
+    const filteredEnrollments = enrollments.filter(
+        (row) =>
+            row.customer &&
+            (row.customer.name.toLowerCase().includes(filter.toLowerCase()) ||
+                row.invoice.status.toLowerCase().includes(filter.toLowerCase()))
+    );
+
+    const filteredIncome = incomeData.filter(
+        (row) =>
+            row.customer &&
+            (row.customer.name.toLowerCase().includes(filter.toLowerCase()) ||
+                row.program.title.toLowerCase().includes(filter.toLowerCase()))
+    );
+
+    const enrollmentColumns = [
+        { label: 'No',render: (_, index) => page * rowsPerPage + index + 1},
+        { label: 'Date', key: 'createdAt' },
+        { label: 'User', render: (row) => row.customer.name },
+        { label: 'Enrolled In', render: (row) => row.invoice.purchaseProgram.title },
+        { label: 'Status', render: (row) => row.invoice.status },
+        { label: 'Amount', key: 'dueAmount' },
+    ];
+
+    const incomeColumns = [
+        { label: 'No', render: (_, index) => page * rowsPerPage + index + 1 },
+        { label: 'Date', key: 'createdAt' },
+        { label: 'User', render: (row) => row.customer.name },
+        { label: 'Enrolled In', render: (row) => row.program.title },
+        { label: 'Amount', key: 'amount' },
+    ];
+
+    return (
+        <div>
+            <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+                <Button variant="text" onClick={() => handleTabChange(0)}>
+                    Enrollments
+                </Button>
+                <Button variant="text" onClick={() => handleTabChange(1)}>
+                    Income
+                </Button>
+            </div>
+            <hr style={{ marginTop: '-16px' }} />
+
+            {/* <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
+                <TextField id="standard-basic" label="Search" variant="standard" onChange={handleFilterChange} />
+            </div> */}
+
+            {tabIndex === 0 ? (
+                <ReusableTable
+                    columns={enrollmentColumns}
+                    data={filteredEnrollments.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)}
+                    loading={loading}
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    onPageChange={handleChangePage}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
+                />
+            ) : (
+                <ReusableTable
+                    columns={incomeColumns}
+                    data={filteredIncome.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)}
+                    loading={loading}
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    onPageChange={handleChangePage}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
+                />
+            )}
+        </div>
+    );
+};
+
+export default Sales;
+
+
+// import React, { useEffect, useState } from 'react';
+// import {
+//     Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
+//     TablePagination, TextField, Button, CircularProgress, Dialog, DialogTitle,
+//     DialogContent, DialogActions, TextField as MuiTextField,
+//     Typography
+// } from '@mui/material';
+// import { api, deleteData } from '../../Db.connection';
+// import { useNavigate } from 'react-router-dom';
+// import EditIcon from '@mui/icons-material/Edit';
+// import AddIcon from '@mui/icons-material/Add';
+// import Switch from '@mui/material/Switch';
+// import DeleteIcon from '@mui/icons-material/Delete';
+// import AddWeightDialog from '../../component/Case/Add';
+// export const Case = () => {
+//     const nav = useNavigate();
+//     const [filter, setFilter] = useState('');
+//     const [page, setPage] = useState(0);
+//     const [rowsPerPage, setRowsPerPage] = useState(5);
+//     const [enrollments, setEnrollments] = useState([]);
+//     const [loading, setLoading] = useState(true);
+//     const [dialogOpen, setDialogOpen] = useState(false);
+//     const [selectedUser, setSelectedUser] = useState(null);
+//     const [editedUser, setEditedUser] = useState({});
+//     const [addWeightDialogOpen, setAddWeightDialogOpen] = useState(false);
+
+//     useEffect(() => {
+//         const accessToken = localStorage.getItem('accessToken');
+//         const userId = localStorage.getItem('userId');
+
+//         if (!accessToken || !userId) {
+//             nav('/');
+//             return;
+//         }
+
+//         const skip = page * rowsPerPage;
+//         const limit = rowsPerPage;
+
+//         const url = `/GuestMeasures/getCases?access_token=${accessToken}&userId=${userId}&skip=${skip}&limit=${limit}`;
+//         const pastData = { userId }
+//         api.post(url, pastData, {
+//             headers: {
+//                 Authorization: `Bearer ${accessToken}`,
+//             },
+//         })
+//             .then((response) => {
+//                 console.log('API Response:', response.data);
+//                 if (Array.isArray(response.data.data)) {
+//                     setEnrollments(response.data.data);
+//                 } else {
+//                     console.error('API response does not contain an array:', response.data.data);
+//                     setEnrollments([]);
+//                 }
+//                 setLoading(false);
+//             })
+//             .catch((error) => {
+//                 console.error('Error fetching data:', error);
+//                 setLoading(false);
+//             });
+//     }, [page, rowsPerPage]);
+
+
+//     const handleFilterChange = (event) => {
+//         setFilter(event.target.value);
+//     };
+
+//     const enrollmentsData = Array.isArray(enrollments)
+//         ? enrollments.filter((row) => {
+//             const customerName = row?.customer?.name || '';
+//             const invoiceStatus = row?.invoice?.status || ''
+//                 ;
+//             return (
+//                 customerName.toLowerCase().includes(filter.toLowerCase()) ||
+//                 invoiceStatus.toLowerCase().includes(filter.toLowerCase())
+//             );
+//         })
+//         : [];
+
+//     const handleChangePage = (event, newPage) => {
+//         setPage(newPage);
+//     };
+
+//     const handleChangeRowsPerPage = (event) => {
+//         setRowsPerPage(parseInt(event.target.value, 10));
+//         setPage(0);
+//     };
+
+//     const handleEditUser = (user) => {
+//         setSelectedUser(user);
+//         setEditedUser({ ...user });
+//         setDialogOpen(true);
+//     };
+
+//     const handleSaveUser = () => {
+
+//         // console.log('Saving edited user:', editedUser);
+
+//         setDialogOpen(false);
+//     };
+
+//     const handleDialogClose = () => {
+//         setDialogOpen(false);
+//     };
+
+//     const handleInputChange = (event) => {
+//         const { name, value } = event.target;
+//         setEditedUser((prevState) => ({
+//             ...prevState,
+//             [name]: value,
+//         }));
+//     };
+//     const handleDelete = async (id) => {
+//         try {
+//             await deleteData(`/Customers/${id}`);
+//             onSave();
+//             onClose();
+//         } catch (error) {
+//             console.error('Error deleting user:', error);
+//         }
+//     }
+
+//     const handleAddWeight = (id) => {
+//         console.log('Add weight for user with id:', id);
+//     };
+//     const handleRowClick = (row) => {
+//         console.log('Navigating to user-info with id:', row._id);
+//         if (row._id) {
+//             nav(`/dashboard/case-detail/${row._id}`);
+//         } else {
+//             console.error('ID is undefined or null');
+//         }
+//     }
+
+//     return <div className='flex flex-col flex-1'>
+//         <div className='flex flex-col md:flex-row justify-between '>
+//             <Typography  > Cases</Typography>
+//             <TextField
+//                 id="standard-basic"
+//                 label="Search"
+//                 variant="standard"
+//                 onChange={handleFilterChange}
+//             />
+//         </div>
+//         <TableContainer className='flex-1'>
+//             <Table>
+//                 <TableHead>
+//                     <TableRow>
+//                         <TableCell>No</TableCell>
+//                         <TableCell>User Name</TableCell>
+//                         <TableCell>Mobile</TableCell>
+//                         <TableCell>Enrolled Program</TableCell>
+//                         <TableCell>Registered On</TableCell>
+//                         <TableCell>Enrollment Date</TableCell>
+//                         <TableCell>Status</TableCell>
+//                         <TableCell>Edit User</TableCell>
+//                         <TableCell>Add Weight</TableCell>
+//                     </TableRow>
+//                 </TableHead>
+//                 <TableBody>
+//                     {loading ? (
+//                         <TableRow>
+//                             <TableCell colSpan={9} align="center">
+//                                 <CircularProgress />
+//                             </TableCell>
+//                         </TableRow>
+//                     ) : (
+//                         enrollmentsData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+//                             .map((row, index) => (
+//                                 <TableRow key={index} onClick={() => handleRowClick(row)}>
+//                                     <TableCell>{index + 1}</TableCell>
+//                                     <TableCell>{row.name}</TableCell>
+//                                     <TableCell>{row.mobile}</TableCell>
+//                                     <TableCell>{row.programTitle ? row.programTitle.join(', ') : 'N/A'}</TableCell>
+//                                     <TableCell>{new Date(row.createdAt).toLocaleDateString()}</TableCell>
+//                                     <TableCell>
+//                                         {row.enrollDate?.length > 0
+//                                             ? new Date(row.enrollDate[0]).toLocaleDateString('en-US', {
+//                                                 month: 'short',
+//                                                 day: 'numeric',
+//                                                 year: 'numeric'
+//                                             })
+//                                             : 'N/A'}
+//                                     </TableCell>
+
+//                                     <TableCell>
+//                                         <Switch
+//                                             checked={row.status === 'active'}
+//                                             onChange={() =>
+//                                                 handleToggleStatus(row.id, row.status)
+//                                             }
+//                                             color="success"
+//                                         />{row.status}
+//                                     </TableCell>
+//                                     <TableCell>
+//                                         <EditIcon
+//                                             variant="contained"
+//                                             color="primary"
+//                                             onClick={() => handleEditUser(row)}
+//                                         >
+//                                             Edit User
+//                                         </EditIcon>
+//                                     </TableCell>
+//                                     <TableCell>
+//                                         <AddIcon
+//                                             variant="contained"
+//                                             color="secondary"
+//                                             onClick={() => setAddWeightDialogOpen(true)}
+//                                         >
+//                                             Add Weight
+//                                         </AddIcon>
+//                                     </TableCell>
+//                                 </TableRow>
+//                             ))
+//                     )}
+//                 </TableBody>
+//             </Table>
+//         </TableContainer>
+//         <TablePagination
+//             rowsPerPageOptions={[5, 10, 15, 20, 25]}
+//             component="div"
+//             count={enrollmentsData.length}
+//             rowsPerPage={rowsPerPage}
+//             page={page}
+//             onPageChange={handleChangePage}
+//             onRowsPerPageChange={handleChangeRowsPerPage}
+//         />
+//         <AddWeightDialog
+//             open={addWeightDialogOpen}
+//             onClose={() => setAddWeightDialogOpen(false)}
+//             onAddWeight={handleAddWeight}
+//         />
+
+//         {/* Edit User Dialog */}
+//         <Dialog open={dialogOpen} onClose={handleDialogClose}>
+//             <DialogTitle>Edit User</DialogTitle>
+//             <DialogContent>
+//                 <MuiTextField
+//                     label="User Name"
+//                     fullWidth
+//                     margin="normal"
+//                     name="name"
+//                     value={editedUser.name || ''}
+//                     onChange={handleInputChange}
+//                 />
+//                 <MuiTextField
+//                     label="Mobile"
+//                     fullWidth
+//                     margin="normal"
+//                     name="mobile"
+//                     value={editedUser.mobile || ''}
+//                     onChange={handleInputChange}
+//                 />
+//                 <MuiTextField
+//                     label="Email"
+//                     fullWidth
+//                     margin="normal"
+//                     name="email"
+//                     value={editedUser.email || ''}
+//                     onChange={handleInputChange}
+//                 />
+//             </DialogContent>
+//             <DialogActions>
+//                 <DeleteIcon onClick={handleDelete}>
+
+//                 </DeleteIcon>
+//                 <Button onClick={handleDialogClose} color="secondary">
+//                     Cancel
+//                 </Button>
+//                 <Button onClick={handleSaveUser} color="primary">
+//                     Save
+//                 </Button>
+//             </DialogActions>
+//         </Dialog>
+//     </div>
+// }
+
+
+import React, { useEffect, useState } from 'react';
+import { api } from '../../Db.connection';
+import ReusableTable from '../../component/ResuableTable';
+import { useNavigate } from 'react-router-dom';
+
+const Case = () => {
+    const nav = useNavigate();
+    const [filter, setFilter] = useState('');
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [enrollments, setEnrollments] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const accessToken = localStorage.getItem('accessToken');
+        const userId = localStorage.getItem('userId');
+
+        if (!accessToken || !userId) {
+            nav('/');
+            return;
+        }
+
+        const skip = page * rowsPerPage;
+        const limit = rowsPerPage;
+
+        const url = `/GuestMeasures/getCases?access_token=${accessToken}&userId=${userId}&skip=${skip}&limit=${limit}`;
+        const pastData = { userId };
+        api.post(url, pastData, {
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+            },
+        })
+            .then((response) => {
+                if (Array.isArray(response.data.data)) {
+                    setEnrollments(response.data.data);
+                } else {
+                    setEnrollments([]);
+                }
+                setLoading(false);
+            })
+            .catch((error) => {
+                console.error('Error fetching data:', error);
+                setLoading(false);
+            });
+    }, [page, rowsPerPage]);
+
+    const handleFilterChange = (event) => {
+        setFilter(event.target.value);
+    };
+
+    const filteredData = enrollments.filter((row) => {
+        const customerName = row?.customer?.name || '';
+        const invoiceStatus = row?.invoice?.status || '';
+        return (
+            customerName.toLowerCase().includes(filter.toLowerCase()) ||
+            invoiceStatus.toLowerCase().includes(filter.toLowerCase())
+        );
+    });
+
+    const columns = [
+        { label: 'No', key: 'index', render: (row, index) => index + 1 },
+        { label: 'User Name', key: 'name' },
+        { label: 'Mobile', key: 'mobile' },
+        { label: 'Enrolled Program', key: 'programTitle', render: (row) => row.programTitle?.join(', ') || 'N/A' },
+        { label: 'Registered On', key: 'createdAt', render: (row) => new Date(row.createdAt).toLocaleDateString() },
+        { label: 'Enrollment Date', key: 'enrollDate', render: (row) => row.enrollDate?.[0] ? new Date(row.enrollDate[0]).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A' },
+        { label: 'Status', key: 'status' },
+    ];
+
+    const handleRowClick = (row) => {
+        if (row._id) {
+            nav(`/dashboard/case-detail/${row._id}`);
+        } else {
+            console.error('ID is undefined or null');
+        }
+    };
+
+    return (
+        <ReusableTable
+            columns={columns}
+            data={filteredData}
+            loading={loading}
+            filterValue={filter}
+            onFilterChange={handleFilterChange}
+            page={page}
+            rowsPerPage={rowsPerPage}
+            onPageChange={(event, newPage) => setPage(newPage)}
+            onRowsPerPageChange={(event) => setRowsPerPage(parseInt(event.target.value, 10))}
+            onRowClick={handleRowClick}
+        />
+    );
+};
+
+export default Case;
+
+
+import React from 'react';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    TablePagination,
+    TextField,
+    Paper,
+    Button,
+    CircularProgress,
+} from '@mui/material';
+
+const ReusableTable = ({
+    columns,
+    data,
+    loading,
+    filterValue,
+    onFilterChange,
+    page,
+    rowsPerPage,
+    onPageChange,
+    onRowsPerPageChange,
+    actions,
+}) => {
+    return (
+        <Paper>
+            {/* Filter/Search */}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
+                <TextField
+                    id="standard-basic"
+                    label="Search"
+                    variant="standard"
+                    value={filterValue}
+                    onChange={onFilterChange}
+                />
+            </div>
+
+            {/* Table */}
+            <TableContainer>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            {columns.map((column, index) => (
+                                <TableCell key={index}>{column.label}</TableCell>
+                            ))}
+                            {actions && <TableCell>Actions</TableCell>}
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {!loading ? (
+                            data.length > 0 ? (
+                                data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row, rowIndex) => (
+                                    <TableRow key={rowIndex}>
+                                        {columns.map((column, colIndex) => (
+                                            <TableCell key={colIndex}>
+                                                {column.render ? column.render(row) : row[column.key]}
+                                            </TableCell>
+                                        ))}
+                                        {actions && <TableCell>{actions(row)}</TableCell>}
+                                    </TableRow>
+                                ))
+                            ) : (
+                                <TableRow>
+                                    <TableCell colSpan={columns.length + (actions ? 1 : 0)}>No Data Found</TableCell>
+                                </TableRow>
+                            )
+                        ) : (
+                            <TableRow>
+                                <TableCell colSpan={columns.length + (actions ? 1 : 0)}>
+                                    <CircularProgress />
+                                </TableCell>
+                            </TableRow>
+                        )}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+
+            {/* Pagination */}
+            <TablePagination
+                rowsPerPageOptions={[5, 10, 15, 20, 25]}
+                component="div"
+                count={data.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onPageChange={onPageChange}
+                onRowsPerPageChange={onRowsPerPageChange}
+            />
+        </Paper>
+    );
+};
+
+export default ReusableTable;
