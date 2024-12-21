@@ -1,821 +1,1285 @@
-// import React, { useEffect, useState } from 'react';
-// import {
-//     Table,
-//     TableBody,
-//     TableCell,
-//     TableContainer,
-//     TableHead,
-//     TableRow,
-//     TablePagination,
-//     TextField,
-//     Paper,
-//     Button,
-// } from '@mui/material';
-// import { api } from '../../Db.connection';
+// import React from 'react';
 
-// const Sales = () => {
-//     const [tabIndex, setTabIndex] = useState(0);
-//     const [data, setData] = useState([]);
-//     const [filter, setFilter] = useState('');
-//     const [page, setPage] = useState(0);
-//     const [rowsPerPage, setRowsPerPage] = useState(5);
-//     const [enrollments, setEnrollments] = useState([]);
-//     const [incomeData, setIncomeData] = useState([]);
-//     const [loading, setLoading] = useState(true);
-
-//     useEffect(() => {
-//         api.get('/UserPrograms', {
-//             params: {
-//                 filter: '{"where": {"status": "active"}, "include": [{"relation": "invoice"}, {"relation": "customer", "scope": {"include": "payments"}}], "order": "createdAt DESC"}',
-//                 access_token: localStorage.getItem('accessToken')
-//             }
-//         })
-//             .then((response) => {
-//                 setEnrollments(response.data);
-//                 setLoading(false);
-//             })
-//             .catch((error) => {
-//                 console.error('Error fetching data:', error);
-//                 setLoading(false);
-//             });
-
-//         api.get('/Payments', {
-//             params: {
-//                 filter: JSON.stringify({
-//                     include: ['customer', 'program'],
-//                     order: 'paidOn DESC',
-//                 }),
-//                 access_token: localStorage.getItem('accessToken'),
-//             },
-//         })
-//             .then((response) => {
-//                 setIncomeData(response.data);
-//                 setLoading(false);
-//             })
-//             .catch((error) => {
-//                 console.error('Error fetching data:', error);
-//                 setLoading(false);
-//             });
-//     }, []);
-
-//     const handleTabChange = (index) => {
-//         setTabIndex(index);
-//     };
-
-//     const handleFilterChange = (event) => {
-//         setFilter(event.target.value);
-//     };
-
-//     const enrollmentsData = enrollments.filter((row) => {
-//         return row.customer && (
-//             row.customer.name.toLowerCase().includes(filter.toLowerCase()) ||
-//             row.invoice.status.toLowerCase().includes(filter.toLowerCase())
-//         );
-//     });
-
-//     const filteredData = incomeData.filter((row) => {
-//         return row.customer && (
-//             row.customer.name.toLowerCase().includes(filter.toLowerCase()) ||
-//             row.invoice.status.toLowerCase().includes(filter.toLowerCase())
-//         );
-//     });
-
-//     const handleChangePage = (event, newPage) => {
-//         setPage(newPage);
-//     };
-
-//     const handleChangeRowsPerPage = (event) => {
-//         setRowsPerPage(parseInt(event.target.value, 10));
-//         setPage(0);
-//     };
-
-//     return (
-//         <div>
-//             {/* Buttons for switching between "Enrollments" and "Income" */}
-//             <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
-//                 <Button
-//                     variant="text"
-//                     onClick={() => handleTabChange(0)}
-//                 >
-//                     Enrollments
-//                 </Button>
-//                 <Button
-//                     variant="text"
-//                     onClick={() => handleTabChange(1)}
-//                 >
-//                     Income
-//                 </Button>
-//             </div>
-//             <hr style={{ marginTop: "-16px" }} />
-
-//             <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
-//                 <TextField
-//                     id="standard-basic"
-//                     label="Search"
-//                     variant="standard"
-//                     onChange={handleFilterChange}
-//                 />
-//             </div>
-
-
-//             {tabIndex === 0 && (
-//                 <Paper>
-//                     <TableContainer>
-//                         <Table>
-//                             <TableHead>
-//                                 <TableRow>
-//                                     <TableCell>No</TableCell>
-//                                     <TableCell>Date</TableCell>
-//                                     <TableCell>User</TableCell>
-//                                     <TableCell>Enrolled In</TableCell>
-//                                     <TableCell>Status</TableCell>
-//                                     <TableCell>Amount</TableCell>
-//                                 </TableRow>
-//                             </TableHead>
-//                             <TableBody>
-//                                 {!loading ? (
-//                                     enrollmentsData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row, index) => (
-//                                         <TableRow key={index}>
-//                                             <TableCell>{index + 1}</TableCell>
-//                                             <TableCell>{row.createdAt}</TableCell>
-//                                             <TableCell>{row.customer.name}</TableCell>
-//                                             <TableCell>{row.invoice.purchaseProgram.title}</TableCell>
-//                                             <TableCell>{row.invoice.status}</TableCell>
-//                                             <TableCell>{row.dueAmount}</TableCell>
-//                                         </TableRow>
-//                                     ))
-//                                 ) : (
-//                                     <TableRow>
-//                                         <TableCell colSpan={6}>Loading...</TableCell>
-//                                     </TableRow>
-//                                 )}
-//                             </TableBody>
-//                         </Table>
-//                     </TableContainer>
-//                     <TablePagination
-//                         rowsPerPageOptions={[5, 10, 15, 20, 25]}
-//                         component="div"
-//                         count={enrollmentsData.length}
-//                         rowsPerPage={rowsPerPage}
-//                         page={page}
-//                         onPageChange={handleChangePage}
-//                         onRowsPerPageChange={handleChangeRowsPerPage}
-//                     />
-//                 </Paper>
-//             )}
-//             {tabIndex === 1 && (
-//                 <Paper>
-//                     <TableContainer>
-//                         <Table>
-//                             <TableHead>
-//                                 <TableRow>
-//                                     <TableCell>No</TableCell>
-//                                     <TableCell>Date</TableCell>
-//                                     <TableCell>User</TableCell>
-//                                     <TableCell>Enrolled In</TableCell>
-//                                     <TableCell>Amount</TableCell>
-//                                 </TableRow>
-//                             </TableHead>
-//                             <TableBody>
-//                                 {!loading ? (
-//                                     filteredData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row, index) => (
-//                                         <TableRow key={index}>
-//                                             <TableCell>{index + 1}</TableCell>
-//                                             <TableCell>{row.createdAt}</TableCell>
-//                                             <TableCell>{row.customer.name}</TableCell>
-//                                             <TableCell>{row.program.title}</TableCell>
-//                                             <TableCell>{row.amount}</TableCell>
-//                                         </TableRow>
-//                                     ))
-//                                 ) : (
-//                                     <TableRow>
-//                                         <TableCell colSpan={6}>Loading...</TableCell>
-//                                     </TableRow>
-//                                 )}
-//                             </TableBody>
-//                         </Table>
-//                     </TableContainer>
-//                     <TablePagination
-//                         rowsPerPageOptions={[5, 10, 15, 20, 25]}
-//                         component="div"
-//                         count={filteredData.length}
-//                         rowsPerPage={rowsPerPage}
-//                         page={page}
-//                         onPageChange={handleChangePage}
-//                         onRowsPerPageChange={handleChangeRowsPerPage}
-//                     />
-//                 </Paper>
-//             )}
+// const Timeline = ({ historyData, serverUrl, accessToken, profilePicUrl, viewLibraryPicDialog, navigateChatScreen }) => {
+//   return (
+//     <div
+//       style={{ marginLeft: '20px', marginRight: '10px' }}
+//       className="layout-margin"
+//     >
+//       <div style={{ flex: '1 1 100%' }}>
+//         <div className="timeLineCard1" style={{ display: 'flex', alignItems: 'center' }}>
+//           <p
+//             style={{
+//               fontSize: '18px',
+//               fontWeight: '500',
+//               marginLeft: '25px',
+//               marginBlockStart: '1em',
+//               marginBlockEnd: '1em',
+//             }}
+//           >
+//             Timeline
+//           </p>
 //         </div>
-//     );
+
+//         {historyData.map((timeLine, index) => (
+//           <div
+//             key={index}
+//             className="timeLineCard centerAlignCard"
+//             style={{ display: 'flex', alignItems: 'center', flexDirection: 'column' }}
+//           >
+//             <div style={{ flex: '1 1 100%' }}>
+//               <div style={{ display: 'flex', alignItems: 'center' }}>
+//                 <p
+//                   style={{
+//                     fontSize: '18px',
+//                     fontWeight: '400',
+//                     marginLeft: '25px',
+//                     marginBlockStart: '0.7em',
+//                     marginBlockEnd: '0.7em',
+//                   }}
+//                 >
+//                   {new Date(timeLine.data._id).toLocaleDateString('en-US', {
+//                     day: 'numeric',
+//                     month: 'long',
+//                     year: 'numeric',
+//                   })}
+//                 </p>
+//               </div>
+
+//               {timeLine.data.measurement && (
+//                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+//                   {timeLine.data.measurement[0].slice(0, 10).map((measurement, i) => (
+//                     <table key={i} style={{ width: '100%' }}>
+//                       <tr align="left">
+//                         <th style={{ width: '50%' }}>
+//                           <p style={{ textTransform: 'uppercase' }} className="TimelineData">
+//                             {measurement.type}
+//                           </p>
+//                         </th>
+//                         <th style={{ width: '50%' }}>
+//                           {measurement.type !== 'comment' ? (
+//                             <p className="TimelineData">
+//                               {measurement.value} {measurement.unit}
+//                             </p>
+//                           ) : (
+//                             <p
+//                               className="TimelineData"
+//                               style={{ wordWrap: 'break-word' }}
+//                             >
+//                               {measurement.comment}
+//                             </p>
+//                           )}
+//                         </th>
+//                       </tr>
+//                     </table>
+//                   ))}
+//                 </div>
+//               )}
+
+//               {timeLine.data.photos && (
+//                 <div
+//                   style={{ maxHeight: '300px', textAlign: 'center' }}
+//                   onClick={() => viewLibraryPicDialog(timeLine.data.photos)}
+//                   className="container12"
+//                 >
+//                   <img
+//                     src={`${serverUrl}/Uploads/gallery/download/${timeLine.data.photos[0].image}?access_token=${accessToken}`}
+//                     className="TimelineImage center"
+//                     alt="timeline"
+//                   />
+//                   <div className="countImage" style={{ textAlign: 'center' }}>
+//                     {timeLine.data.photos.length}+
+//                   </div>
+//                 </div>
+//               )}
+
+//               {timeLine.data.supportTopic && (
+//                 <div style={{ flex: '1 1 100%' }}>
+//                   {timeLine.data.supportTopic[0].map((data, m) => (
+//                     <div key={m} style={{ display: 'flex', flexDirection: 'row', margin: '20px 0' }}>
+//                       {m === 0 && (
+//                         <img
+//                           src={
+//                             data.Chat.sendBy === 'customer'
+//                               ? profilePicUrl
+//                               : 'assets/img/admin.png'
+//                           }
+//                           className="mat-elevation-z1"
+//                           alt="profile"
+//                         />
+//                       )}
+//                       <p onClick={() => navigateChatScreen(data.customerId)}>{data.Chat.message}</p>
+//                     </div>
+//                   ))}
+//                 </div>
+//               )}
+//             </div>
+//           </div>
+//         ))}
+//       </div>
+//     </div>
+//   );
 // };
 
-// export default Sales;
+// export default Timeline;
 
+// import React from "react";
 
-// Sales.jsx
-import React, { useEffect, useState } from 'react';
-import { Button, TextField } from '@mui/material';
-import { api } from '../../Db.connection';
-import ReusableTable from '../../component/ResuableTable';
-
-const Sales = () => {
-    const [tabIndex, setTabIndex] = useState(0);
-    const [filter, setFilter] = useState('');
-    const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(5);
-    const [enrollments, setEnrollments] = useState([]);
-    const [incomeData, setIncomeData] = useState([]);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        api.get('/UserPrograms', {
-            params: {
-                filter: '{"where": {"status": "active"}, "include": [{"relation": "invoice"}, {"relation": "customer", "scope": {"include": "payments"}}], "order": "createdAt DESC"}',
-                access_token: localStorage.getItem('accessToken'),
-            },
-        })
-            .then((response) => {
-                setEnrollments(response.data);
-                setLoading(false);
-            })
-            .catch((error) => {
-                console.error('Error fetching data:', error);
-                setLoading(false);
-            });
-
-        api.get('/Payments', {
-            params: {
-                filter: JSON.stringify({
-                    include: ['customer', 'program'],
-                    order: 'paidOn DESC',
-                }),
-                access_token: localStorage.getItem('accessToken'),
-            },
-        })
-            .then((response) => {
-                setIncomeData(response.data);
-                setLoading(false);
-            })
-            .catch((error) => {
-                console.error('Error fetching data:', error);
-                setLoading(false);
-            });
-    }, []);
-
-    const handleFilterChange = (event) => {
-        setFilter(event.target.value);
-    };
-
-    const handleTabChange = (index) => setTabIndex(index);
-
-    const handleChangePage = (event, newPage) => setPage(newPage);
-
-    const handleChangeRowsPerPage = (event) => {
-        setRowsPerPage(parseInt(event.target.value, 10));
-        setPage(0);
-    };
-
-    const filteredEnrollments = enrollments.filter(
-        (row) =>
-            row.customer &&
-            (row.customer.name.toLowerCase().includes(filter.toLowerCase()) ||
-                row.invoice.status.toLowerCase().includes(filter.toLowerCase()))
-    );
-
-    const filteredIncome = incomeData.filter(
-        (row) =>
-            row.customer &&
-            (row.customer.name.toLowerCase().includes(filter.toLowerCase()) ||
-                row.program.title.toLowerCase().includes(filter.toLowerCase()))
-    );
-
-    const enrollmentColumns = [
-        { label: 'No',render: (_, index) => page * rowsPerPage + index + 1},
-        { label: 'Date', key: 'createdAt' },
-        { label: 'User', render: (row) => row.customer.name },
-        { label: 'Enrolled In', render: (row) => row.invoice.purchaseProgram.title },
-        { label: 'Status', render: (row) => row.invoice.status },
-        { label: 'Amount', key: 'dueAmount' },
-    ];
-
-    const incomeColumns = [
-        { label: 'No', render: (_, index) => page * rowsPerPage + index + 1 },
-        { label: 'Date', key: 'createdAt' },
-        { label: 'User', render: (row) => row.customer.name },
-        { label: 'Enrolled In', render: (row) => row.program.title },
-        { label: 'Amount', key: 'amount' },
-    ];
-
-    return (
-        <div>
-            <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
-                <Button variant="text" onClick={() => handleTabChange(0)}>
-                    Enrollments
-                </Button>
-                <Button variant="text" onClick={() => handleTabChange(1)}>
-                    Income
-                </Button>
-            </div>
-            <hr style={{ marginTop: '-16px' }} />
-
-            {/* <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
-                <TextField id="standard-basic" label="Search" variant="standard" onChange={handleFilterChange} />
-            </div> */}
-
-            {tabIndex === 0 ? (
-                <ReusableTable
-                    columns={enrollmentColumns}
-                    data={filteredEnrollments.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)}
-                    loading={loading}
-                    rowsPerPage={rowsPerPage}
-                    page={page}
-                    onPageChange={handleChangePage}
-                    onRowsPerPageChange={handleChangeRowsPerPage}
-                />
-            ) : (
-                <ReusableTable
-                    columns={incomeColumns}
-                    data={filteredIncome.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)}
-                    loading={loading}
-                    rowsPerPage={rowsPerPage}
-                    page={page}
-                    onPageChange={handleChangePage}
-                    onRowsPerPageChange={handleChangeRowsPerPage}
-                />
-            )}
-        </div>
-    );
-};
-
-export default Sales;
-
-
-// import React, { useEffect, useState } from 'react';
-// import {
-//     Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-//     TablePagination, TextField, Button, CircularProgress, Dialog, DialogTitle,
-//     DialogContent, DialogActions, TextField as MuiTextField,
-//     Typography
-// } from '@mui/material';
-// import { api, deleteData } from '../../Db.connection';
-// import { useNavigate } from 'react-router-dom';
-// import EditIcon from '@mui/icons-material/Edit';
-// import AddIcon from '@mui/icons-material/Add';
-// import Switch from '@mui/material/Switch';
-// import DeleteIcon from '@mui/icons-material/Delete';
-// import AddWeightDialog from '../../component/Case/Add';
-// export const Case = () => {
-//     const nav = useNavigate();
-//     const [filter, setFilter] = useState('');
-//     const [page, setPage] = useState(0);
-//     const [rowsPerPage, setRowsPerPage] = useState(5);
-//     const [enrollments, setEnrollments] = useState([]);
-//     const [loading, setLoading] = useState(true);
-//     const [dialogOpen, setDialogOpen] = useState(false);
-//     const [selectedUser, setSelectedUser] = useState(null);
-//     const [editedUser, setEditedUser] = useState({});
-//     const [addWeightDialogOpen, setAddWeightDialogOpen] = useState(false);
-
-//     useEffect(() => {
-//         const accessToken = localStorage.getItem('accessToken');
-//         const userId = localStorage.getItem('userId');
-
-//         if (!accessToken || !userId) {
-//             nav('/');
-//             return;
-//         }
-
-//         const skip = page * rowsPerPage;
-//         const limit = rowsPerPage;
-
-//         const url = `/GuestMeasures/getCases?access_token=${accessToken}&userId=${userId}&skip=${skip}&limit=${limit}`;
-//         const pastData = { userId }
-//         api.post(url, pastData, {
-//             headers: {
-//                 Authorization: `Bearer ${accessToken}`,
+// const TimeLine = () => {
+//   const historyData = [
+//     {
+//       data: {
+//         _id: "2023-12-20T00:00:00Z",
+//         measurement: [
+//           [
+//             { type: "temperature", value: "22", unit: "C" },
+//             { type: "humidity", value: "55", unit: "%" },
+//             { type: "comment", comment: "Pleasant weather" }
+//           ]
+//         ],
+//         photos: [
+//           { image: "sample1.jpg" },
+//           { image: "sample2.jpg" }
+//         ],
+//         supportTopic: [
+//           [
+//             { customerId: 1, Chat: { sendBy: "customer", message: "Need assistance" } },
+//             { customerId: 2, Chat: { sendBy: "admin", message: "Assistance provided" } }
+//           ]
+//         ],
+//         programdata: [
+//           {
+//             invoice: {
+//               purchaseProgram: { title: "Health Program", price: 5000, duration: 30 },
+//               enrollOn: "2023-11-01T00:00:00Z",
+//               status: "Paid"
 //             },
-//         })
-//             .then((response) => {
-//                 console.log('API Response:', response.data);
-//                 if (Array.isArray(response.data.data)) {
-//                     setEnrollments(response.data.data);
-//                 } else {
-//                     console.error('API response does not contain an array:', response.data.data);
-//                     setEnrollments([]);
-//                 }
-//                 setLoading(false);
-//             })
-//             .catch((error) => {
-//                 console.error('Error fetching data:', error);
-//                 setLoading(false);
-//             });
-//     }, [page, rowsPerPage]);
-
-
-//     const handleFilterChange = (event) => {
-//         setFilter(event.target.value);
-//     };
-
-//     const enrollmentsData = Array.isArray(enrollments)
-//         ? enrollments.filter((row) => {
-//             const customerName = row?.customer?.name || '';
-//             const invoiceStatus = row?.invoice?.status || ''
-//                 ;
-//             return (
-//                 customerName.toLowerCase().includes(filter.toLowerCase()) ||
-//                 invoiceStatus.toLowerCase().includes(filter.toLowerCase())
-//             );
-//         })
-//         : [];
-
-//     const handleChangePage = (event, newPage) => {
-//         setPage(newPage);
-//     };
-
-//     const handleChangeRowsPerPage = (event) => {
-//         setRowsPerPage(parseInt(event.target.value, 10));
-//         setPage(0);
-//     };
-
-//     const handleEditUser = (user) => {
-//         setSelectedUser(user);
-//         setEditedUser({ ...user });
-//         setDialogOpen(true);
-//     };
-
-//     const handleSaveUser = () => {
-
-//         // console.log('Saving edited user:', editedUser);
-
-//         setDialogOpen(false);
-//     };
-
-//     const handleDialogClose = () => {
-//         setDialogOpen(false);
-//     };
-
-//     const handleInputChange = (event) => {
-//         const { name, value } = event.target;
-//         setEditedUser((prevState) => ({
-//             ...prevState,
-//             [name]: value,
-//         }));
-//     };
-//     const handleDelete = async (id) => {
-//         try {
-//             await deleteData(`/Customers/${id}`);
-//             onSave();
-//             onClose();
-//         } catch (error) {
-//             console.error('Error deleting user:', error);
-//         }
+//             completedOn: "2023-11-30T00:00:00Z",
+//             remainingDays: 0
+//           }
+//         ],
+//         payment: [
+//           {
+//             amount: 5000,
+//             modes: "Credit Card",
+//             Program: { title: "Health Program" }
+//           }
+//         ]
+//       }
 //     }
+//   ];
 
-//     const handleAddWeight = (id) => {
-//         console.log('Add weight for user with id:', id);
-//     };
-//     const handleRowClick = (row) => {
-//         console.log('Navigating to user-info with id:', row._id);
-//         if (row._id) {
-//             nav(`/dashboard/case-detail/${row._id}`);
-//         } else {
-//             console.error('ID is undefined or null');
-//         }
-//     }
+//   const viewLibraryPicDialog = (photos) => {
+//     console.log("Viewing photos:", photos);
+//   };
 
-//     return <div className='flex flex-col flex-1'>
-//         <div className='flex flex-col md:flex-row justify-between '>
-//             <Typography  > Cases</Typography>
-//             <TextField
-//                 id="standard-basic"
-//                 label="Search"
-//                 variant="standard"
-//                 onChange={handleFilterChange}
-//             />
+//   const NavigateChatScreen = (customerId) => {
+//     console.log("Navigating to chat for customer:", customerId);
+//   };
+
+//   return (
+//     <div style={{ marginLeft: "20px", marginRight: "10px" }}>
+//       <div>
+//         <div style={{ display: "flex", alignItems: "center" }}>
+//           <p style={{ fontSize: "18px", fontWeight: 500, marginLeft: "25px" }}>TimeLine</p>
 //         </div>
-//         <TableContainer className='flex-1'>
-//             <Table>
-//                 <TableHead>
-//                     <TableRow>
-//                         <TableCell>No</TableCell>
-//                         <TableCell>User Name</TableCell>
-//                         <TableCell>Mobile</TableCell>
-//                         <TableCell>Enrolled Program</TableCell>
-//                         <TableCell>Registered On</TableCell>
-//                         <TableCell>Enrollment Date</TableCell>
-//                         <TableCell>Status</TableCell>
-//                         <TableCell>Edit User</TableCell>
-//                         <TableCell>Add Weight</TableCell>
-//                     </TableRow>
-//                 </TableHead>
-//                 <TableBody>
-//                     {loading ? (
-//                         <TableRow>
-//                             <TableCell colSpan={9} align="center">
-//                                 <CircularProgress />
-//                             </TableCell>
-//                         </TableRow>
-//                     ) : (
-//                         enrollmentsData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-//                             .map((row, index) => (
-//                                 <TableRow key={index} onClick={() => handleRowClick(row)}>
-//                                     <TableCell>{index + 1}</TableCell>
-//                                     <TableCell>{row.name}</TableCell>
-//                                     <TableCell>{row.mobile}</TableCell>
-//                                     <TableCell>{row.programTitle ? row.programTitle.join(', ') : 'N/A'}</TableCell>
-//                                     <TableCell>{new Date(row.createdAt).toLocaleDateString()}</TableCell>
-//                                     <TableCell>
-//                                         {row.enrollDate?.length > 0
-//                                             ? new Date(row.enrollDate[0]).toLocaleDateString('en-US', {
-//                                                 month: 'short',
-//                                                 day: 'numeric',
-//                                                 year: 'numeric'
-//                                             })
-//                                             : 'N/A'}
-//                                     </TableCell>
+//         {historyData.map((timeLine, index) => (
+//           <div key={index} style={{ marginBottom: "20px" }}>
+//             <div style={{ display: "flex", alignItems: "center" }}>
+//               <p style={{ fontSize: "18px", fontWeight: 400, marginLeft: "25px" }}>
+//                 {new Date(timeLine.data._id).toLocaleDateString("en-US", {
+//                   day: "numeric",
+//                   month: "long",
+//                   year: "numeric"
+//                 })}
+//               </p>
+//             </div>
+//             <hr />
+//             <div style={{ display: "flex", flexWrap: "wrap" }}>
+//               {timeLine.data.measurement && (
+//                 <div style={{ marginLeft: "20px", borderRight: "1px solid #bdbdbd", flex: 1 }}>
+//                   <table style={{ width: "100%" }}>
+//                     {timeLine.data.measurement[0].map((measurement, i) => (
+//                       i < 10 && (
+//                         <tr key={i}>
+//                           <th style={{ width: "50%" }}>
+//                             <p style={{ textTransform: "uppercase" }}>{measurement.type}</p>
+//                           </th>
+//                           <th style={{ width: "50%" }}>
+//                             <p>
+//                               {measurement.type !== "comment"
+//                                 ? `${measurement.value} ${measurement.unit}`
+//                                 : measurement.comment}
+//                             </p>
+//                           </th>
+//                         </tr>
+//                       )
+//                     ))}
+//                   </table>
+//                 </div>
+//               )}
 
-//                                     <TableCell>
-//                                         <Switch
-//                                             checked={row.status === 'active'}
-//                                             onChange={() =>
-//                                                 handleToggleStatus(row.id, row.status)
-//                                             }
-//                                             color="success"
-//                                         />{row.status}
-//                                     </TableCell>
-//                                     <TableCell>
-//                                         <EditIcon
-//                                             variant="contained"
-//                                             color="primary"
-//                                             onClick={() => handleEditUser(row)}
-//                                         >
-//                                             Edit User
-//                                         </EditIcon>
-//                                     </TableCell>
-//                                     <TableCell>
-//                                         <AddIcon
-//                                             variant="contained"
-//                                             color="secondary"
-//                                             onClick={() => setAddWeightDialogOpen(true)}
-//                                         >
-//                                             Add Weight
-//                                         </AddIcon>
-//                                     </TableCell>
-//                                 </TableRow>
-//                             ))
-//                     )}
-//                 </TableBody>
-//             </Table>
-//         </TableContainer>
-//         <TablePagination
-//             rowsPerPageOptions={[5, 10, 15, 20, 25]}
-//             component="div"
-//             count={enrollmentsData.length}
-//             rowsPerPage={rowsPerPage}
-//             page={page}
-//             onPageChange={handleChangePage}
-//             onRowsPerPageChange={handleChangeRowsPerPage}
-//         />
-//         <AddWeightDialog
-//             open={addWeightDialogOpen}
-//             onClose={() => setAddWeightDialogOpen(false)}
-//             onAddWeight={handleAddWeight}
-//         />
+//               {timeLine.data.photos && (
+//                 <div
+//                   style={{ maxHeight: "300px", textAlign: "center" }}
+//                   onClick={() => viewLibraryPicDialog(timeLine.data.photos)}
+//                 >
+//                   <img
+//                     src={`Uploads/gallery/download/${timeLine.data.photos[0].image}`}
+//                     alt="Timeline"
+//                     style={{ width: "100px", height: "100px", objectFit: "cover" }}
+//                   />
+//                   <div>{timeLine.data.photos.length}+</div>
+//                 </div>
+//               )}
+//             </div>
+//             <hr />
 
-//         {/* Edit User Dialog */}
-//         <Dialog open={dialogOpen} onClose={handleDialogClose}>
-//             <DialogTitle>Edit User</DialogTitle>
-//             <DialogContent>
-//                 <MuiTextField
-//                     label="User Name"
-//                     fullWidth
-//                     margin="normal"
-//                     name="name"
-//                     value={editedUser.name || ''}
-//                     onChange={handleInputChange}
-//                 />
-//                 <MuiTextField
-//                     label="Mobile"
-//                     fullWidth
-//                     margin="normal"
-//                     name="mobile"
-//                     value={editedUser.mobile || ''}
-//                     onChange={handleInputChange}
-//                 />
-//                 <MuiTextField
-//                     label="Email"
-//                     fullWidth
-//                     margin="normal"
-//                     name="email"
-//                     value={editedUser.email || ''}
-//                     onChange={handleInputChange}
-//                 />
-//             </DialogContent>
-//             <DialogActions>
-//                 <DeleteIcon onClick={handleDelete}>
+//             {timeLine.data.supportTopic && (
+//               <div>
+//                 {timeLine.data.supportTopic[0].map((data, m) => (
+//                   <div key={m} style={{ display: "flex", marginBottom: "20px" }}>
+//                     <div style={{ flex: 1 }}>
+//                       <img
+//                         src={
+//                           data.Chat.sendBy === "customer"
+//                             ? "profilePicUrl"
+//                             : "assets/img/admin.png"
+//                         }
+//                         alt="Avatar"
+//                         style={{ width: "40px", height: "40px" }}
+//                       />
+//                     </div>
+//                     <div style={{ flex: 4 }} onClick={() => NavigateChatScreen(data.customerId)}>
+//                       {data.Chat.message}
+//                     </div>
+//                   </div>
+//                 ))}
+//               </div>
+//             )}
+//             <hr />
 
-//                 </DeleteIcon>
-//                 <Button onClick={handleDialogClose} color="secondary">
-//                     Cancel
-//                 </Button>
-//                 <Button onClick={handleSaveUser} color="primary">
-//                     Save
-//                 </Button>
-//             </DialogActions>
-//         </Dialog>
+//             {timeLine.data.programdata && (
+//               <div>
+//                 {timeLine.data.programdata.map((data, idx) => (
+//                   <div key={idx} style={{ marginBottom: "20px" }}>
+//                     <p>WeightWonder™ {data.invoice.purchaseProgram.title}</p>
+//                     <p>
+//                       {new Date(data.invoice.enrollOn).toLocaleDateString()} - {new Date(data.completedOn).toLocaleDateString()}
+//                     </p>
+//                     <p>{data.remainingDays === 0 ? "Completed" : "In Progress"}</p>
+//                     <progress
+//                       value={
+//                         data.remainingDays === 0
+//                           ? 100
+//                           : data.invoice.purchaseProgram.duration - data.remainingDays
+//                       }
+//                       max={data.invoice.purchaseProgram.duration}
+//                     />
+//                     <p>{data.remainingDays}d Remaining</p>
+//                   </div>
+//                 ))}
+//               </div>
+//             )}
+//             <hr />
+
+//             {timeLine.data.payment && (
+//               <div>
+//                 {timeLine.data.payment.map((data, idx) => (
+//                   <div key={idx} style={{ marginBottom: "20px" }}>
+//                     <p>Amount: ₹{data.amount}</p>
+//                     <p>Mode: {data.modes}</p>
+//                     <p>Program: {data.Program.title}</p>
+//                   </div>
+//                 ))}
+//               </div>
+//             )}
+//           </div>
+//         ))}
+//       </div>
 //     </div>
-// }
+//   );
+// };
+
+//  export default TimeLine;
+// Import required libraries and components
+// import React from 'react';
+// import {
+//   Card,
+//   CardContent,
+//   Typography,
+//   Table,
+//   TableBody,
+//   TableCell,
+//   TableRow,
+//   Grid,
+//   Container
+// } from '@mui/material';
+
+// const Timeline = () => {
+//   const sampleData = [
+//     {
+//       title: 'Event 1',
+//       data: {
+//         measurement: [
+//           { type: 'Temperature', value: '30', unit: '°C' },
+//           { type: 'Comment', comment: 'All systems stable' }
+//         ],
+//         photos: [
+//           { url: 'https://via.placeholder.com/150', caption: 'Photo 1' },
+//           { url: 'https://via.placeholder.com/150', caption: 'Photo 2' }
+//         ],
+//         supportTopic: 'General Maintenance'
+//       }
+//     },
+//     {
+//       title: 'Event 2',
+//       data: {
+//         measurement: [{ type: 'Pressure', value: '1.2', unit: 'bar' }],
+//         photos: [],
+//         supportTopic: 'Routine Check'
+//       }
+//     }
+//   ];
+
+//   return (
+//     <Container>
+//       <div style={{ padding: '16px' }}>
+//         {sampleData.map((event, index) => (
+//           <TimelineEvent key={index} timeLine={event} />
+//         ))}
+//       </div>
+//     </Container>
+//   );
+// };
+
+// const TimelineEvent = ({ timeLine }) => {
+//   if (!timeLine) return null;
+
+//   return (
+//     <Card style={{ marginBottom: '16px' }}>
+//       <CardContent>
+//         <Typography variant="h6" gutterBottom>
+//           {timeLine.title || 'Timeline Event'}
+//         </Typography>
+
+//         <TimelineMeasurement measurements={timeLine.data.measurement} />
+//         <TimelinePhotos photos={timeLine.data.photos} />
+
+//         {timeLine.data.supportTopic && (
+//           <Typography variant="body1" style={{ marginTop: '16px' }}>
+//             {timeLine.data.supportTopic}
+//           </Typography>
+//         )}
+//       </CardContent>
+//     </Card>
+//   );
+// };
+
+// const TimelineMeasurement = ({ measurements, maxItems = 10 }) => {
+//   if (!measurements || measurements.length === 0) return null;
+
+//   return (
+//     <Table>
+//       <TableBody>
+//         {measurements.slice(0, maxItems).map((measurement, index) => (
+//           <TableRow key={index}>
+//             <TableCell>
+//               <Typography variant="body2" color="textSecondary">
+//                 {measurement.type}
+//               </Typography>
+//             </TableCell>
+//             <TableCell>
+//               <Typography variant="body2">
+//                 {measurement.type !== 'comment'
+//                   ? `${measurement.value} ${measurement.unit}`
+//                   : measurement.comment}
+//               </Typography>
+//             </TableCell>
+//           </TableRow>
+//         ))}
+//       </TableBody>
+//     </Table>
+//   );
+// };
+
+// const TimelinePhotos = ({ photos }) => {
+//   if (!photos || photos.length === 0) return null;
+
+//   return (
+//     <Grid container spacing={2}>
+//       {photos.map((photo, index) => (
+//         <Grid item xs={4} key={index}>
+//           <img
+//             src={photo.url}
+//             alt={photo.caption || `Photo ${index}`}
+//             style={{ width: '100%', borderRadius: '8px' }}
+//           />
+//         </Grid>
+//       ))}
+//     </Grid>
+//   );
+// };
+
+// export default Timeline;
 
 
-import React, { useEffect, useState } from 'react';
-import { api } from '../../Db.connection';
-import ReusableTable from '../../component/ResuableTable';
-import { useNavigate } from 'react-router-dom';
+// import React, { useState } from 'react';
+// import { Box, Grid, Typography, Divider, List, ListItem, IconButton } from '@mui/material';
+// import { styled } from '@mui/system';
 
-const Case = () => {
-    const nav = useNavigate();
-    const [filter, setFilter] = useState('');
-    const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(5);
-    const [enrollments, setEnrollments] = useState([]);
-    const [loading, setLoading] = useState(true);
+// const Timeline = ({ HistoryData, serverUrl, accessToken, profilePicUrl }) => {
+//   const [openDialog, setOpenDialog] = useState(false);
 
-    useEffect(() => {
-        const accessToken = localStorage.getItem('accessToken');
-        const userId = localStorage.getItem('userId');
+//   const viewLibraryPicDialog = (photos) => {
+//     setOpenDialog(true);
+//     // Handle dialog logic here
+//   };
 
-        if (!accessToken || !userId) {
-            nav('/');
-            return;
-        }
+//   return (
+//     <Box sx={{ ml: 2, mr: 1, marginTop: 2 }}>
+//       <Grid container direction="column" spacing={2}>
+//         <Grid item xs={12}>
+//           <Typography variant="h6" sx={{ ml: 3, fontWeight: 500 }}>TimeLine</Typography>
+//         </Grid>
+//         {HistoryData?.map((timeLine, index) => (
+//           <Grid container item xs={12} key={index}>
+//             <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
+//               <Typography variant="body1" sx={{ ml: 3 }}>
+//                 {new Date(timeLine.data._id).toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' })}
+//               </Typography>
+//             </Grid>
+//             <Divider sx={{ width: '100%' }} />
+//             <Grid container item xs={12} spacing={2}>
+//               <Grid item xs={12} sm={6} sx={{ borderRight: '1px solid #bdbdbd', display: 'flex', justifyContent: 'center' }}>
+//                 {timeLine.data.measurement && timeLine.data.measurement[0]?.map((mesurment, index) => (
+//                   <Box key={index} sx={{ width: '100%' }}>
+//                     <Grid container>
+//                       <Grid item xs={6}>
+//                         <Typography variant="body2" sx={{ textTransform: 'uppercase' }}>
+//                           {mesurment.type}
+//                         </Typography>
+//                       </Grid>
+//                       <Grid item xs={6}>
+//                         <Typography variant="body2">
+//                           {mesurment.type !== 'comment' ? `${mesurment.value} ${mesurment.unit}` : mesurment.comment}
+//                         </Typography>
+//                       </Grid>
+//                     </Grid>
+//                   </Box>
+//                 ))}
+//               </Grid>
+//               <Grid item xs={12} sm={6} sx={{ display: 'flex', justifyContent: 'center' }}>
+//                 {timeLine.data.measurement && timeLine.data.measurement[0]?.map((mesurment, index) => (
+//                   index > 9 && index < 20 && (
+//                     <Box key={index} sx={{ width: '100%' }}>
+//                       <Grid container>
+//                         <Grid item xs={6} sx={{ textAlign: 'center' }}>
+//                           <Typography variant="body2" sx={{ textTransform: 'uppercase' }}>
+//                             {mesurment.type}
+//                           </Typography>
+//                         </Grid>
+//                         <Grid item xs={6} sx={{ textAlign: 'center' }}>
+//                           <Typography variant="body2">
+//                             {mesurment.type !== 'comment' ? `${mesurment.value} ${mesurment.unit}` : mesurment.comment}
+//                           </Typography>
+//                         </Grid>
+//                       </Grid>
+//                     </Box>
+//                   )
+//                 ))}
+//               </Grid>
+//               {timeLine.data.photos && (
+//                 <Grid item xs={12} sx={{ textAlign: 'center' }}>
+//                   <IconButton onClick={() => viewLibraryPicDialog(timeLine.data.photos)}>
+//                     <img
+//                       src={`${serverUrl}/Uploads/gallery/download/${timeLine.data.photos[0].image}?access_token${accessToken}`}
+//                       alt="Timeline"
+//                       style={{ maxHeight: '300px' }}
+//                     />
+//                     <Typography variant="body2" sx={{ position: 'absolute', bottom: 10 }}>
+//                       {timeLine.data.photos.length}+
+//                     </Typography>
+//                   </IconButton>
+//                 </Grid>
+//               )}
+//             </Grid>
+//             <Divider sx={{ width: '100%' }} />
+//             {timeLine.data.supportTopic && (
+//               <Grid item xs={12}>
+//                 {timeLine.data.supportTopic[0]?.map((data, mIndex) => (
+//                   <Grid container key={mIndex}>
+//                     {mIndex === 0 && (
+//                       <>
+//                         <Grid item xs={2}>
+//                           <List>
+//                             {data.chats?.map((msg, index) => (
+//                               <ListItem key={index}>
+//                                 <img
+//                                   src={msg.sendBy === 'customer' ? profilePicUrl : 'assets/img/admin.png'}
+//                                   alt="Profile"
+//                                   className="mat-elevation-z1"
+//                                   style={{ width: 40, height: 40 }}
+//                                 />
+//                               </ListItem>
+//                             ))}
+//                           </List>
+//                         </Grid>
+//                         <Grid item xs={8}>
+//                           <Typography variant="body1" onClick={() => NavigateChatScreen(data.customerId)}>
+//                             {data.Chat.message}
+//                           </Typography>
+//                         </Grid>
+//                       </>
+//                     )}
+//                   </Grid>
+//                 ))}
+//               </Grid>
+//             )}
+//             <Divider sx={{ width: '100%' }} />
+//             {timeLine.data.programdata && (
+//               <Grid item xs={12}>
+//                 {timeLine.data.programdata.map((data, pIndex) => (
+//                   <Box key={pIndex} sx={{ marginBottom: 2 }}>
+//                     <Typography variant="h6">WeightWonder™ {data.invoice.purchaseProgram.title}</Typography>
+//                     <Typography variant="body2">
+//                       {new Date(data.invoice.enrollOn).toLocaleDateString()} - {new Date(data.completedOn).toLocaleDateString()}
+//                     </Typography>
+//                     <Typography variant="body2" sx={{ color: data.remainingDays === '0' ? 'green' : 'orange' }}>
+//                       {data.remainingDays === '0' ? 'Completed' : 'In Progress'}
+//                     </Typography>
+//                     <Divider />
+//                     <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+//                       <Typography variant="body1">Program Fee: ₹{data.invoice.purchaseProgram.price}</Typography>
+//                       <Typography variant="body1" sx={{ color: data.invoice.status === 'Paid' ? 'green' : 'red' }}>
+//                         Fee Status: {data.invoice.status}
+//                       </Typography>
+//                     </Box>
+//                     <Typography variant="body2" sx={{ mt: 1 }}>
+//                       {data.invoice.enrollOn}
+//                     </Typography>
+//                   </Box>
+//                 ))}
+//               </Grid>
+//             )}
+//             {timeLine.data.payment && (
+//               <Grid item xs={12}>
+//                 {timeLine.data.payment.map((data, pIndex) => (
+//                   <Box key={pIndex} sx={{ marginBottom: 2 }}>
+//                     <Typography variant="h6">Amount</Typography>
+//                     <Typography variant="body1">₹{data.amount} <span style={{ fontWeight: 600 }}>{data.modes}</span></Typography>
+//                     <Typography variant="body2">WeightWonder™ {data.Program.title}</Typography>
+//                   </Box>
+//                 ))}
+//               </Grid>
+//             )}
+//           </Grid>
+//         ))}
+//       </Grid>
+//     </Box>
+//   );
+// };
 
-        const skip = page * rowsPerPage;
-        const limit = rowsPerPage;
+// export default Timeline;
 
-        const url = `/GuestMeasures/getCases?access_token=${accessToken}&userId=${userId}&skip=${skip}&limit=${limit}`;
-        const pastData = { userId };
-        api.post(url, pastData, {
-            headers: {
-                Authorization: `Bearer ${accessToken}`,
+import React, { useState } from 'react';
+import { Box, Grid, Typography, Divider, List, ListItem, IconButton } from '@mui/material';
+import { styled } from '@mui/system';
+
+const Timeline = ({ HistoryData, serverUrl, accessToken, profilePicUrl }) => {
+  const [openDialog, setOpenDialog] = useState(false);
+
+  const viewLibraryPicDialog = (photos) => {
+    setOpenDialog(true);
+    // Handle dialog logic here
+  };
+
+  const dummyData = [
+    {
+      data: {
+        _id: '2024-12-21T12:00:00Z',
+        measurement: [
+          [
+            { type: 'weight', value: 70, unit: 'kg' },
+            { type: 'comment', comment: 'No issues' }
+          ]
+        ],
+        photos: [
+          { image: 'dummy-image1.jpg' }
+        ],
+        supportTopic: [
+          [
+            { customerId: '123', chats: [{ sendBy: 'customer', message: 'Can I get help?' }] }
+          ]
+        ],
+        programdata: [
+          {
+            invoice: {
+              purchaseProgram: { title: 'Weight Loss Program', price: 3000 },
+              enrollOn: '2024-10-10T00:00:00Z',
+              completedOn: '2024-11-10T00:00:00Z',
+              status: 'Paid'
             },
-        })
-            .then((response) => {
-                if (Array.isArray(response.data.data)) {
-                    setEnrollments(response.data.data);
-                } else {
-                    setEnrollments([]);
-                }
-                setLoading(false);
-            })
-            .catch((error) => {
-                console.error('Error fetching data:', error);
-                setLoading(false);
-            });
-    }, [page, rowsPerPage]);
+            remainingDays: '0'
+          }
+        ],
+        payment: [
+          { amount: 500, modes: 'Card', Program: { title: 'Weight Loss Program' } }
+        ]
+      }
+    },
+    {
+      data: {
+        _id: '2024-12-20T12:00:00Z',
+        measurement: [
+          [
+            { type: 'height', value: 180, unit: 'cm' },
+            { type: 'comment', comment: 'All good' }
+          ]
+        ],
+        photos: [
+          { image: 'dummy-image2.jpg' }
+        ],
+        supportTopic: [
+          [
+            { customerId: '124', chats: [{ sendBy: 'admin', message: 'We are on it!' }] }
+          ]
+        ],
+        programdata: [
+          {
+            invoice: {
+              purchaseProgram: { title: 'Fitness Program', price: 2500 },
+              enrollOn: '2024-09-10T00:00:00Z',
+              completedOn: '2024-10-10T00:00:00Z',
+              status: 'Paid'
+            },
+            remainingDays: '0'
+          }
+        ],
+        payment: [
+          { amount: 500, modes: 'Cash', Program: { title: 'Fitness Program' } }
+        ]
+      }
+    }
+  ];
 
-    const handleFilterChange = (event) => {
-        setFilter(event.target.value);
-    };
-
-    const filteredData = enrollments.filter((row) => {
-        const customerName = row?.customer?.name || '';
-        const invoiceStatus = row?.invoice?.status || '';
-        return (
-            customerName.toLowerCase().includes(filter.toLowerCase()) ||
-            invoiceStatus.toLowerCase().includes(filter.toLowerCase())
-        );
-    });
-
-    const columns = [
-        { label: 'No', key: 'index', render: (row, index) => index + 1 },
-        { label: 'User Name', key: 'name' },
-        { label: 'Mobile', key: 'mobile' },
-        { label: 'Enrolled Program', key: 'programTitle', render: (row) => row.programTitle?.join(', ') || 'N/A' },
-        { label: 'Registered On', key: 'createdAt', render: (row) => new Date(row.createdAt).toLocaleDateString() },
-        { label: 'Enrollment Date', key: 'enrollDate', render: (row) => row.enrollDate?.[0] ? new Date(row.enrollDate[0]).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A' },
-        { label: 'Status', key: 'status' },
-    ];
-
-    const handleRowClick = (row) => {
-        if (row._id) {
-            nav(`/dashboard/case-detail/${row._id}`);
-        } else {
-            console.error('ID is undefined or null');
-        }
-    };
-
-    return (
-        <ReusableTable
-            columns={columns}
-            data={filteredData}
-            loading={loading}
-            filterValue={filter}
-            onFilterChange={handleFilterChange}
-            page={page}
-            rowsPerPage={rowsPerPage}
-            onPageChange={(event, newPage) => setPage(newPage)}
-            onRowsPerPageChange={(event) => setRowsPerPage(parseInt(event.target.value, 10))}
-            onRowClick={handleRowClick}
-        />
-    );
+  return (
+    <Box sx={{ ml: 2, mr: 1, marginTop: 2 }}>
+      <Grid container direction="column" spacing={2}>
+        <Grid item xs={12}>
+          <Typography variant="h6" sx={{ ml: 3, fontWeight: 500 }}>TimeLine</Typography>
+        </Grid>
+        {dummyData?.map((timeLine, index) => (
+          <Grid container item xs={12} key={index}>
+            <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
+              <Typography variant="body1" sx={{ ml: 3 }}>
+                {new Date(timeLine.data._id).toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' })}
+              </Typography>
+            </Grid>
+            <Divider sx={{ width: '100%' }} />
+            <Grid container item xs={12} spacing={2}>
+              <Grid item xs={12} sm={6} sx={{ borderRight: '1px solid #bdbdbd', display: 'flex', justifyContent: 'center' }}>
+                {timeLine.data.measurement && timeLine.data.measurement[0]?.map((mesurment, index) => (
+                  <Box key={index} sx={{ width: '100%' }}>
+                    <Grid container>
+                      <Grid item xs={6}>
+                        <Typography variant="body2" sx={{ textTransform: 'uppercase' }}>
+                          {mesurment.type}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Typography variant="body2">
+                          {mesurment.type !== 'comment' ? `${mesurment.value} ${mesurment.unit}` : mesurment.comment}
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                  </Box>
+                ))}
+              </Grid>
+              <Grid item xs={12} sm={6} sx={{ display: 'flex', justifyContent: 'center' }}>
+                {timeLine.data.measurement && timeLine.data.measurement[0]?.map((mesurment, index) => (
+                  index > 9 && index < 20 && (
+                    <Box key={index} sx={{ width: '100%' }}>
+                      <Grid container>
+                        <Grid item xs={6} sx={{ textAlign: 'center' }}>
+                          <Typography variant="body2" sx={{ textTransform: 'uppercase' }}>
+                            {mesurment.type}
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={6} sx={{ textAlign: 'center' }}>
+                          <Typography variant="body2">
+                            {mesurment.type !== 'comment' ? `${mesurment.value} ${mesurment.unit}` : mesurment.comment}
+                          </Typography>
+                        </Grid>
+                      </Grid>
+                    </Box>
+                  )
+                ))}
+              </Grid>
+              {timeLine.data.photos && (
+                <Grid item xs={12} sx={{ textAlign: 'center' }}>
+                  <IconButton onClick={() => viewLibraryPicDialog(timeLine.data.photos)}>
+                    <img
+                      src={`${serverUrl}/Uploads/gallery/download/${timeLine.data.photos[0].image}?access_token${accessToken}`}
+                      alt="Timeline"
+                      style={{ maxHeight: '300px' }}
+                    />
+                    <Typography variant="body2" sx={{ position: 'absolute', bottom: 10 }}>
+                      {timeLine.data.photos.length}+
+                    </Typography>
+                  </IconButton>
+                </Grid>
+              )}
+            </Grid>
+            <Divider sx={{ width: '100%' }} />
+            {timeLine.data.supportTopic && (
+              <Grid item xs={12}>
+                {timeLine.data.supportTopic[0]?.map((data, mIndex) => (
+                  <Grid container key={mIndex}>
+                    {mIndex === 0 && (
+                      <>
+                        <Grid item xs={2}>
+                          <List>
+                            {data.chats?.map((msg, index) => (
+                              <ListItem key={index}>
+                                <img
+                                  src={msg.sendBy === 'customer' ? profilePicUrl : 'assets/img/admin.png'}
+                                  alt="Profile"
+                                  className="mat-elevation-z1"
+                                  style={{ width: 40, height: 40 }}
+                                />
+                              </ListItem>
+                            ))}
+                          </List>
+                        </Grid>
+                        <Grid item xs={8}>
+                          <Typography variant="body1" onClick={() => {}}>
+                            {data.chats[0].message}
+                          </Typography>
+                        </Grid>
+                      </>
+                    )}
+                  </Grid>
+                ))}
+              </Grid>
+            )}
+            <Divider sx={{ width: '100%' }} />
+            {timeLine.data.programdata && (
+              <Grid item xs={12}>
+                {timeLine.data.programdata.map((data, pIndex) => (
+                  <Box key={pIndex} sx={{ marginBottom: 2 }}>
+                    <Typography variant="h6">WeightWonder™ {data.invoice.purchaseProgram.title}</Typography>
+                    <Typography variant="body2">
+                      {new Date(data.invoice.enrollOn).toLocaleDateString()} - {new Date(data.completedOn).toLocaleDateString()}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: data.remainingDays === '0' ? 'green' : 'orange' }}>
+                      {data.remainingDays === '0' ? 'Completed' : 'In Progress'}
+                    </Typography>
+                    <Divider />
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+                      <Typography variant="body1">Program Fee: ₹{data.invoice.purchaseProgram.price}</Typography>
+                      <Typography variant="body1" sx={{ color: data.invoice.status === 'Paid' ? 'green' : 'red' }}>
+                        Fee Status: {data.invoice.status}
+                      </Typography>
+                    </Box>
+                    <Typography variant="body2" sx={{ mt: 1 }}>
+                      {data.invoice.enrollOn}
+                    </Typography>
+                  </Box>
+                ))}
+              </Grid>
+            )}
+            {timeLine.data.payment && (
+              <Grid item xs={12}>
+                {timeLine.data.payment.map((data, pIndex) => (
+                  <Box key={pIndex} sx={{ marginBottom: 2 }}>
+                    <Typography variant="h6">Amount</Typography>
+                    <Typography variant="body1">₹{data.amount} <span style={{ fontWeight: 600 }}>{data.modes}</span></Typography>
+                    <Typography variant="body2">WeightWonder™ {data.Program.title}</Typography>
+                  </Box>
+                ))}
+              </Grid>
+            )}
+          </Grid>
+        ))}
+      </Grid>
+    </Box>
+  );
 };
 
-export default Case;
+export default Timeline;
+
+
+// import React from 'react';
+// import { Button, Typography, Box, Divider, IconButton } from '@mui/material';
+// import { Add as AddIcon } from '@mui/icons-material';
+// import { Line } from 'react-chartjs-2';
+
+// const MeasurementsCard = ({
+//   userId,
+//   loadWeight,
+//   loadWaistSize,
+//   loadChestSize,
+//   loadHipsSize,
+//   loadThighsSize,
+//   loadArmsSize,
+//   loadBodyFatSize,
+//   loadMuscleFatSize,
+//   currentWeight,
+//   currentWaistSize,
+//   currentChestSize,
+//   currentHipsSize,
+//   currentThighsSize,
+//   currentArmsSize,
+//   currentOverallBodyFat,
+//   currentSkeletalMuscleFat,
+//   weightChartData,
+//   waistChartData,
+//   chestChartData,
+//   hipsChartData,
+//   thighsChartData,
+//   armsChartData,
+//   bodyFatChartData,
+//   muscleFatChartData,
+//   weightChartLabels,
+//   waistChartLabels,
+//   chestChartLabels,
+//   hipsChartLabels,
+//   thighsChartLabels,
+//   armsChartLabels,
+//   bodyFatChartLabels,
+//   muscleFatChartLabels,
+//   weightChartOptions,
+//   waistChartOptions,
+//   chestChartOptions,
+//   hipsChartOptions,
+//   thighsChartOptions,
+//   armsChartOptions,
+//   bodyFatChartOptions,
+//   muscleFatChartOptions,
+//   weightChartColors,
+//   waistChartColors,
+//   chestChartColors,
+//   hipsChartColors,
+//   thighsChartColors,
+//   armsChartColors,
+//   bodyFatChartColors,
+//   muscleFatChartColors,
+// }) => {
+//   const renderSection = (title, currentValue, chartData, chartLabels, chartOptions, chartColors, chartType, chartHeight, onClickHandler) => (
+//     <Box display="flex" flexDirection="row" alignItems="center" sx={{ marginLeft: 2 }}>
+//       <Box flex="1">
+//         <Typography variant="h6" sx={{ fontWeight: 300, cursor: 'pointer', fontSize: '18px' }} onClick={onClickHandler}>
+//           {title}
+//         </Typography>
+//       </Box>
+//       <Box flex="1">
+//         <Line data={{ labels: chartLabels, datasets: chartData }} options={chartOptions} height={chartHeight} />
+//       </Box>
+//       <Box flex="1" display="flex" justifyContent="flex-end" alignItems="center">
+//         <Typography variant="h5" sx={{ fontWeight: 300, fontSize: '24px' }}>
+//           {currentValue}
+//           {currentValue && <span style={{ fontSize: '14px', color: '#757575' }}>kg</span>}
+//         </Typography>
+//         <IconButton onClick={onClickHandler}>
+//           <AddIcon sx={{ color: 'primary.main' }} />
+//         </IconButton>
+//       </Box>
+//     </Box>
+//   );
+
+//   return (
+//     <Box sx={{ background: '#ffffff', boxShadow: 1, borderRadius: 1, p: 2 }}>
+//       <Typography variant="h6" sx={{ fontWeight: 500, fontSize: '18px', marginBottom: 2 }}>
+//         Measurements
+//       </Typography>
+//       <Divider />
+//       {loadWeight && renderSection('Weight', currentWeight, weightChartData, weightChartLabels, weightChartOptions, weightChartColors, 'line', 60, () => addWeightRecordDialog(userId))}
+//       <Divider />
+//       {loadWaistSize && renderSection('Waist Size', currentWaistSize, waistChartData, waistChartLabels, waistChartOptions, waistChartColors, 'line', 60, () => addWaistSizeRecordDialog(userId))}
+//       <Divider />
+//       {loadChestSize && renderSection('Chest Size', currentChestSize, chestChartData, chestChartLabels, chestChartOptions, chestChartColors, 'line', 60, () => addChestSizeRecordDialog(userId))}
+//       <Divider />
+//       {loadHipsSize && renderSection('Hips Size', currentHipsSize, hipsChartData, hipsChartLabels, hipsChartOptions, hipsChartColors, 'line', 60, () => addHipsSizeRecordDialog(userId))}
+//       <Divider />
+//       {loadThighsSize && renderSection('Thighs Size', currentThighsSize, thighsChartData, thighsChartLabels, thighsChartOptions, thighsChartColors, 'line', 60, () => addThighsSizeRecordDialog(userId))}
+//       <Divider />
+//       {loadArmsSize && renderSection('Arms Size', currentArmsSize, armsChartData, armsChartLabels, armsChartOptions, armsChartColors, 'line', 60, () => addArmsSizeRecordDialog(userId))}
+//       <Divider />
+//       {loadBodyFatSize && renderSection('Overall Body Fat', currentOverallBodyFat, bodyFatChartData, bodyFatChartLabels, bodyFatChartOptions, bodyFatChartColors, 'line', 60, () => addOverAllBodyFatRecordDialog(userId))}
+//       <Divider />
+//       {loadMuscleFatSize && renderSection('Skeletal Muscle', currentSkeletalMuscleFat, muscleFatChartData, muscleFatChartLabels, muscleFatChartOptions, muscleFatChartColors, 'line', 60, () => addSkeletalMuscleFatRecordDialog(userId))}
+//     </Box>
+//   );
+// };
+
+// export default MeasurementsCard;
+
+import React from 'react';
+import { Button, Typography, Box, Divider, IconButton } from '@mui/material';
+import { Add as AddIcon } from '@mui/icons-material';
+import { Chart as ChartJS, LineElement, CategoryScale, LinearScale, PointElement, Tooltip, Legend } from 'chart.js';
+import { Line } from 'react-chartjs-2';
+
+// Register required Chart.js components
+ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, Tooltip, Legend);
+
+const MeasurementsCard = () => {
+  // Dummy data for each metric
+  const userId = 1;
+  const loadWeight = true;
+  const loadWaistSize = true;
+  const loadChestSize = true;
+  const loadHipsSize = true;
+  const loadThighsSize = true;
+  const loadArmsSize = true;
+  const loadBodyFatSize = true;
+  const loadMuscleFatSize = true;
+
+  const currentWeight = 70;
+  const currentWaistSize = 32;
+  const currentChestSize = 40;
+  const currentHipsSize = 36;
+  const currentThighsSize = 24;
+  const currentArmsSize = 14;
+  const currentOverallBodyFat = 18;
+  const currentSkeletalMuscleFat = 25;
+
+  const dummyLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May'];
+  const dummyChartData = (label, color) => [
+    {
+      label,
+      data: [65, 68, 70, 69, 72],
+      borderColor: color,
+      backgroundColor: `${color}33`,
+      fill: true,
+      tension: 0.4,
+    },
+  ];
+
+  const chartOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        display: false,
+      },
+    },
+    scales: {
+      x: {
+        beginAtZero: true,
+      },
+      y: {
+        beginAtZero: true,
+      },
+    },
+  };
+
+  const addWeightRecordDialog = (userId) => console.log(`Add weight for user ${userId}`);
+  const addWaistSizeRecordDialog = (userId) => console.log(`Add waist size for user ${userId}`);
+  const addChestSizeRecordDialog = (userId) => console.log(`Add chest size for user ${userId}`);
+  const addHipsSizeRecordDialog = (userId) => console.log(`Add hips size for user ${userId}`);
+  const addThighsSizeRecordDialog = (userId) => console.log(`Add thighs size for user ${userId}`);
+  const addArmsSizeRecordDialog = (userId) => console.log(`Add arms size for user ${userId}`);
+  const addOverAllBodyFatRecordDialog = (userId) => console.log(`Add overall body fat for user ${userId}`);
+  const addSkeletalMuscleFatRecordDialog = (userId) => console.log(`Add skeletal muscle fat for user ${userId}`);
+
+  const renderSection = (title, currentValue, chartData, chartLabels, chartOptions, onClickHandler) => (
+    <Box display="flex" flexDirection="row" alignItems="center" sx={{ marginLeft: 2 }}>
+      <Box flex="1">
+        <Typography variant="h6" sx={{ fontWeight: 300, cursor: 'pointer', fontSize: '18px' }} onClick={onClickHandler}>
+          {title}
+        </Typography>
+      </Box>
+      <Box flex="1">
+        <Line data={{ labels: chartLabels, datasets: chartData }} options={chartOptions} height={60} />
+      </Box>
+      <Box flex="1" display="flex" justifyContent="flex-end" alignItems="center">
+        <Typography variant="h5" sx={{ fontWeight: 300, fontSize: '24px' }}>
+          {currentValue}
+          {currentValue && <span style={{ fontSize: '14px', color: '#757575' }}> kg</span>}
+        </Typography>
+        <IconButton onClick={onClickHandler}>
+          <AddIcon sx={{ color: 'primary.main' }} />
+        </IconButton>
+      </Box>
+    </Box>
+  );
+
+  return (
+    <Box sx={{ background: '#ffffff', boxShadow: 1, borderRadius: 1, p: 2 }}>
+      <Typography variant="h6" sx={{ fontWeight: 500, fontSize: '18px', marginBottom: 2 }}>
+        Measurements
+      </Typography>
+      <Divider />
+      {loadWeight && renderSection('Weight', currentWeight, dummyChartData('Weight', 'blue'), dummyLabels, chartOptions, () => addWeightRecordDialog(userId))}
+      <Divider />
+      {loadWaistSize && renderSection('Waist Size', currentWaistSize, dummyChartData('Waist Size', 'green'), dummyLabels, chartOptions, () => addWaistSizeRecordDialog(userId))}
+      <Divider />
+      {loadChestSize && renderSection('Chest Size', currentChestSize, dummyChartData('Chest Size', 'red'), dummyLabels, chartOptions, () => addChestSizeRecordDialog(userId))}
+      <Divider />
+      {loadHipsSize && renderSection('Hips Size', currentHipsSize, dummyChartData('Hips Size', 'purple'), dummyLabels, chartOptions, () => addHipsSizeRecordDialog(userId))}
+      <Divider />
+      {loadThighsSize && renderSection('Thighs Size', currentThighsSize, dummyChartData('Thighs Size', 'orange'), dummyLabels, chartOptions, () => addThighsSizeRecordDialog(userId))}
+      <Divider />
+      {loadArmsSize && renderSection('Arms Size', currentArmsSize, dummyChartData('Arms Size', 'pink'), dummyLabels, chartOptions, () => addArmsSizeRecordDialog(userId))}
+      <Divider />
+      {loadBodyFatSize && renderSection('Overall Body Fat', currentOverallBodyFat, dummyChartData('Body Fat', 'brown'), dummyLabels, chartOptions, () => addOverAllBodyFatRecordDialog(userId))}
+      <Divider />
+      {loadMuscleFatSize && renderSection('Skeletal Muscle', currentSkeletalMuscleFat, dummyChartData('Muscle Fat', 'cyan'), dummyLabels, chartOptions, () => addSkeletalMuscleFatRecordDialog(userId))}
+    </Box>
+  );
+};
+
+export default MeasurementsCard;
 
 
 import React from 'react';
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    TablePagination,
-    TextField,
-    Paper,
-    Button,
-    CircularProgress,
+  Box,
+  Typography,
+  Button,
+  LinearProgress,
+  Card,
+  CardContent,
+  IconButton,
+  Tooltip,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper
 } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import InfoIcon from '@mui/icons-material/Info';
 
-const ReusableTable = ({
-    columns,
-    data,
-    loading,
-    filterValue,
-    onFilterChange,
-    page,
-    rowsPerPage,
-    onPageChange,
-    onRowsPerPageChange,
-    actions,
-}) => {
-    return (
-        <Paper>
-            {/* Filter/Search */}
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
-                <TextField
-                    id="standard-basic"
-                    label="Search"
-                    variant="standard"
-                    value={filterValue}
-                    onChange={onFilterChange}
-                />
-            </div>
+const EnrolledPrograms = ({ enrollPrograms = [], userId, tabIndex }) => {
+  const addUserProgramDialog = () => {
+    // Handle add user program dialog
+  };
 
-            {/* Table */}
-            <TableContainer>
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                            {columns.map((column, index) => (
-                                <TableCell key={index}>{column.label}</TableCell>
-                            ))}
-                            {actions && <TableCell>Actions</TableCell>}
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {!loading ? (
-                            data.length > 0 ? (
-                                data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row, rowIndex) => (
-                                    <TableRow key={rowIndex}>
-                                        {columns.map((column, colIndex) => (
-                                            <TableCell key={colIndex}>
-                                                {column.render ? column.render(row) : row[column.key]}
-                                            </TableCell>
-                                        ))}
-                                        {actions && <TableCell>{actions(row)}</TableCell>}
-                                    </TableRow>
-                                ))
-                            ) : (
-                                <TableRow>
-                                    <TableCell colSpan={columns.length + (actions ? 1 : 0)}>No Data Found</TableCell>
-                                </TableRow>
-                            )
-                        ) : (
-                            <TableRow>
-                                <TableCell colSpan={columns.length + (actions ? 1 : 0)}>
-                                    <CircularProgress />
-                                </TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
-            </TableContainer>
+  const editUserProgramDialog = (userId, programId) => {
+    // Handle edit user program dialog
+  };
 
-            {/* Pagination */}
-            <TablePagination
-                rowsPerPageOptions={[5, 10, 15, 20, 25]}
-                component="div"
-                count={data.length}
-                rowsPerPage={rowsPerPage}
-                page={page}
-                onPageChange={onPageChange}
-                onRowsPerPageChange={onRowsPerPageChange}
+  const invoiceUrl = (invoiceId) => {
+    // Handle viewing the invoice
+  };
+
+  // Dummy Data for enrollPrograms
+  const dummyData = [
+    {
+      id: 1,
+      status: 'active',
+      invoice: {
+        id: 101,
+        feeDiscount: 200,
+        discountNote: 'Seasonal discount',
+        purchaseProgram: {
+          title: 'WeightWonder™ Program',
+          price: 5000,
+          duration: 30,
+        },
+        enrollOn: '2023-11-01T00:00:00Z',
+        completedOn: '2023-11-30T00:00:00Z',
+      },
+      remainingDay: '10',
+      programNetAmt: 4800,
+      remainAmount: 1000,
+      paymentsLength: 1,
+      payments: [
+        {
+          id: 1,
+          paidOn: '2023-11-05T00:00:00Z',
+          amount: 4000,
+          remainingAmount: 1000,
+          mode: 'Credit Card',
+          comment: 'Initial Payment',
+        },
+      ],
+    },
+    {
+      id: 2,
+      status: 'inactive',
+      invoice: {
+        id: 102,
+        feeDiscount: 0,
+        discountNote: '',
+        purchaseProgram: {
+          title: 'YogaFit™ Program',
+          price: 3000,
+          duration: 60,
+        },
+        enrollOn: '2023-10-01T00:00:00Z',
+        completedOn: '2023-11-30T00:00:00Z',
+      },
+      remainingDay: '0',
+      programNetAmt: 3000,
+      remainAmount: 0,
+      paymentsLength: 2,
+      payments: [
+        {
+          id: 2,
+          paidOn: '2023-10-05T00:00:00Z',
+          amount: 1500,
+          remainingAmount: 1500,
+          mode: 'Debit Card',
+          comment: 'First installment',
+        },
+        {
+          id: 3,
+          paidOn: '2023-10-10T00:00:00Z',
+          amount: 1500,
+          remainingAmount: 0,
+          mode: 'Debit Card',
+          comment: 'Second installment',
+        },
+      ],
+    },
+  ];
+
+  // If no enrollPrograms are passed, use the dummy data
+  const programsToDisplay = enrollPrograms.length > 0 ? enrollPrograms : dummyData;
+
+  return (
+    <Box sx={{ marginLeft: '20px', marginRight: '10px' }}>
+      <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ marginBottom: 2 }}>
+        <Typography variant="h6" sx={{ fontWeight: 500 }}>
+          Enrolled Programs
+        </Typography>
+        <Button
+          variant="text"
+          color="secondary"
+          onClick={() => addUserProgramDialog(userId, tabIndex)}
+        >
+          Enroll new programs
+        </Button>
+      </Box>
+
+      {programsToDisplay?.length === 0 && (
+        <Typography align="center">Enroll program for the user!</Typography>
+      )}
+
+      {Array.isArray(programsToDisplay) && programsToDisplay.map((enrollProgram) => (
+        <Card
+          key={enrollProgram.id}
+          sx={{
+            marginBottom: 2,
+            backgroundColor: enrollProgram.status === 'active' ? '#fff' : '#f5f5f5',
+            boxShadow: 1,
+          }}
+        >
+          <CardContent>
+            <Box display="flex" justifyContent="space-between" alignItems="center">
+              <Typography variant="h6">
+                WeightWonder&trade; {enrollProgram.invoice.purchaseProgram.title} (₹
+                {enrollProgram.invoice.purchaseProgram.price})
+              </Typography>
+              <IconButton onClick={() => editUserProgramDialog(userId, enrollProgram.id)}>
+                <EditIcon color="action" />
+              </IconButton>
+            </Box>
+
+            <Typography variant="body2" color="textSecondary">
+              {enrollProgram.invoice.purchaseProgram.duration} Days
+            </Typography>
+            <Typography variant="body2" color="textSecondary">
+              {new Date(enrollProgram.invoice.enrollOn).toLocaleDateString()} To
+              {new Date(enrollProgram.invoice.completedOn).toLocaleDateString()}
+            </Typography>
+
+            <Typography
+              variant="body2"
+              color={enrollProgram.remainingDay === '0' ? 'primary' : 'textSecondary'}
+            >
+              {enrollProgram.remainingDay === '0' ? 'Completed' : 'In Progress'}
+            </Typography>
+
+            <LinearProgress
+              variant="determinate"
+              value={
+                enrollProgram.remainingDay === '0'
+                  ? 100
+                  : (enrollProgram.invoice.purchaseProgram.duration -
+                      enrollProgram.remainingDay) /
+                    enrollProgram.invoice.purchaseProgram.duration *
+                    100
+              }
+              color="secondary"
             />
-        </Paper>
-    );
+
+            <Typography
+              variant="body2"
+              color="primary"
+            >
+              {enrollProgram.remainingDay}d Remaining
+            </Typography>
+
+            <Box display="flex" flexWrap="wrap">
+              <Typography variant="body2">
+                Discount: ₹{enrollProgram.invoice.feeDiscount || '0'}
+                <Tooltip title={enrollProgram.invoice.discountNote || ''} arrow>
+                  <InfoIcon color="action" />
+                </Tooltip>
+              </Typography>
+
+              <Typography variant="body2">
+                Net Fee: ₹{enrollProgram.programNetAmt}
+              </Typography>
+
+              <Typography
+                variant="body2"
+                color={enrollProgram.remainAmount <= 1 ? 'primary' : 'error'}
+              >
+                Fee Status: {enrollProgram.remainAmount <= 1 ? '✔ Paid' : `(₹${enrollProgram.remainAmount}) Due`}
+              </Typography>
+
+              <Button onClick={() => invoiceUrl(enrollProgram.invoice.id)}>VIEW INVOICE</Button>
+            </Box>
+
+            {enrollProgram.paymentsLength > 0 && (
+              <TableContainer component={Paper} sx={{ marginTop: 2 }}>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Paid On</TableCell>
+                      <TableCell>Paid Amount</TableCell>
+                      <TableCell>Remaining Amount</TableCell>
+                      <TableCell>Payment Mode</TableCell>
+                      <TableCell>Comments</TableCell>
+                      <TableCell>Action</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {enrollProgram.payments.map((payment) => (
+                      <TableRow key={payment.id}>
+                        <TableCell>{new Date(payment.paidOn).toLocaleDateString()}</TableCell>
+                        <TableCell>₹{payment.amount}</TableCell>
+                        <TableCell>₹{payment.remainingAmount}</TableCell>
+                        <TableCell>{payment.mode}</TableCell>
+                        <TableCell>{payment.comment}</TableCell>
+                        <TableCell>
+                          <IconButton
+                            onClick={() =>
+                              editUserProgramDialog(payment.id, enrollProgram.remainAmount)
+                            }
+                            disabled={enrollProgram.remainAmount <= 1}
+                          >
+                            <EditIcon />
+                          </IconButton>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            )}
+          </CardContent>
+        </Card>
+      ))}
+    </Box>
+  );
 };
 
-export default ReusableTable;
+export default EnrolledPrograms;
