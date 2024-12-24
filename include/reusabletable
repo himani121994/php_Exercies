@@ -1,189 +1,537 @@
-// import React from "react";
+// import React, { useEffect, useState } from "react";
 // import {
-//   Box,
-//   Typography,
-//   Card,
-//   CardContent,
-//   Divider,
+//     Box,
+//     Button,
+//     CircularProgress,
+//     Snackbar,
+//     Typography,
+//     Container,
+//     Card,
+//     CardContent,
+//     Grid,
+//     Avatar,
+//     Divider,
+//     Table,
+//     TableBody,
+//     TableRow,
+//     TableCell,
+//     IconButton,
+//     Grid2
 // } from "@mui/material";
-// import PersonIcon from "@mui/icons-material/Person";
+// import { useNavigate, useParams } from "react-router-dom";
+// import { api } from "../../Db.connection";
+// import { deepPurple } from "@mui/material/colors";
+// import EditIcon from '@mui/icons-material/Edit';
+// import Switch from '@mui/material/Switch';
+// import WeightProgress from "../../component/Case-Detail/Weight";
+// import UserSupportTopics from "../../component/Case-Detail/Support";
+// import UserImageLibrary from "../../component/Case-Detail/Gallery";
 
-// const data = [
-//   { label: "Hips Size", value: "38Cms" },
-//   { label: "Waist Size", value: "36Cms" },
-//   { label: "Chest Size", value: "38Cms" },
-//   { label: "Weight", value: "65.3kgs" },
-// ];
 
-// const TimelineItem = ({ date, time, label, value }) => (
-//   <Box display="flex" alignItems="flex-start" marginBottom={2}>
-//     {/* Icon Section */}
-//     <Box display="flex" flexDirection="column" alignItems="center" marginRight={2}>
-//       <PersonIcon color="success" fontSize="large" />
-//       <Divider orientation="vertical" flexItem sx={{ marginY: 1 }} />
-//     </Box>
+// const GenrelInfo = () => {
+//     const [userData, setUserData] = useState({});
+//     const [loading, setLoading] = useState(true);
+//     // const [snackbar, setSnackbar] = useState({ open: false, message: "" });
+//     const navigate = useNavigate();
+//     const { id } = useParams();
 
-//     {/* Content Section */}
-//     <Box>
-//       <Typography variant="body2" color="text.secondary">
-//         {date}
-//       </Typography>
-//       <Typography variant="body2" color="text.secondary">
-//         {time}
-//       </Typography>
-//       <Card variant="outlined" sx={{ marginTop: 1 }}>
-//         <CardContent>
-//           <Typography variant="body1" color="text.primary">
-//             {label}
-//           </Typography>
-//           <Typography variant="h6" color="text.primary">
-//             {value}
-//           </Typography>
-//         </CardContent>
-//       </Card>
-//     </Box>
-//   </Box>
-// );
 
-// const Timeline = () => {
+//     // const handleSnackbarClose = () => setSnackbar({ open: false, message: "" });
+//     // const handleGoBack = () => {
+//     //     navigate(-1);
+//     // };
+
+//     useEffect(() => {
+//         const fetchUserProfile = async () => {
+//             const accessToken = localStorage.getItem("accessToken");
+//             const url = `/Customers/${id}?access_token=${accessToken}`;
+
+//             try {
+//                 const response = await api.get(url);
+//                 const data = response.data;
+//                 setUserData(data);
+
+//                 if (data.image && data.image !== '') {
+//                     setUserData((prevData) => ({
+//                         ...prevData,
+//                         profilePicUrl: `${api.defaults.baseURL}/Uploads/profile-pic/download/${data.image}?accessToken=${accessToken}`
+//                     }));
+//                 } else {
+//                     setUserData((prevData) => ({
+//                         ...prevData,
+//                         profilePicUrl: "assets/img/userProfile.png"
+//                     }));
+//                 }
+//             } catch (error) {
+//                 if (error.response?.status === 401) {
+//                     // setSnackbar({ open: true, message: "Login expired, please login again." });
+//                     localStorage.clear();
+//                     navigate("/login");
+//                 } else {
+//                     console.error("Error fetching user profile", error);
+//                 }
+//             } finally {
+//                 setLoading(false);
+//             }
+//         };
+
+//         fetchUserProfile();
+//     }, [id, navigate]);
+
+//     return (
+
+//         <Box sx={{ flexGrow: 1 }}>
+//             <Grid container spacing={2}>
+//                 {/* Left Side - Profile Card */}
+//                 <Grid item xs={12} sm={4} md={4}>
+//                     <Card>
+
+//                         <CardContent sx={{ textAlign: "center", p: 2 }}>
+//                             <Grid container alignItems="center" justifyContent="space-between" spacing={2}>
+//                                 {/* Title on the left */}
+//                                 <Grid item>
+//                                     <Typography variant="h5" sx={{ fontWeight: 600 }}>
+//                                         WeightWonder™Plus +1
+//                                     </Typography>
+//                                 </Grid>
+
+//                                 {/* Icon on the right */}
+//                                 <Grid item>
+
+//                                     <Switch checked={userData.status === 'active'} color="success" />{userData.status}
+//                                 </Grid>
+//                             </Grid>
+//                             <Avatar
+//                                 sx={{ width: 100, height: 100, mx: "auto", bgcolor: deepPurple[500], mb: 2 }}
+//                                 src={userData.profilePicUrl}
+//                             >
+//                                 {userData.name && userData.name.charAt(0)}
+//                             </Avatar>
+//                             <Typography variant="h6">{userData.name}</Typography>
+//                             <Typography variant="body2" color="textSecondary">
+//                                 {userData.mobile}
+//                             </Typography>
+//                             <Typography variant="body2" color="textSecondary">
+//                                 {userData.email}
+//                             </Typography>
+//                             <Divider sx={{ my: 2 }} />
+//                             <Grid container alignItems="center" justifyContent="space-between" spacing={2}>
+//                                 {/* Title on the left */}
+//                                 <Grid item>
+//                                     <Typography variant="h5" sx={{ fontWeight: 600 }}>
+//                                         Basic Detail
+//                                     </Typography>
+//                                 </Grid>
+
+//                                 {/* Icon on the right */}
+//                                 <Grid item>
+//                                     <EditIcon />
+//                                 </Grid>
+//                             </Grid>
+//                             <Table>
+//                                 <TableBody>
+//                                     <TableRow>
+//                                         <TableCell sx={{ pb: 1, border: "none", color: "gray" }}>
+//                                             DOB
+//                                         </TableCell>
+//                                         <TableCell sx={{ pb: 1, border: "none" }}>
+//                                             {new Date(userData.dateOfBirth).toLocaleDateString()}
+//                                         </TableCell>
+//                                     </TableRow>
+//                                     <TableRow>
+//                                         <TableCell sx={{ pb: 1, border: "none", color: "gray" }}>
+//                                             Gender
+//                                         </TableCell>
+//                                         <TableCell sx={{ pb: 1, border: "none" }}>{userData.gender}</TableCell>
+//                                     </TableRow>
+//                                     <TableRow>
+//                                         <TableCell sx={{ pb: 1, border: "none", color: "gray" }}>
+//                                             Alternative Contact No.
+//                                         </TableCell>
+//                                         <TableCell sx={{ pb: 1, border: "none" }}>{userData.gender}</TableCell>
+//                                     </TableRow>
+//                                     <TableRow>
+//                                         <TableCell sx={{ pb: 1, border: "none", color: "gray" }}>
+//                                             Height (in cms)
+//                                         </TableCell>
+//                                         <TableCell sx={{ pb: 1, border: "none" }}>{userData.height} Cms</TableCell>
+//                                     </TableRow>
+//                                     <TableRow>
+//                                         <TableCell sx={{ pb: 1, border: "none", color: "gray" }}>
+//                                             Address
+//                                         </TableCell>
+//                                         <TableCell sx={{ pb: 1, border: "none" }}>{userData.address}</TableCell>
+//                                     </TableRow>
+//                                     <TableRow>
+//                                         <TableCell sx={{ pb: 1, border: "none", color: "gray" }}>
+//                                             Occupation
+//                                         </TableCell>
+//                                         <TableCell sx={{ pb: 1, border: "none" }}>{userData.occupation}</TableCell>
+//                                     </TableRow>
+//                                     <TableRow>
+//                                         <TableCell sx={{ pb: 1, border: "none", color: "gray" }}>
+//                                             Organization
+//                                         </TableCell>
+//                                         <TableCell sx={{ pb: 1, border: "none" }}>{userData.organization}</TableCell>
+//                                     </TableRow>
+//                                     <TableRow>
+//                                         <TableCell sx={{ pb: 1, border: "none", color: "gray" }}>
+//                                             Clinical Issues
+//                                         </TableCell>
+//                                         <TableCell sx={{ pb: 1, border: "none" }}>
+//                                             {userData.clinicalIssues || "No clinical issue"}
+//                                         </TableCell>
+//                                     </TableRow>
+//                                     <TableRow>
+//                                         <TableCell sx={{ pb: 1, border: "none", color: "gray" }}>
+//                                             Wake up time
+//                                         </TableCell>
+//                                         <TableCell sx={{ pb: 1, border: "none" }}>{userData.wakeUp}</TableCell>
+//                                     </TableRow>
+//                                 </TableBody>
+//                             </Table>
+//                         </CardContent>
+//                     </Card>
+//                 </Grid>
+
+//                 {/* Center - Weight Progress */}
+//                 <Grid item xs={12} sm={4} md={4}>
+//                     <WeightProgress />
+//                 </Grid>
+
+//                 {/* Right Side - Support and Info */}
+//                 <Grid item xs={12} sm={4} md={4}>
+//                     <UserSupportTopics />
+//                 </Grid>
+//                 {/* New Section - Image Gallery */}
+//                 <Grid item xs={12} sm={8} md={8} sx={{ marginLeft: "auto" }}>
+//                     <Typography variant="h6" sx={{ mb: 2 }}>
+//                         Image Gallery
+//                     </Typography>
+//                     <UserImageLibrary />
+//                 </Grid>
+
+//             </Grid>
+//             {/* <Snackbar
+//                 open={snackbar.open}
+//                 autoHideDuration={3000}
+//                 onClose={handleSnackbarClose}
+//                 message={snackbar.message}
+//             /> */}
+//         </Box>
+
+
+//     )
+// }
+
+// export default GenrelInfo;
+// import React from "react";
+// import { Box, Card, CardContent, Typography, Button, Switch, Avatar, Grid, TextField } from "@mui/material";
+
+// const GenrelInfo = () => {
 //   return (
-//     <Box sx={{ padding: 3, maxWidth: 400, margin: "auto" }}>
-//       {data.map((item, index) => (
-//         <TimelineItem
-//           key={index}
-//           date="Dec 19, 2024"
-//           time="3:56 PM"
-//           label={item.label}
-//           value={item.value}
-//         />
-//       ))}
+//     <Box sx={{ padding: 2 }}>
+//       <Grid container spacing={2}>
+//         {/* Left Section */}
+//         <Grid item xs={12} md={3}>
+//           <Card sx={{ padding: 2 }}>
+//             <Typography variant="h6" color="green">
+//               WeightWonder™ Plus +1
+//             </Typography>
+//             <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 2 }}>
+//               <Switch defaultChecked={false} />
+//               <Typography>Inactive</Typography>
+//             </Box>
+//             <Avatar sx={{ width: 80, height: 80, margin: "20px auto" }} />
+//             <Typography align="center">+91</Typography>
+//             <Typography variant="h6" sx={{ marginTop: 2 }}>
+//               Basic Detail
+//             </Typography>
+//             <Button variant="contained" color="success" fullWidth sx={{ marginTop: 2 }}>
+//               Add Info
+//             </Button>
+//           </Card>
+//         </Grid>
+
+//         {/* Right Section */}
+//         <Grid item xs={12} md={9}>
+//           <Grid container spacing={2}>
+//             {/* Weight Progress */}
+//             <Grid item xs={12} md={6}>
+//               <Card sx={{ height: "100%" }}>
+//                 <CardContent>
+//                   <Typography variant="h6">Weight Progress</Typography>
+//                   <Typography sx={{ marginTop: 2 }}>
+//                     Please update profile to view progress.........
+//                   </Typography>
+//                 </CardContent>
+//               </Card>
+//             </Grid>
+
+//             {/* Support */}
+//             <Grid item xs={12} md={6}>
+//               <Card sx={{ height: "100%" }}>
+//                 <CardContent>
+//                   <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+//                     <Typography variant="h6">Support</Typography>
+//                     <Button variant="outlined">NEW MESSAGE +</Button>
+//                   </Box>
+//                   <Typography sx={{ marginTop: 2 }}>No conversation Yet</Typography>
+//                 </CardContent>
+//               </Card>
+//             </Grid>
+
+//             {/* Pictures */}
+//             <Grid item xs={12}>
+//               <Card>
+//                 <CardContent>
+//                   <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+//                     <Typography variant="h6">Pictures</Typography>
+//                     <TextField
+//                       type="date"
+//                       size="small"
+//                       InputLabelProps={{ shrink: true }}
+//                       sx={{ maxWidth: 200 }}
+//                     />
+//                   </Box>
+//                 </CardContent>
+//               </Card>
+//             </Grid>
+//           </Grid>
+//         </Grid>
+//       </Grid>
 //     </Box>
 //   );
 // };
 
-// export default Timeline;
+// export default GenrelInfo;
 
-import React from "react";
-import { Box, Typography, Card, CardContent, Divider } from "@mui/material";
-import PersonIcon from "@mui/icons-material/Person";
+import React, { useEffect, useState } from "react";
+import {
+    Box,
+    Button,
+    CircularProgress,
+    Snackbar,
+    Typography,
+    Container,
+    Card,
+    CardContent,
+    Grid,
+    Avatar,
+    Divider,
+    Table,
+    TableBody,
+    TableRow,
+    TableCell,
+    IconButton,
+    Grid2, TextField
 
-const data = [
-  { label: "Hips Size", value: "38Cms" },
-  { label: "Waist Size", value: "36Cms" },
-  { label: "Chest Size", value: "38Cms" },
-  { label: "Weight", value: "65.3kgs" },
-];
+} from "@mui/material";
+import { useNavigate, useParams } from "react-router-dom";
+import { api } from "../../Db.connection";
+import { deepPurple } from "@mui/material/colors";
+import EditIcon from '@mui/icons-material/Edit';
+import Switch from '@mui/material/Switch';
+import WeightProgress from "../../component/Case-Detail/Weight";
+import UserSupportTopics from "../../component/Case-Detail/Support";
+import UserImageLibrary from "../../component/Case-Detail/Gallery";
 
-const TimelineItem = ({ date, time, label, value, isLast }) => (
-  <Box
-    display="flex"
-    alignItems="center"
-    position="relative"
-    marginBottom={4}
-    // width="100%"
-  >
-    {/* Left Section: Date and Time */}
-    <Box
-      width="15%"
-      textAlign="right"
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "flex-end",
-        paddingRight: 2,
-      }}
-    >
-      <Typography variant="body2" color="text.secondary">
-        {date}
-      </Typography>
-      <Typography variant="body2" color="text.secondary">
-        {time}
-      </Typography>
-    </Box>
 
-    {/* Icon Section */}
-    <Box
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      width="5%"
-      position="relative"
-    >
-      <Box
-        sx={{
-          backgroundColor: "#e8f5e9",
-          borderRadius: "50%",
-          padding: "10px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <PersonIcon color="success" />
-      </Box>
-      {!isLast && (
-        <Divider
-          orientation="vertical"
-          flexItem
-          sx={{
-            position: "absolute",
-            left: "50%",
-            top: "50%",
-            transform: "translateX(-50%)",
-            height: "calc(100% + 150px)",
-            backgroundColor: "#cfcfcf",
-            zIndex: -1,
-          }}
-        />
-      )}
-    </Box>
+const GenrelInfo = () => {
+    const [userData, setUserData] = useState({});
+    const [loading, setLoading] = useState(true);
+    // const [snackbar, setSnackbar] = useState({ open: false, message: "" });
+    const navigate = useNavigate();
+    const { id } = useParams();
 
-    {/* Right Section: Card with Content */}
-    <Box flex={1} sx={{ paddingLeft: 2,  }}>
-      <Card
-        variant="outlined"
-        sx={{
-          padding: 2,
-          backgroundColor: "#f9f9f9",
-        //   borderLeft: "4px solid #4caf50",
-        marginTop:8,
-        }}
-      >
-        <CardContent sx={{ padding: 0 }}>
-          <Typography variant="body1" color="text.primary" fontWeight="bold">
-            {label}
-          </Typography>
-          <Typography variant="h6" color="text.secondary" mt={0.5}>
-            {value}
-          </Typography>
-        </CardContent>
-      </Card>
-    </Box>
-  </Box>
-);
 
-const Timeline = () => {
-  return (
-    <Box
-      sx={{
-        padding: 4,
-        maxWidth: "100%",
-       
-      }}
-    >
-      {data.map((item, index) => (
-        <TimelineItem
-          key={index}
-          date="Dec 19, 2024"
-          time="3:56 PM"
-          label={item.label}
-          value={item.value}
-          isLast={index === data.length - 1}
-        />
-      ))}
-    </Box>
-  );
-};
+    // const handleSnackbarClose = () => setSnackbar({ open: false, message: "" });
+    // const handleGoBack = () => {
+    //     navigate(-1);
+    // };
 
-export default Timeline;
+    useEffect(() => {
+        const fetchUserProfile = async () => {
+            const accessToken = localStorage.getItem("accessToken");
+            const url = `/Customers/${id}?access_token=${accessToken}`;
+
+            try {
+                const response = await api.get(url);
+                const data = response.data;
+                setUserData(data);
+
+                if (data.image && data.image !== '') {
+                    setUserData((prevData) => ({
+                        ...prevData,
+                        profilePicUrl: `${api.defaults.baseURL}/Uploads/profile-pic/download/${data.image}?accessToken=${accessToken}`
+                    }));
+                } else {
+                    setUserData((prevData) => ({
+                        ...prevData,
+                        profilePicUrl: "assets/img/userProfile.png"
+                    }));
+                }
+            } catch (error) {
+                if (error.response?.status === 401) {
+                    // setSnackbar({ open: true, message: "Login expired, please login again." });
+                    localStorage.clear();
+                    navigate("/login");
+                } else {
+                    console.error("Error fetching user profile", error);
+                }
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchUserProfile();
+    }, [id, navigate]);
+
+    return (
+
+        <Box sx={{ flexGrow: 1 }}>
+            <Grid container spacing={2}>
+                {/* Left Side - Profile Card */}
+                <Grid item xs={12} md={4}>
+                    <Card>
+
+                        <CardContent sx={{ textAlign: "center", p: 2 }}>
+                            <Grid container alignItems="center" justifyContent="space-between" spacing={2}>
+                                {/* Title on the left */}
+                                <Grid item>
+                                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                                        WeightWonder™Plus +1
+                                    </Typography>
+                                </Grid>
+
+                                {/* Icon on the right */}
+                                <Grid item>
+
+                                    <Switch checked={userData.status === 'active'} color="success" />{userData.status}
+                                </Grid>
+                            </Grid>
+                            <Avatar
+                                sx={{ width: 100, height: 100, mx: "auto", bgcolor: deepPurple[500], mb: 2 }}
+                                src={userData.profilePicUrl}
+                            >
+                                {userData.name && userData.name.charAt(0)}
+                            </Avatar>
+                            <Typography variant="h6">{userData.name}</Typography>
+                            <Typography variant="body2" color="textSecondary">
+                                {userData.mobile}
+                            </Typography>
+                            <Typography variant="body2" color="textSecondary">
+                                {userData.email}
+                            </Typography>
+                            <Divider sx={{ my: 2 }} />
+                            <Grid container alignItems="center" justifyContent="space-between" spacing={2}>
+                                {/* Title on the left */}
+                                <Grid item>
+                                    <Typography variant="h5" sx={{ fontWeight: 600 }}>
+                                        Basic Detail
+                                    </Typography>
+                                </Grid>
+
+                                {/* Icon on the right */}
+                                <Grid item>
+                                    <EditIcon />
+                                </Grid>
+                            </Grid>
+                            <Table>
+                                <TableBody>
+                                    <TableRow>
+                                        <TableCell sx={{ pb: 1, border: "none", color: "gray" }}>
+                                            DOB
+                                        </TableCell>
+                                        <TableCell sx={{ pb: 1, border: "none" }}>
+                                            {new Date(userData.dateOfBirth).toLocaleDateString()}
+                                        </TableCell>
+                                    </TableRow>
+                                    <TableRow>
+                                        <TableCell sx={{ pb: 1, border: "none", color: "gray" }}>
+                                            Gender
+                                        </TableCell>
+                                        <TableCell sx={{ pb: 1, border: "none" }}>{userData.gender}</TableCell>
+                                    </TableRow>
+                                    <TableRow>
+                                        <TableCell sx={{ pb: 1, border: "none", color: "gray" }}>
+                                            Alternative Contact No.
+                                        </TableCell>
+                                        <TableCell sx={{ pb: 1, border: "none" }}>{userData.gender}</TableCell>
+                                    </TableRow>
+                                    <TableRow>
+                                        <TableCell sx={{ pb: 1, border: "none", color: "gray" }}>
+                                            Height (in cms)
+                                        </TableCell>
+                                        <TableCell sx={{ pb: 1, border: "none" }}>{userData.height} Cms</TableCell>
+                                    </TableRow>
+                                    <TableRow>
+                                        <TableCell sx={{ pb: 1, border: "none", color: "gray" }}>
+                                            Address
+                                        </TableCell>
+                                        <TableCell sx={{ pb: 1, border: "none" }}>{userData.address}</TableCell>
+                                    </TableRow>
+                                    <TableRow>
+                                        <TableCell sx={{ pb: 1, border: "none", color: "gray" }}>
+                                            Occupation
+                                        </TableCell>
+                                        <TableCell sx={{ pb: 1, border: "none" }}>{userData.occupation}</TableCell>
+                                    </TableRow>
+                                    <TableRow>
+                                        <TableCell sx={{ pb: 1, border: "none", color: "gray" }}>
+                                            Organization
+                                        </TableCell>
+                                        <TableCell sx={{ pb: 1, border: "none" }}>{userData.organization}</TableCell>
+                                    </TableRow>
+                                    <TableRow>
+                                        <TableCell sx={{ pb: 1, border: "none", color: "gray" }}>
+                                            Clinical Issues
+                                        </TableCell>
+                                        <TableCell sx={{ pb: 1, border: "none" }}>
+                                            {userData.clinicalIssues || "No clinical issue"}
+                                        </TableCell>
+                                    </TableRow>
+                                    <TableRow>
+                                        <TableCell sx={{ pb: 1, border: "none", color: "gray" }}>
+                                            Wake up time
+                                        </TableCell>
+                                        <TableCell sx={{ pb: 1, border: "none" }}>{userData.wakeUp}</TableCell>
+                                    </TableRow>
+                                </TableBody>
+                            </Table>
+                        </CardContent>
+                    </Card>
+                </Grid>
+                <Grid item xs={12} md={8}>
+                    <Grid container spacing={2}>
+                        {/* Weight Progress */}
+                        <Grid item xs={12} md={6}>
+                            <WeightProgress />
+                        </Grid>
+
+                        {/* Support */}
+                        <Grid item xs={12} md={6}>
+                            <UserSupportTopics />
+                        </Grid>
+
+
+                        {/* New Section - Image Gallery */}
+                        <Grid item xs={12}>
+                            <UserImageLibrary />
+                        </Grid>
+                    </Grid>
+                </Grid>
+            </Grid>
+            {/* <Snackbar
+                open={snackbar.open}
+                autoHideDuration={3000}
+                onClose={handleSnackbarClose}
+                message={snackbar.message}
+            /> */}
+        </Box>
+
+
+    )
+}
+
+export default GenrelInfo;
