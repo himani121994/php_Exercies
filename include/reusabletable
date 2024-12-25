@@ -1,537 +1,1296 @@
-// import React, { useEffect, useState } from "react";
+// import React, { useState, useEffect } from 'react';
+// import { Line } from 'react-chartjs-2';
+// import { CircularProgress, Typography, Box } from '@mui/material';
+// import { get } from '../../../services/api-services';
+// import { useParams } from 'react-router-dom';
+
 // import {
-//     Box,
-//     Button,
-//     CircularProgress,
-//     Snackbar,
-//     Typography,
-//     Container,
-//     Card,
-//     CardContent,
-//     Grid,
-//     Avatar,
-//     Divider,
-//     Table,
-//     TableBody,
-//     TableRow,
-//     TableCell,
-//     IconButton,
-//     Grid2
-// } from "@mui/material";
-// import { useNavigate, useParams } from "react-router-dom";
-// import { api } from "../../Db.connection";
-// import { deepPurple } from "@mui/material/colors";
-// import EditIcon from '@mui/icons-material/Edit';
-// import Switch from '@mui/material/Switch';
-// import WeightProgress from "../../component/Case-Detail/Weight";
-// import UserSupportTopics from "../../component/Case-Detail/Support";
-// import UserImageLibrary from "../../component/Case-Detail/Gallery";
+//     Chart as ChartJS,
+//     CategoryScale,
+//     LinearScale,
+//     PointElement,
+//     LineElement,
+//     Title,
+//     Tooltip,
+//     Legend,
+//     TimeScale,
+// } from 'chart.js';
+// import 'chartjs-adapter-date-fns';
 
+// // Register Chart.js modules
+// ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, TimeScale);
 
-// const GenrelInfo = () => {
-//     const [userData, setUserData] = useState({});
-//     const [loading, setLoading] = useState(true);
-//     // const [snackbar, setSnackbar] = useState({ open: false, message: "" });
-//     const navigate = useNavigate();
+// const NeckSizeGraph = ({ type }) => {
 //     const { id } = useParams();
-
-
-//     // const handleSnackbarClose = () => setSnackbar({ open: false, message: "" });
-//     // const handleGoBack = () => {
-//     //     navigate(-1);
-//     // };
+//     const [labels, setLabels] = useState([]);
+//     const [data, setData] = useState([]);
+//     const [loading, setLoading] = useState(true);
 
 //     useEffect(() => {
-//         const fetchUserProfile = async () => {
-//             const accessToken = localStorage.getItem("accessToken");
-//             const url = `/Customers/${id}?access_token=${accessToken}`;
-
+//         const fetchData = async () => {
+//             const url = `/Measurements?filter={"where":{"customerId":"${id}","type":"${type}"},"order":"recordedAt DESC","limit":30}`;
 //             try {
-//                 const response = await api.get(url);
-//                 const data = response.data;
-//                 setUserData(data);
-
-//                 if (data.image && data.image !== '') {
-//                     setUserData((prevData) => ({
-//                         ...prevData,
-//                         profilePicUrl: `${api.defaults.baseURL}/Uploads/profile-pic/download/${data.image}?accessToken=${accessToken}`
-//                     }));
-//                 } else {
-//                     setUserData((prevData) => ({
-//                         ...prevData,
-//                         profilePicUrl: "assets/img/userProfile.png"
-//                     }));
+//                 const response = await get(url);
+//                 if (response && response.data) {
+//                     const labelData = response.data.map((item) => {
+//                         const date = new Date(item.recordedAt);
+//                         console.log(date);  // Check if dates are being parsed correctly
+//                         return date;
+//                     });
+//                     const valueData = response.data.map((item) => parseFloat(item.value));
+//                     setLabels(labelData);
+//                     setData(valueData);
 //                 }
 //             } catch (error) {
-//                 if (error.response?.status === 401) {
-//                     // setSnackbar({ open: true, message: "Login expired, please login again." });
-//                     localStorage.clear();
-//                     navigate("/login");
-//                 } else {
-//                     console.error("Error fetching user profile", error);
-//                 }
+//                 console.error('Error fetching graph data:', error);
 //             } finally {
 //                 setLoading(false);
 //             }
 //         };
 
-//         fetchUserProfile();
-//     }, [id, navigate]);
+//         fetchData();
+//     }, [id, type]);
+
+//     if (loading) {
+//         return (
+//             <Box textAlign="center" py={2}>
+//                 <CircularProgress />
+//                 <Typography variant="body2" mt={1}>
+//                     Loading Graph...
+//                 </Typography>
+//             </Box>
+//         );
+//     }
+
+//     const chartData = {
+//         labels,
+//         datasets: [
+//             {
+//                 label: `${type} Measurements`,
+//                 data,
+//                 fill: true,
+//                 borderColor: 'rgba(75, 192, 192, 1)',
+//                 backgroundColor: 'rgba(75, 192, 192, 0.2)', // Adds a light fill color
+//                 pointBackgroundColor: 'rgba(75, 192, 192, 1)', // Point color
+//                 tension: 0.4, // Smoother line
+//             },
+//         ],
+//     };
+
+//     const chartOptions = {
+//         responsive: true,
+//         plugins: {
+//             legend: {
+//                 display: true,
+//                 position: 'top', // Display legend at the top
+//             },
+//             title: {
+//                 display: true,
+//                 text: `${type} Measurements Over Time`,
+//             },
+//         },
+//         scales: {
+//             x: {
+//                 type: 'time',
+//                 time: {
+//                     unit: 'day',
+//                     displayFormats: {
+//                         day: 'MMM d', // Example: "Oct 5"
+//                     },
+//                 },
+//                 title: {
+//                     display: true,
+//                     text: 'Date',
+//                 },
+//             },
+//             y: {
+//                 beginAtZero: true,
+//                 title: {
+//                     display: true,
+//                     text: `${type}`,
+//                 },
+//             },
+//         },
+//     };
 
 //     return (
-
-//         <Box sx={{ flexGrow: 1 }}>
-//             <Grid container spacing={2}>
-//                 {/* Left Side - Profile Card */}
-//                 <Grid item xs={12} sm={4} md={4}>
-//                     <Card>
-
-//                         <CardContent sx={{ textAlign: "center", p: 2 }}>
-//                             <Grid container alignItems="center" justifyContent="space-between" spacing={2}>
-//                                 {/* Title on the left */}
-//                                 <Grid item>
-//                                     <Typography variant="h5" sx={{ fontWeight: 600 }}>
-//                                         WeightWonder™Plus +1
-//                                     </Typography>
-//                                 </Grid>
-
-//                                 {/* Icon on the right */}
-//                                 <Grid item>
-
-//                                     <Switch checked={userData.status === 'active'} color="success" />{userData.status}
-//                                 </Grid>
-//                             </Grid>
-//                             <Avatar
-//                                 sx={{ width: 100, height: 100, mx: "auto", bgcolor: deepPurple[500], mb: 2 }}
-//                                 src={userData.profilePicUrl}
-//                             >
-//                                 {userData.name && userData.name.charAt(0)}
-//                             </Avatar>
-//                             <Typography variant="h6">{userData.name}</Typography>
-//                             <Typography variant="body2" color="textSecondary">
-//                                 {userData.mobile}
-//                             </Typography>
-//                             <Typography variant="body2" color="textSecondary">
-//                                 {userData.email}
-//                             </Typography>
-//                             <Divider sx={{ my: 2 }} />
-//                             <Grid container alignItems="center" justifyContent="space-between" spacing={2}>
-//                                 {/* Title on the left */}
-//                                 <Grid item>
-//                                     <Typography variant="h5" sx={{ fontWeight: 600 }}>
-//                                         Basic Detail
-//                                     </Typography>
-//                                 </Grid>
-
-//                                 {/* Icon on the right */}
-//                                 <Grid item>
-//                                     <EditIcon />
-//                                 </Grid>
-//                             </Grid>
-//                             <Table>
-//                                 <TableBody>
-//                                     <TableRow>
-//                                         <TableCell sx={{ pb: 1, border: "none", color: "gray" }}>
-//                                             DOB
-//                                         </TableCell>
-//                                         <TableCell sx={{ pb: 1, border: "none" }}>
-//                                             {new Date(userData.dateOfBirth).toLocaleDateString()}
-//                                         </TableCell>
-//                                     </TableRow>
-//                                     <TableRow>
-//                                         <TableCell sx={{ pb: 1, border: "none", color: "gray" }}>
-//                                             Gender
-//                                         </TableCell>
-//                                         <TableCell sx={{ pb: 1, border: "none" }}>{userData.gender}</TableCell>
-//                                     </TableRow>
-//                                     <TableRow>
-//                                         <TableCell sx={{ pb: 1, border: "none", color: "gray" }}>
-//                                             Alternative Contact No.
-//                                         </TableCell>
-//                                         <TableCell sx={{ pb: 1, border: "none" }}>{userData.gender}</TableCell>
-//                                     </TableRow>
-//                                     <TableRow>
-//                                         <TableCell sx={{ pb: 1, border: "none", color: "gray" }}>
-//                                             Height (in cms)
-//                                         </TableCell>
-//                                         <TableCell sx={{ pb: 1, border: "none" }}>{userData.height} Cms</TableCell>
-//                                     </TableRow>
-//                                     <TableRow>
-//                                         <TableCell sx={{ pb: 1, border: "none", color: "gray" }}>
-//                                             Address
-//                                         </TableCell>
-//                                         <TableCell sx={{ pb: 1, border: "none" }}>{userData.address}</TableCell>
-//                                     </TableRow>
-//                                     <TableRow>
-//                                         <TableCell sx={{ pb: 1, border: "none", color: "gray" }}>
-//                                             Occupation
-//                                         </TableCell>
-//                                         <TableCell sx={{ pb: 1, border: "none" }}>{userData.occupation}</TableCell>
-//                                     </TableRow>
-//                                     <TableRow>
-//                                         <TableCell sx={{ pb: 1, border: "none", color: "gray" }}>
-//                                             Organization
-//                                         </TableCell>
-//                                         <TableCell sx={{ pb: 1, border: "none" }}>{userData.organization}</TableCell>
-//                                     </TableRow>
-//                                     <TableRow>
-//                                         <TableCell sx={{ pb: 1, border: "none", color: "gray" }}>
-//                                             Clinical Issues
-//                                         </TableCell>
-//                                         <TableCell sx={{ pb: 1, border: "none" }}>
-//                                             {userData.clinicalIssues || "No clinical issue"}
-//                                         </TableCell>
-//                                     </TableRow>
-//                                     <TableRow>
-//                                         <TableCell sx={{ pb: 1, border: "none", color: "gray" }}>
-//                                             Wake up time
-//                                         </TableCell>
-//                                         <TableCell sx={{ pb: 1, border: "none" }}>{userData.wakeUp}</TableCell>
-//                                     </TableRow>
-//                                 </TableBody>
-//                             </Table>
-//                         </CardContent>
-//                     </Card>
-//                 </Grid>
-
-//                 {/* Center - Weight Progress */}
-//                 <Grid item xs={12} sm={4} md={4}>
-//                     <WeightProgress />
-//                 </Grid>
-
-//                 {/* Right Side - Support and Info */}
-//                 <Grid item xs={12} sm={4} md={4}>
-//                     <UserSupportTopics />
-//                 </Grid>
-//                 {/* New Section - Image Gallery */}
-//                 <Grid item xs={12} sm={8} md={8} sx={{ marginLeft: "auto" }}>
-//                     <Typography variant="h6" sx={{ mb: 2 }}>
-//                         Image Gallery
-//                     </Typography>
-//                     <UserImageLibrary />
-//                 </Grid>
-
-//             </Grid>
-//             {/* <Snackbar
-//                 open={snackbar.open}
-//                 autoHideDuration={3000}
-//                 onClose={handleSnackbarClose}
-//                 message={snackbar.message}
-//             /> */}
+//         <Box width="100%" mx="auto" maxWidth="600px" mt={3}>
+//             <Line data={chartData} options={chartOptions} />
 //         </Box>
-
-
-//     )
-// }
-
-// export default GenrelInfo;
-// import React from "react";
-// import { Box, Card, CardContent, Typography, Button, Switch, Avatar, Grid, TextField } from "@mui/material";
-
-// const GenrelInfo = () => {
-//   return (
-//     <Box sx={{ padding: 2 }}>
-//       <Grid container spacing={2}>
-//         {/* Left Section */}
-//         <Grid item xs={12} md={3}>
-//           <Card sx={{ padding: 2 }}>
-//             <Typography variant="h6" color="green">
-//               WeightWonder™ Plus +1
-//             </Typography>
-//             <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 2 }}>
-//               <Switch defaultChecked={false} />
-//               <Typography>Inactive</Typography>
-//             </Box>
-//             <Avatar sx={{ width: 80, height: 80, margin: "20px auto" }} />
-//             <Typography align="center">+91</Typography>
-//             <Typography variant="h6" sx={{ marginTop: 2 }}>
-//               Basic Detail
-//             </Typography>
-//             <Button variant="contained" color="success" fullWidth sx={{ marginTop: 2 }}>
-//               Add Info
-//             </Button>
-//           </Card>
-//         </Grid>
-
-//         {/* Right Section */}
-//         <Grid item xs={12} md={9}>
-//           <Grid container spacing={2}>
-//             {/* Weight Progress */}
-//             <Grid item xs={12} md={6}>
-//               <Card sx={{ height: "100%" }}>
-//                 <CardContent>
-//                   <Typography variant="h6">Weight Progress</Typography>
-//                   <Typography sx={{ marginTop: 2 }}>
-//                     Please update profile to view progress.........
-//                   </Typography>
-//                 </CardContent>
-//               </Card>
-//             </Grid>
-
-//             {/* Support */}
-//             <Grid item xs={12} md={6}>
-//               <Card sx={{ height: "100%" }}>
-//                 <CardContent>
-//                   <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-//                     <Typography variant="h6">Support</Typography>
-//                     <Button variant="outlined">NEW MESSAGE +</Button>
-//                   </Box>
-//                   <Typography sx={{ marginTop: 2 }}>No conversation Yet</Typography>
-//                 </CardContent>
-//               </Card>
-//             </Grid>
-
-//             {/* Pictures */}
-//             <Grid item xs={12}>
-//               <Card>
-//                 <CardContent>
-//                   <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-//                     <Typography variant="h6">Pictures</Typography>
-//                     <TextField
-//                       type="date"
-//                       size="small"
-//                       InputLabelProps={{ shrink: true }}
-//                       sx={{ maxWidth: 200 }}
-//                     />
-//                   </Box>
-//                 </CardContent>
-//               </Card>
-//             </Grid>
-//           </Grid>
-//         </Grid>
-//       </Grid>
-//     </Box>
-//   );
+//     );
 // };
 
-// export default GenrelInfo;
+// export default NeckSizeGraph;
 
-import React, { useEffect, useState } from "react";
+
+import React, { useState, useEffect } from 'react';
+import { Line } from 'react-chartjs-2';
+import { CircularProgress, Typography, Box } from '@mui/material';
+import { get } from '../../../services/api-services';
+import { useParams } from 'react-router-dom';
+
 import {
-    Box,
-    Button,
-    CircularProgress,
-    Snackbar,
-    Typography,
-    Container,
-    Card,
-    CardContent,
-    Grid,
-    Avatar,
-    Divider,
-    Table,
-    TableBody,
-    TableRow,
-    TableCell,
-    IconButton,
-    Grid2, TextField
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend,
+    TimeScale,
+} from 'chart.js';
+import 'chartjs-adapter-date-fns';
 
-} from "@mui/material";
-import { useNavigate, useParams } from "react-router-dom";
-import { api } from "../../Db.connection";
-import { deepPurple } from "@mui/material/colors";
-import EditIcon from '@mui/icons-material/Edit';
-import Switch from '@mui/material/Switch';
-import WeightProgress from "../../component/Case-Detail/Weight";
-import UserSupportTopics from "../../component/Case-Detail/Support";
-import UserImageLibrary from "../../component/Case-Detail/Gallery";
+// Register Chart.js modules
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, TimeScale);
 
-
-const GenrelInfo = () => {
-    const [userData, setUserData] = useState({});
-    const [loading, setLoading] = useState(true);
-    // const [snackbar, setSnackbar] = useState({ open: false, message: "" });
-    const navigate = useNavigate();
+const NeckSizeGraph = ({ type }) => {
     const { id } = useParams();
-
-
-    // const handleSnackbarClose = () => setSnackbar({ open: false, message: "" });
-    // const handleGoBack = () => {
-    //     navigate(-1);
-    // };
+    const [labels, setLabels] = useState([]);
+    const [data, setData] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const fetchUserProfile = async () => {
-            const accessToken = localStorage.getItem("accessToken");
-            const url = `/Customers/${id}?access_token=${accessToken}`;
-
+        const fetchData = async () => {
+            const url = `/Measurements?filter={"where":{"customerId":"${id}","type":"${type}"},"order":"recordedAt DESC","limit":30}`;
             try {
-                const response = await api.get(url);
-                const data = response.data;
-                setUserData(data);
-
-                if (data.image && data.image !== '') {
-                    setUserData((prevData) => ({
-                        ...prevData,
-                        profilePicUrl: `${api.defaults.baseURL}/Uploads/profile-pic/download/${data.image}?accessToken=${accessToken}`
-                    }));
-                } else {
-                    setUserData((prevData) => ({
-                        ...prevData,
-                        profilePicUrl: "assets/img/userProfile.png"
-                    }));
+                const response = await get(url);
+                if (response && response.data) {
+                    const labelData = response.data.map((item) => {
+                        const date = new Date(item.recordedAt);
+                        console.log(date);  // Check if dates are being parsed correctly
+                        return date;
+                    });
+                    const valueData = response.data.map((item) => parseFloat(item.value));
+                    console.log('Labels:', labelData);  // Ensure all dates are parsed
+                    console.log('Values:', valueData);  // Ensure all values are parsed
+                    setLabels(labelData);
+                    setData(valueData);
                 }
             } catch (error) {
-                if (error.response?.status === 401) {
-                    // setSnackbar({ open: true, message: "Login expired, please login again." });
-                    localStorage.clear();
-                    navigate("/login");
-                } else {
-                    console.error("Error fetching user profile", error);
-                }
+                console.error('Error fetching graph data:', error);
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchUserProfile();
-    }, [id, navigate]);
+        fetchData();
+    }, [id, type]);
+
+    if (loading) {
+        return (
+            <Box textAlign="center" py={2}>
+                <CircularProgress />
+                <Typography variant="body2" mt={1}>
+                    Loading Graph...
+                </Typography>
+            </Box>
+        );
+    }
+
+    // Ensure min and max values for the time scale
+    const chartOptions = {
+        responsive: true,
+        plugins: {
+            legend: {
+                display: true,
+                position: 'top', // Display legend at the top
+            },
+            title: {
+                display: true,
+                text: `${type} Measurements Over Time`,
+            },
+        },
+        scales: {
+            x: {
+                type: 'time',
+                time: {
+                    unit: 'day',
+                    displayFormats: {
+                        day: 'MMM d', // Example: "Oct 5"
+                    },
+                },
+                title: {
+                    display: true,
+                    text: 'Date',
+                },
+                min: Math.min(...labels),  // Set min date
+                max: Math.max(...labels),  // Set max date
+            },
+            y: {
+                beginAtZero: true,
+                title: {
+                    display: true,
+                    text: `${type}`,
+                },
+            },
+        },
+    };
+
+    const chartData = {
+        labels,
+        datasets: [
+            {
+                label: `${type} Measurements`,
+                data,
+                fill: true,
+                borderColor: 'rgba(75, 192, 192, 1)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)', // Adds a light fill color
+                pointBackgroundColor: 'rgba(75, 192, 192, 1)', // Point color
+                tension: 0.4, // Smoother line
+            },
+        ],
+    };
 
     return (
-
-        <Box sx={{ flexGrow: 1 }}>
-            <Grid container spacing={2}>
-                {/* Left Side - Profile Card */}
-                <Grid item xs={12} md={4}>
-                    <Card>
-
-                        <CardContent sx={{ textAlign: "center", p: 2 }}>
-                            <Grid container alignItems="center" justifyContent="space-between" spacing={2}>
-                                {/* Title on the left */}
-                                <Grid item>
-                                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                                        WeightWonder™Plus +1
-                                    </Typography>
-                                </Grid>
-
-                                {/* Icon on the right */}
-                                <Grid item>
-
-                                    <Switch checked={userData.status === 'active'} color="success" />{userData.status}
-                                </Grid>
-                            </Grid>
-                            <Avatar
-                                sx={{ width: 100, height: 100, mx: "auto", bgcolor: deepPurple[500], mb: 2 }}
-                                src={userData.profilePicUrl}
-                            >
-                                {userData.name && userData.name.charAt(0)}
-                            </Avatar>
-                            <Typography variant="h6">{userData.name}</Typography>
-                            <Typography variant="body2" color="textSecondary">
-                                {userData.mobile}
-                            </Typography>
-                            <Typography variant="body2" color="textSecondary">
-                                {userData.email}
-                            </Typography>
-                            <Divider sx={{ my: 2 }} />
-                            <Grid container alignItems="center" justifyContent="space-between" spacing={2}>
-                                {/* Title on the left */}
-                                <Grid item>
-                                    <Typography variant="h5" sx={{ fontWeight: 600 }}>
-                                        Basic Detail
-                                    </Typography>
-                                </Grid>
-
-                                {/* Icon on the right */}
-                                <Grid item>
-                                    <EditIcon />
-                                </Grid>
-                            </Grid>
-                            <Table>
-                                <TableBody>
-                                    <TableRow>
-                                        <TableCell sx={{ pb: 1, border: "none", color: "gray" }}>
-                                            DOB
-                                        </TableCell>
-                                        <TableCell sx={{ pb: 1, border: "none" }}>
-                                            {new Date(userData.dateOfBirth).toLocaleDateString()}
-                                        </TableCell>
-                                    </TableRow>
-                                    <TableRow>
-                                        <TableCell sx={{ pb: 1, border: "none", color: "gray" }}>
-                                            Gender
-                                        </TableCell>
-                                        <TableCell sx={{ pb: 1, border: "none" }}>{userData.gender}</TableCell>
-                                    </TableRow>
-                                    <TableRow>
-                                        <TableCell sx={{ pb: 1, border: "none", color: "gray" }}>
-                                            Alternative Contact No.
-                                        </TableCell>
-                                        <TableCell sx={{ pb: 1, border: "none" }}>{userData.gender}</TableCell>
-                                    </TableRow>
-                                    <TableRow>
-                                        <TableCell sx={{ pb: 1, border: "none", color: "gray" }}>
-                                            Height (in cms)
-                                        </TableCell>
-                                        <TableCell sx={{ pb: 1, border: "none" }}>{userData.height} Cms</TableCell>
-                                    </TableRow>
-                                    <TableRow>
-                                        <TableCell sx={{ pb: 1, border: "none", color: "gray" }}>
-                                            Address
-                                        </TableCell>
-                                        <TableCell sx={{ pb: 1, border: "none" }}>{userData.address}</TableCell>
-                                    </TableRow>
-                                    <TableRow>
-                                        <TableCell sx={{ pb: 1, border: "none", color: "gray" }}>
-                                            Occupation
-                                        </TableCell>
-                                        <TableCell sx={{ pb: 1, border: "none" }}>{userData.occupation}</TableCell>
-                                    </TableRow>
-                                    <TableRow>
-                                        <TableCell sx={{ pb: 1, border: "none", color: "gray" }}>
-                                            Organization
-                                        </TableCell>
-                                        <TableCell sx={{ pb: 1, border: "none" }}>{userData.organization}</TableCell>
-                                    </TableRow>
-                                    <TableRow>
-                                        <TableCell sx={{ pb: 1, border: "none", color: "gray" }}>
-                                            Clinical Issues
-                                        </TableCell>
-                                        <TableCell sx={{ pb: 1, border: "none" }}>
-                                            {userData.clinicalIssues || "No clinical issue"}
-                                        </TableCell>
-                                    </TableRow>
-                                    <TableRow>
-                                        <TableCell sx={{ pb: 1, border: "none", color: "gray" }}>
-                                            Wake up time
-                                        </TableCell>
-                                        <TableCell sx={{ pb: 1, border: "none" }}>{userData.wakeUp}</TableCell>
-                                    </TableRow>
-                                </TableBody>
-                            </Table>
-                        </CardContent>
-                    </Card>
-                </Grid>
-                <Grid item xs={12} md={8}>
-                    <Grid container spacing={2}>
-                        {/* Weight Progress */}
-                        <Grid item xs={12} md={6}>
-                            <WeightProgress />
-                        </Grid>
-
-                        {/* Support */}
-                        <Grid item xs={12} md={6}>
-                            <UserSupportTopics />
-                        </Grid>
-
-
-                        {/* New Section - Image Gallery */}
-                        <Grid item xs={12}>
-                            <UserImageLibrary />
-                        </Grid>
-                    </Grid>
-                </Grid>
-            </Grid>
-            {/* <Snackbar
-                open={snackbar.open}
-                autoHideDuration={3000}
-                onClose={handleSnackbarClose}
-                message={snackbar.message}
-            /> */}
+        <Box width="100%" mx="auto" maxWidth="600px" mt={3}>
+            <Line data={chartData} options={chartOptions} />
         </Box>
+    );
+};
+
+export default NeckSizeGraph;
 
 
-    )
+
+
+// import React, { useState, useEffect } from 'react';
+// import Button from '@mui/material/Button';
+// import Dialog from '@mui/material/Dialog';
+// import DialogActions from '@mui/material/DialogActions';
+// import DialogContent from '@mui/material/DialogContent';
+// import DialogTitle from '@mui/material/DialogTitle';
+// import CircularProgress from '@mui/material/CircularProgress';
+// import { useParams } from 'react-router-dom';
+// import { get } from '../../../services/api-services';
+// import DateShow from '../../date-filed/DateShow';
+// import EditIcon from '@mui/icons-material/Edit';
+// import DeleteIcon from '@mui/icons-material/Delete';
+// import { Box, Typography, IconButton, TextField } from '@mui/material';
+// import NeckSizeGraph from './Ghraph';
+
+// export default function AddMeasurementDialog({ open, onClose, type }) {
+//     const { id } = useParams();
+//     const [measurements, setMeasurements] = useState([]);
+//     const [loading, setLoading] = useState(true);
+//     const [editingId, setEditingId] = useState(null);
+//     const [editableFields, setEditableFields] = useState({});
+
+//     const fetchData = async () => {
+//         const url = `/Measurements?filter={"where":{"customerId":"${id}","type":"${type}"},"order":"recordedAt DESC","limit":30}`;
+//         try {
+//             const response = await get(url);
+//             if (response && response.data) {
+//                 setMeasurements(response.data);
+//             }
+//         } catch (error) {
+//             console.error('Error fetching measurements:', error);
+//         } finally {
+//             setLoading(false);
+//         }
+//     };
+
+//     useEffect(() => {
+//         if (open) {
+//             fetchData();
+//         }
+//     }, [open, type]); // Re-fetch if type changes
+
+//     const handleEditClick = (measurement) => {
+//         setEditingId(measurement.id);
+//         setEditableFields({ value: measurement.value, unit: measurement.unit });
+//     };
+
+//     const handleSave = () => {
+//         // Add logic to save changes
+//         console.log('Updated Measurement:', editingId, editableFields);
+//         setEditingId(null);
+//     };
+
+//     const handleFieldChange = (field, value) => {
+//         setEditableFields((prev) => ({ ...prev, [field]: value }));
+//     };
+
+//     return (
+//         <Dialog fullWidth open={open} onClose={onClose} aria-labelledby="measurement-dialog-title">
+//             <DialogTitle id="measurement-dialog-title">Measurement: {type}</DialogTitle>
+//             <DialogContent>
+//                 <NeckSizeGraph type={type} />
+//                 {loading ? (
+//                     <Box textAlign="center" py={2}>
+//                         <CircularProgress />
+//                     </Box>
+//                 ) : measurements.length > 0 ? (
+//                     measurements.map((measurement) => (
+//                         <Box
+//                             key={measurement.id}
+//                             display="flex"
+//                             alignItems="center"
+//                             justifyContent="space-between"
+//                             py={1}
+//                             borderBottom="1px solid #f0f0f0"
+//                         >
+//                             <Typography variant="body2">
+//                                 <DateShow date={measurement.recordedAt} />
+//                             </Typography>
+//                             <Box display="flex" alignItems="center" gap={1}>
+//                                 {editingId === measurement.id ? (
+//                                     <>
+//                                         <TextField
+//                                             label="Value"
+//                                             size="small"
+//                                             variant="outlined"
+//                                             value={editableFields.value}
+//                                             onChange={(e) => handleFieldChange('value', e.target.value)}
+//                                         />
+//                                         <TextField
+//                                             label="Unit"
+//                                             size="small"
+//                                             variant="outlined"
+//                                             value={editableFields.unit}
+//                                             onChange={(e) => handleFieldChange('unit', e.target.value)}
+//                                         />
+//                                         <Button onClick={handleSave}>Save</Button>
+//                                     </>
+//                                 ) : (
+//                                     <>
+//                                         <Typography variant="body2">
+//                                             {measurement.value} {measurement.unit}
+//                                         </Typography>
+//                                         <IconButton onClick={() => handleEditClick(measurement)}>
+//                                             <EditIcon color="primary" />
+//                                         </IconButton>
+//                                     </>
+//                                 )}
+//                             </Box>
+//                         </Box>
+//                     ))
+//                 ) : (
+//                     <Typography>No measurements available.</Typography>
+//                 )}
+//             </DialogContent>
+//             <DialogActions>
+//                 <Button onClick={onClose}>Cancel</Button>
+//             </DialogActions>
+//         </Dialog>
+//     );
+// }
+
+
+import React, { useState, useEffect } from 'react';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import CircularProgress from '@mui/material/CircularProgress';
+import { useParams } from 'react-router-dom';
+import { get } from '../../../services/api-services';
+import DateShow from '../../date-filed/DateShow';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { Box, Typography, IconButton, TextField } from '@mui/material';
+import NeckSizeGraph from './Ghraph';
+
+export default function AddMeasurementDialog({ open, onClose, type }) {
+    const { id } = useParams();
+    const [measurements, setMeasurements] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [editingId, setEditingId] = useState(null);
+    const [editableFields, setEditableFields] = useState({});
+
+    const fetchData = async () => {
+        const url = `/Measurements?filter={"where":{"customerId":"${id}","type":"${type}"},"order":"recordedAt DESC","limit":30}`;
+        try {
+            const response = await get(url);
+            if (response && response.data) {
+                setMeasurements(response.data);
+            }
+        } catch (error) {
+            console.error('Error fetching measurements:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (open) {
+            fetchData();
+        }
+    }, [open, type]); // Re-fetch if type changes
+
+    const handleEditClick = (measurement) => {
+        setEditingId(measurement.id);
+        setEditableFields({ value: measurement.value, unit: measurement.unit });
+    };
+
+    const handleSave = () => {
+        // Add logic to save changes
+        console.log('Updated Measurement:', editingId, editableFields);
+        setEditingId(null);
+    };
+
+    const handleFieldChange = (field, value) => {
+        setEditableFields((prev) => ({ ...prev, [field]: value }));
+    };
+
+    return (
+        <Dialog fullWidth open={open} onClose={onClose} aria-labelledby="measurement-dialog-title">
+            <DialogTitle id="measurement-dialog-title">Measurement: {type}</DialogTitle>
+            <DialogContent>
+                <NeckSizeGraph type={type} />
+                {loading ? (
+                    <Box textAlign="center" py={2}>
+                        <CircularProgress />
+                    </Box>
+                ) : measurements.length > 0 ? (
+                    measurements.map((measurement) => (
+                        <Box
+                            key={measurement.id}
+                            display="flex"
+                            alignItems="center"
+                            justifyContent="space-between"
+                            py={1}
+                            borderBottom="1px solid #f0f0f0"
+                            flexDirection="column"
+                        >
+                            <Typography variant="body2">
+                                <DateShow date={measurement.recordedAt} />
+                            </Typography>
+                            <Box display="flex" alignItems="center" gap={1} width="100%">
+                                {editingId === measurement.id ? (
+                                    <>
+                                        <Box display="flex" flexDirection="column" gap={1} width="100%">
+                                            <TextField
+                                                label="Value"
+                                                size="small"
+                                                variant="outlined"
+                                                value={editableFields.value}
+                                                onChange={(e) => handleFieldChange('value', e.target.value)}
+                                            />
+                                            <TextField
+                                                label="Unit"
+                                                size="small"
+                                                variant="outlined"
+                                                value={editableFields.unit}
+                                                onChange={(e) => handleFieldChange('unit', e.target.value)}
+                                            />
+                                            <Button onClick={handleSave}>Save</Button>
+                                        </Box>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Typography variant="body2">
+                                            {measurement.value} {measurement.unit}
+                                        </Typography>
+                                        <IconButton onClick={() => handleEditClick(measurement)}>
+                                            <EditIcon color="primary" />
+                                        </IconButton>
+                                    </>
+                                )}
+                            </Box>
+                        </Box>
+                    ))
+                ) : (
+                    <Typography>No measurements available.</Typography>
+                )}
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={onClose}>Cancel</Button>
+            </DialogActions>
+        </Dialog>
+    );
 }
 
-export default GenrelInfo;
+
+
+// // import React from 'react';
+// // import { Button, Typography, Box, Divider, IconButton } from '@mui/material';
+// // import { Add as AddIcon } from '@mui/icons-material';
+// // import { Line } from 'react-chartjs-2';
+
+// // const MeasurementsCard = ({
+// //   userId,
+// //   loadWeight,
+// //   loadWaistSize,
+// //   loadChestSize,
+// //   loadHipsSize,
+// //   loadThighsSize,
+// //   loadArmsSize,
+// //   loadBodyFatSize,
+// //   loadMuscleFatSize,
+// //   currentWeight,
+// //   currentWaistSize,
+// //   currentChestSize,
+// //   currentHipsSize,
+// //   currentThighsSize,
+// //   currentArmsSize,
+// //   currentOverallBodyFat,
+// //   currentSkeletalMuscleFat,
+// //   weightChartData,
+// //   waistChartData,
+// //   chestChartData,
+// //   hipsChartData,
+// //   thighsChartData,
+// //   armsChartData,
+// //   bodyFatChartData,
+// //   muscleFatChartData,
+// //   weightChartLabels,
+// //   waistChartLabels,
+// //   chestChartLabels,
+// //   hipsChartLabels,
+// //   thighsChartLabels,
+// //   armsChartLabels,
+// //   bodyFatChartLabels,
+// //   muscleFatChartLabels,
+// //   weightChartOptions,
+// //   waistChartOptions,
+// //   chestChartOptions,
+// //   hipsChartOptions,
+// //   thighsChartOptions,
+// //   armsChartOptions,
+// //   bodyFatChartOptions,
+// //   muscleFatChartOptions,
+// //   weightChartColors,
+// //   waistChartColors,
+// //   chestChartColors,
+// //   hipsChartColors,
+// //   thighsChartColors,
+// //   armsChartColors,
+// //   bodyFatChartColors,
+// //   muscleFatChartColors,
+// // }) => {
+// //   const renderSection = (title, currentValue, chartData, chartLabels, chartOptions, chartColors, chartType, chartHeight, onClickHandler) => (
+// //     <Box display="flex" flexDirection="row" alignItems="center" sx={{ marginLeft: 2 }}>
+// //       <Box flex="1">
+// //         <Typography variant="h6" sx={{ fontWeight: 300, cursor: 'pointer', fontSize: '18px' }} onClick={onClickHandler}>
+// //           {title}
+// //         </Typography>
+// //       </Box>
+// //       <Box flex="1">
+// //         <Line data={{ labels: chartLabels, datasets: chartData }} options={chartOptions} height={chartHeight} />
+// //       </Box>
+// //       <Box flex="1" display="flex" justifyContent="flex-end" alignItems="center">
+// //         <Typography variant="h5" sx={{ fontWeight: 300, fontSize: '24px' }}>
+// //           {currentValue}
+// //           {currentValue && <span style={{ fontSize: '14px', color: '#757575' }}>kg</span>}
+// //         </Typography>
+// //         <IconButton onClick={onClickHandler}>
+// //           <AddIcon sx={{ color: 'primary.main' }} />
+// //         </IconButton>
+// //       </Box>
+// //     </Box>
+// //   );
+
+// //   return (
+// //     <Box sx={{ background: '#ffffff', boxShadow: 1, borderRadius: 1, p: 2 }}>
+// //       <Typography variant="h6" sx={{ fontWeight: 500, fontSize: '18px', marginBottom: 2 }}>
+// //         Measurements
+// //       </Typography>
+// //       <Divider />
+// //       {loadWeight && renderSection('Weight', currentWeight, weightChartData, weightChartLabels, weightChartOptions, weightChartColors, 'line', 60, () => addWeightRecordDialog(userId))}
+// //       <Divider />
+// //       {loadWaistSize && renderSection('Waist Size', currentWaistSize, waistChartData, waistChartLabels, waistChartOptions, waistChartColors, 'line', 60, () => addWaistSizeRecordDialog(userId))}
+// //       <Divider />
+// //       {loadChestSize && renderSection('Chest Size', currentChestSize, chestChartData, chestChartLabels, chestChartOptions, chestChartColors, 'line', 60, () => addChestSizeRecordDialog(userId))}
+// //       <Divider />
+// //       {loadHipsSize && renderSection('Hips Size', currentHipsSize, hipsChartData, hipsChartLabels, hipsChartOptions, hipsChartColors, 'line', 60, () => addHipsSizeRecordDialog(userId))}
+// //       <Divider />
+// //       {loadThighsSize && renderSection('Thighs Size', currentThighsSize, thighsChartData, thighsChartLabels, thighsChartOptions, thighsChartColors, 'line', 60, () => addThighsSizeRecordDialog(userId))}
+// //       <Divider />
+// //       {loadArmsSize && renderSection('Arms Size', currentArmsSize, armsChartData, armsChartLabels, armsChartOptions, armsChartColors, 'line', 60, () => addArmsSizeRecordDialog(userId))}
+// //       <Divider />
+// //       {loadBodyFatSize && renderSection('Overall Body Fat', currentOverallBodyFat, bodyFatChartData, bodyFatChartLabels, bodyFatChartOptions, bodyFatChartColors, 'line', 60, () => addOverAllBodyFatRecordDialog(userId))}
+// //       <Divider />
+// //       {loadMuscleFatSize && renderSection('Skeletal Muscle', currentSkeletalMuscleFat, muscleFatChartData, muscleFatChartLabels, muscleFatChartOptions, muscleFatChartColors, 'line', 60, () => addSkeletalMuscleFatRecordDialog(userId))}
+// //     </Box>
+// //   );
+// // };
+
+// // export default MeasurementsCard;
+
+// // import React from 'react';
+// // import { Button, Typography, Box, Divider, IconButton } from '@mui/material';
+// // import { Add as AddIcon } from '@mui/icons-material';
+// // import { Chart as ChartJS, LineElement, CategoryScale, LinearScale, PointElement, Tooltip, Legend } from 'chart.js';
+// // import { Line } from 'react-chartjs-2';
+
+// // // Register required Chart.js components
+// // ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, Tooltip, Legend);
+
+// // const Measurement = () => {
+// //     // Dummy data for each metric
+// //     const userId = 1;
+// //     const loadWeight = true;
+// //     const loadWaistSize = true;
+// //     const loadChestSize = true;
+// //     const loadHipsSize = true;
+// //     const loadThighsSize = true;
+// //     const loadArmsSize = true;
+// //     const loadBodyFatSize = true;
+// //     const loadMuscleFatSize = true;
+
+// //     const currentWeight = 70;
+// //     const currentWaistSize = 32;
+// //     const currentChestSize = 40;
+// //     const currentHipsSize = 36;
+// //     const currentThighsSize = 24;
+// //     const currentArmsSize = 14;
+// //     const currentOverallBodyFat = 18;
+// //     const currentSkeletalMuscleFat = 25;
+
+// //     const dummyLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May'];
+// //     const dummyChartData = (label, color) => [
+// //         {
+// //             label,
+// //             data: [65, 68, 70, 69, 72],
+// //             borderColor: color,
+// //             backgroundColor: `${color}33`,
+// //             fill: true,
+// //             tension: 0.4,
+// //         },
+// //     ];
+
+// //     const chartOptions = {
+// //         responsive: true,
+// //         plugins: {
+// //             legend: {
+// //                 display: false,
+// //             },
+// //         },
+// //         scales: {
+// //             x: {
+// //                 beginAtZero: true,
+// //             },
+// //             y: {
+// //                 beginAtZero: true,
+// //             },
+// //         },
+// //     };
+
+// //     const addWeightRecordDialog = (userId) => console.log(`Add weight for user ${userId}`);
+// //     const addWaistSizeRecordDialog = (userId) => console.log(`Add waist size for user ${userId}`);
+// //     const addChestSizeRecordDialog = (userId) => console.log(`Add chest size for user ${userId}`);
+// //     const addHipsSizeRecordDialog = (userId) => console.log(`Add hips size for user ${userId}`);
+// //     const addThighsSizeRecordDialog = (userId) => console.log(`Add thighs size for user ${userId}`);
+// //     const addArmsSizeRecordDialog = (userId) => console.log(`Add arms size for user ${userId}`);
+// //     const addOverAllBodyFatRecordDialog = (userId) => console.log(`Add overall body fat for user ${userId}`);
+// //     const addSkeletalMuscleFatRecordDialog = (userId) => console.log(`Add skeletal muscle fat for user ${userId}`);
+
+// //     const renderSection = (title, currentValue, chartData, chartLabels, chartOptions, onClickHandler) => (
+// //         <Box display="flex" flexDirection="row" alignItems="center" sx={{ marginLeft: 2 }}>
+// //             <Box flex="1">
+// //                 <Typography variant="h6" sx={{ fontWeight: 300, cursor: 'pointer', fontSize: '18px' }} onClick={onClickHandler}>
+// //                     {title}
+// //                 </Typography>
+// //             </Box>
+// //             <Box flex="1">
+// //                 <Line data={{ labels: chartLabels, datasets: chartData }} options={chartOptions} height={60} />
+// //             </Box>
+// //             <Box flex="1" display="flex" justifyContent="flex-end" alignItems="center">
+// //                 <Typography variant="h5" sx={{ fontWeight: 300, fontSize: '24px' }}>
+// //                     {currentValue}
+// //                     {currentValue && <span style={{ fontSize: '14px', color: '#757575' }}> kg</span>}
+// //                 </Typography>
+// //                 <IconButton onClick={onClickHandler}>
+// //                     <AddIcon sx={{ color: 'primary.main' }} />
+// //                 </IconButton>
+// //             </Box>
+// //         </Box>
+// //     );
+
+// //     return (
+// //         <Box sx={{ background: '#ffffff', boxShadow: 1, borderRadius: 1, p: 2 }}>
+// //             <Typography variant="h6" sx={{ fontWeight: 500, fontSize: '18px', marginBottom: 2 }}>
+// //                 Measurements
+// //             </Typography>
+// //             <Divider />
+// //             {loadWeight && renderSection('Weight', currentWeight, dummyChartData('Weight', 'blue'), dummyLabels, chartOptions, () => addWeightRecordDialog(userId))}
+// //             <Divider />
+// //             {loadWaistSize && renderSection('Waist Size', currentWaistSize, dummyChartData('Waist Size', 'green'), dummyLabels, chartOptions, () => addWaistSizeRecordDialog(userId))}
+// //             <Divider />
+// //             {loadChestSize && renderSection('Chest Size', currentChestSize, dummyChartData('Chest Size', 'red'), dummyLabels, chartOptions, () => addChestSizeRecordDialog(userId))}
+// //             <Divider />
+// //             {loadHipsSize && renderSection('Hips Size', currentHipsSize, dummyChartData('Hips Size', 'purple'), dummyLabels, chartOptions, () => addHipsSizeRecordDialog(userId))}
+// //             <Divider />
+// //             {loadThighsSize && renderSection('Thighs Size', currentThighsSize, dummyChartData('Thighs Size', 'orange'), dummyLabels, chartOptions, () => addThighsSizeRecordDialog(userId))}
+// //             <Divider />
+// //             {loadArmsSize && renderSection('Arms Size', currentArmsSize, dummyChartData('Arms Size', 'pink'), dummyLabels, chartOptions, () => addArmsSizeRecordDialog(userId))}
+// //             <Divider />
+// //             {loadBodyFatSize && renderSection('Overall Body Fat', currentOverallBodyFat, dummyChartData('Body Fat', 'brown'), dummyLabels, chartOptions, () => addOverAllBodyFatRecordDialog(userId))}
+// //             <Divider />
+// //             {loadMuscleFatSize && renderSection('Skeletal Muscle', currentSkeletalMuscleFat, dummyChartData('Muscle Fat', 'cyan'), dummyLabels, chartOptions, () => addSkeletalMuscleFatRecordDialog(userId))}
+// //         </Box>
+// //     );
+// // };
+
+// // export default Measurement;
+
+// import React, { useState, useEffect } from 'react';
+// import { Button, Typography, Box, Divider, IconButton } from '@mui/material';
+// import { Add as AddIcon } from '@mui/icons-material';
+// import { Chart as ChartJS, LineElement, CategoryScale, LinearScale, PointElement, Tooltip, Legend } from 'chart.js';
+// import { Line } from 'react-chartjs-2';
+// import { get } from '../../../services/api-services';
+// import { useParams } from 'react-router-dom';
+// import { useCommon } from '../../../context/CommonContext'
+// import AddMeasurmentDialog from '../profileModel-DialogBox/AddMeasurmentDialog';
+// // Register required Chart.js components
+// ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, Tooltip, Legend);
+
+// const Measurement = () => {
+//     // const userId = 1;  // Hardcoded userId (You can replace this as needed)
+//     const [measurements, setMeasurements] = useState([]);
+//     const [loading, setLoading] = useState(true);
+//     const { id } = useParams();
+//     const [isOpneDialog, setIsOpenDialog] = useState(false)
+//     const { setSnackbar, currentUser, setCurrentUser } = useCommon();
+//     const [measurementType, setMeasurementType] = useState(null);
+
+//     const fetchData = async () => {
+//         const url = `/Measurements?filter={"where":{"customerId":"${id}"},"order":"recordedAt DESC"}`;
+
+//         try {
+//             const response = await get(
+//                 url
+//             );
+//             if (response && response.data) {
+//                 setMeasurements(response.data);
+//                 setLoading(false);
+
+//             }
+//         } catch (error) {
+//             console.error('Error fetching measurements:', error);
+//             setLoading(false);
+//         }
+//     };
+//     // Fetch measurements from API
+//     useEffect(() => {
+//         fetchData();
+//     }, [id]);
+//     // console.log(measurements)
+//     const dummyLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May'];
+//     const chartOptions = {
+//         responsive: true,
+//         plugins: {
+//             legend: {
+//                 display: false,
+//             },
+//         },
+//         scales: {
+//             x: {
+//                 beginAtZero: true,
+//             },
+//             y: {
+//                 beginAtZero: true,
+//             },
+//         },
+//     };
+
+//     // Create chart data for each measurement type
+//     const generateChartData = (label, color) => {
+//         // console.log('Filtered Data:', measurements.filter(measurement => measurement.type === 'skeletalMuscleFat'));
+//         const filteredData = measurements.filter(measurement => measurement.type === label);
+//         // console.log(filteredData, "jhcfdewf")
+//         const data = filteredData.map(item => item.value);
+
+
+//         return [
+//             {
+//                 label,
+//                 data,
+//                 borderColor: color,
+//                 backgroundColor: `${color}33`,
+//                 fill: true,
+//                 tension: 0.4,
+//             },
+//         ];
+//     };
+
+//     const renderSection = (title, currentValue, chartData, chartLabels, chartOptions, onClickHandler, type, value) => (
+//         <Box display="flex" flexDirection="row" alignItems="center" sx={{ marginLeft: 2 }}>
+//             <Box flex="1">
+//                 <Typography variant="h6" sx={{ fontWeight: 300, cursor: 'pointer', fontSize: '18px' }} onClick={onClickHandler}>
+//                     {title}
+//                 </Typography>
+//             </Box>
+//             <Box flex="1">
+//                 <Line data={{ labels: chartLabels, datasets: chartData }} options={chartOptions} height={60} />
+//             </Box>
+//             <Box flex="1" display="flex" justifyContent="flex-end" alignItems="center">
+//                 <Typography variant="h5" sx={{ fontWeight: 300, fontSize: '24px' }}>
+//                     {currentValue}
+//                     {currentValue && <span style={{ fontSize: '14px', color: '#757575' }}> kg</span>}
+//                 </Typography>
+//                 <IconButton onClick={() => { setMeasurementType(type); setIsOpenDialog(true); }}>
+//                     <AddIcon sx={{ color: 'primary.main' }} />
+//                 </IconButton>
+//             </Box>
+//         </Box>
+//     );
+
+//     if (loading) {
+//         return <Typography>Loading...</Typography>;
+//     }
+
+//     return (
+//         <Box sx={{ background: '#ffffff', boxShadow: 1, borderRadius: 1, p: 2 }}>
+//             <Typography variant="h6" sx={{ fontWeight: 500, fontSize: '18px', marginBottom: 2 }}>
+//                 Measurements
+//             </Typography>
+//             <Divider />
+//             {renderSection(
+//                 'Weight',
+//                 measurements.find(m => m.type === 'weight')?.value || 'N/A',
+//                 generateChartData('weight', 'blue'),
+//                 dummyLabels,
+//                 chartOptions,
+//                 () => setIsOpenDialog(true),
+//                 'weight'
+//             )}
+//             <Divider />
+//             {renderSection(
+//                 'Waist Size',
+//                 measurements.find(m => m.type === 'waistSize')?.value || 'N/A',
+//                 generateChartData('waist_size', 'green'),
+//                 dummyLabels,
+//                 chartOptions,
+//                 () => setIsOpenDialog(true),
+//                 'waistSize'
+//             )}
+//             <Divider />
+//             {renderSection(
+//                 'Chest Size',
+//                 measurements.find(m => m.type === 'chestSize')?.value || 'N/A',
+//                 generateChartData('chest_size', 'red'),
+//                 dummyLabels,
+//                 chartOptions,
+//                 () => setIsOpenDialog(true),
+//                 'chestSize'
+//             )}
+//             <Divider />
+//             {renderSection(
+//                 'Hips Size',
+//                 measurements.find(m => m.type === 'hipsSize')?.value || 'N/A',
+//                 generateChartData('hips_size', 'purple'),
+//                 dummyLabels,
+//                 chartOptions,
+//                 () => setIsOpenDialog(true),
+//                 'hipsSize'
+//             )}
+//             <Divider />
+//             {renderSection(
+//                 'Thighs Size',
+//                 measurements.find(m => m.type === 'thighsSize')?.value || 'N/A',
+//                 generateChartData('thighs_size', 'orange'),
+//                 dummyLabels,
+//                 chartOptions,
+//                 () => setIsOpenDialog(true),
+//                 'thighsSize'
+//             )}
+//             <Divider />
+//             {renderSection(
+//                 'Arms Size',
+//                 measurements.find(m => m.type === 'armsSize')?.value || 'N/A',
+//                 generateChartData('arms_size', 'pink'),
+//                 dummyLabels,
+//                 chartOptions,
+//                 () => setIsOpenDialog(true),
+//                 'armsSize'
+//             )}
+//             <Divider />
+//             {renderSection(
+//                 'Overall Body Fat',
+//                 measurements.find(m => m.type === 'overallBodyFat')?.value || 'N/A',
+//                 generateChartData('body_fat', 'brown'),
+//                 dummyLabels,
+//                 chartOptions,
+//                 () => setIsOpenDialog(true),
+//                 'overallBodyFat'
+//             )}
+//             <Divider />
+//             {renderSection(
+//                 'Skeletal Muscle',
+//                 measurements.find(m => m.type === 'skeletalMuscleFat')?.value || 'N/A',
+//                 generateChartData('skeletal_muscle', 'cyan'),
+//                 dummyLabels,
+//                 chartOptions,
+//                 () => setIsOpenDialog(true),
+//                 'skeletalMuscleFat'
+//             )}
+//             <Divider />
+//             {renderSection(
+//                 'Visceral Fat',
+//                 measurements.find(m => m.type === 'visceralFat')?.value || 'N/A',
+//                 generateChartData('skeletal_muscle', 'cyan'),
+//                 dummyLabels,
+//                 chartOptions,
+//                 () => setIsOpenDialog(true),
+//                 'visceralFat'
+//             )}
+//             <Divider />
+//             {renderSection(
+//                 'Height',
+//                 measurements.find(m => m.type === 'height')?.value || 'N/A',
+//                 generateChartData('skeletal_muscle', 'cyan'),
+//                 dummyLabels,
+//                 chartOptions,
+//                 () => setIsOpenDialog(true),
+//                 'height'
+//             )}
+//             <Divider />
+//             {renderSection(
+//                 'Subcutaneous fat',
+//                 measurements.find(m => m.type === 'subcutaneousFat')?.value || 'N/A',
+//                 generateChartData('skeletal_muscle', 'cyan'),
+//                 dummyLabels,
+//                 chartOptions,
+//                 () => setIsOpenDialog(true),
+//                 'subcutaneousFat'
+//             )}
+//             <Divider />
+//             {renderSection(
+//                 'Basal Metabolic Rate(BMR)',
+//                 measurements.find(m => m.type === 'bmr')?.value || 'N/A',
+//                 generateChartData('skeletal_muscle', 'cyan'),
+//                 dummyLabels,
+//                 chartOptions,
+//                 () => setIsOpenDialog(true),
+//                 'bmr'
+//             )}
+//             {/* <Divider />
+//             {renderSection(
+//                 'Height',
+//                 measurements.find(m => m.type === 'height')?.value || 'N/A',
+//                 generateChartData('skeletal_muscle', 'cyan'),
+//                 dummyLabels,
+//                 chartOptions,
+//                 () => console.log(`Add skeletal muscle fat for user ${userId}`)
+//             )} */}
+//             <Divider />
+//             {renderSection(
+//                 'Neck Size',
+//                 measurements.find(m => m.type === 'neck')?.value || 'N/A',
+//                 generateChartData('skeletal_muscle', 'cyan'),
+//                 dummyLabels,
+//                 chartOptions,
+//                 () => setIsOpenDialog(true),
+//                 'neck'
+//             )}
+//             <AddMeasurmentDialog
+//                 open={isOpneDialog}
+//                 onClose={() => setIsOpenDialog(false)}
+//                 type={measurementType}
+//             />
+//         </Box>
+//     );
+// };
+
+// export default Measurement;
+
+
+import React, { useState, useEffect } from 'react';
+import { Typography, Box, Divider, IconButton, CircularProgress } from '@mui/material';
+import { Add as AddIcon } from '@mui/icons-material';
+import { Chart as ChartJS, LineElement, CategoryScale, LinearScale, PointElement, Tooltip, Legend } from 'chart.js';
+import { Line } from 'react-chartjs-2';
+import { get } from '../../../services/api-services';
+import { useParams } from 'react-router-dom';
+import AddMeasurmentDialog from '../profileModel-DialogBox/AddMeasurmentDialog';
+
+// Register Chart.js components
+ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, Tooltip, Legend);
+
+const Measurement = () => {
+    const { id } = useParams();
+    const [measurements, setMeasurements] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [measurementType, setMeasurementType] = useState(null);
+
+    const fetchData = async () => {
+        const url = `/Measurements?filter={"where":{"customerId":"${id}"},"order":"recordedAt DESC"}`;
+        try {
+            const response = await get(url);
+            if (response && response.data) {
+                setMeasurements(response.data);
+            }
+        } catch (error) {
+            console.error('Error fetching measurements:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, [id]);
+
+    const chartOptions = {
+        responsive: true,
+        plugins: {
+            legend: { display: false },
+        },
+        scales: {
+            x: { beginAtZero: true },
+            y: { beginAtZero: true },
+        },
+    };
+
+    const generateChartData = (type, color) => {
+        const filteredData = measurements.filter((m) => m.type === type);
+        const labels = filteredData.map((m) => new Date(m.recordedAt).toLocaleDateString());
+        const data = filteredData.map((m) => m.value);
+
+        return {
+            labels,
+            datasets: [
+                {
+                    label: `${type} Data`,
+                    data,
+                    borderColor: color,
+                    backgroundColor: `${color}33`, // Slightly transparent fill
+                    tension: 0.4, // Smoother line
+                },
+            ],
+        };
+    };
+
+    const renderSection = (title, type, color, unit = 'kg') => {
+        const currentValue = measurements.find((m) => m.type === type)?.value || 'N/A';
+        const chartData = generateChartData(type, color);
+
+        return (
+            <Box display="flex" alignItems="center" py={2} key={type}>
+                {/* Section Title */}
+                <Box flex={1}>
+                    <Typography
+                        variant="h6"
+                        sx={{ fontWeight: 400, fontSize: '16px', cursor: 'pointer' }}
+                        onClick={() => {
+                            setMeasurementType(type);
+                            setIsDialogOpen(true);
+                        }}
+                    >
+                        {title}
+                    </Typography>
+                </Box>
+
+                {/* Chart */}
+                <Box flex={2}>
+                    <Line data={chartData} options={chartOptions} height={60} />
+                </Box>
+
+                {/* Current Value and Add Button */}
+                <Box flex={1} display="flex" alignItems="center" justifyContent="flex-end">
+                    <Typography variant="h5" sx={{ fontWeight: 400, fontSize: '20px', mr: 1 }}>
+                        {currentValue}
+                        {currentValue !== 'N/A' && <span style={{ fontSize: '14px', color: '#757575' }}> {unit}</span>}
+                    </Typography>
+                    <IconButton
+                        onClick={() => {
+                            setMeasurementType(type);
+                            setIsDialogOpen(true);
+                        }}
+                    >
+                        <AddIcon sx={{ color: 'primary.main' }} />
+                    </IconButton>
+                </Box>
+            </Box>
+        );
+    };
+
+    if (loading) {
+        return (
+            <Box textAlign="center" py={4}>
+                <CircularProgress />
+                <Typography mt={2}>Loading measurements...</Typography>
+            </Box>
+        );
+    }
+
+    return (
+        <Box sx={{ background: '#ffffff', boxShadow: 1, borderRadius: 1, p: 3 }}>
+            {/* Header */}
+            <Typography variant="h6" sx={{ fontWeight: 500, fontSize: '18px', mb: 2 }}>
+                Measurements
+            </Typography>
+            <Divider />
+
+            {/* Sections */}
+            {renderSection('Weight', 'weight', 'blue')}
+            <Divider />
+            {renderSection('Waist Size', 'waistSize', 'green')}
+            <Divider />
+            {renderSection('Chest Size', 'chestSize', 'red')}
+            <Divider />
+            {renderSection('Hips Size', 'hipsSize', 'purple')}
+            <Divider />
+            {renderSection('Thighs Size', 'thighsSize', 'orange')}
+            <Divider />
+            {renderSection('Arms Size', 'armsSize', 'pink')}
+            <Divider />
+            {renderSection('Overall Body Fat', 'overallBodyFat', 'brown')}
+            <Divider />
+            {renderSection('Skeletal Muscle', 'skeletalMuscleFat', 'cyan')}
+            <Divider />
+            {renderSection('Visceral Fat', 'visceralFat', 'cyan')}
+            <Divider />
+            {renderSection('Height', 'height', 'cyan', 'cm')}
+            <Divider />
+            {renderSection('Subcutaneous Fat', 'subcutaneousFat', 'cyan')}
+            <Divider />
+            {renderSection('Basal Metabolic Rate (BMR)', 'bmr', 'cyan')}
+            <Divider />
+            {renderSection('Neck Size', 'neck', 'cyan')}
+
+            {/* Add Measurement Dialog */}
+            <AddMeasurmentDialog
+                open={isDialogOpen}
+                onClose={() => setIsDialogOpen(false)}
+                type={measurementType}
+            />
+        </Box>
+    );
+};
+
+export default Measurement;
+
+
+
+
+
+// import React, { useEffect, useState } from 'react';
+// import { Box, Typography, Snackbar, Button } from '@mui/material';
+// import { Chart, registerables } from 'chart.js';
+
+// Chart.register(...registerables);
+
+// const DashboardGraph = () => {
+//   const [startDate] = useState(new Date("10/07/2017"));
+//   const [endDate] = useState(new Date("11/25/2017"));
+//   const [yesterday] = useState(new Date(Date.now() - 864e5));
+//   const [today] = useState(new Date());
+//   const [snackbarOpen, setSnackbarOpen] = useState(false);
+
+//   useEffect(() => {
+//     const ctx = document.getElementById('myChart').getContext('2d');
+//     new Chart(ctx, {
+//       type: 'line',
+//       data: {
+//         labels: ['January', 'February', 'March', 'April', 'May', 'June'],
+//         datasets: [
+//           {
+//             label: 'Sample Data',
+//             data: [65, 59, 80, 81, 56, 55],
+//             borderColor: 'rgba(75, 192, 192, 1)',
+//             backgroundColor: 'rgba(75, 192, 192, 0.2)',
+//           },
+//         ],
+//       },
+//       options: {
+//         responsive: true,
+//       },
+//     });
+//   }, []);
+
+//   const handleSnackbarClose = () => {
+//     setSnackbarOpen(false);
+//   };
+
+//   return (
+//     <Box sx={{ padding: 2 }}>
+//       <Typography variant="h4" gutterBottom>
+//         Dashboard
+//       </Typography>
+//       <Box>
+//         <canvas id="myChart" width="400" height="200"></canvas>
+//       </Box>
+//       <Button
+//         variant="contained"
+//         onClick={() => setSnackbarOpen(true)}
+//         sx={{ marginTop: 2 }}
+//       >
+//         Show Notification
+//       </Button>
+//       <Snackbar
+//         open={snackbarOpen}
+//         autoHideDuration={6000}
+//         onClose={handleSnackbarClose}
+//         message="This is a sample notification"
+//       />
+//     </Box>
+//   );
+// };
+
+// export default DashboardGraph;
+import React, { useEffect, useRef, useState } from 'react';
+import { Box, Typography, Snackbar, Button } from '@mui/material';
+import { Chart, registerables } from 'chart.js';
+
+Chart.register(...registerables);
+
+const DashboardGraph = () => {
+  const chartRef = useRef(null); // Reference for the chart instance
+  const canvasRef = useRef(null); // Reference for the canvas
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+
+  useEffect(() => {
+    const ctx = canvasRef.current.getContext('2d');
+    chartRef.current = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['January', 'February', 'March', 'April', 'May', 'June'],
+        datasets: [
+          {
+            label: 'Sample Data',
+            data: [65, 59, 80, 81, 56, 55],
+            borderColor: 'rgba(75, 192, 192, 1)',
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+      },
+    });
+
+    // Cleanup function to destroy chart instance
+    return () => {
+      if (chartRef.current) {
+        chartRef.current.destroy();
+      }
+    };
+  }, []); // Runs only once on mount
+
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
+
+  return (
+    <Box sx={{ padding: 2 }}>
+      <Typography variant="h4" gutterBottom>
+        Dashboard
+      </Typography>
+      <Box>
+        <canvas id="myChart" ref={canvasRef} width="400" height="200"></canvas>
+      </Box>
+      <Button
+        variant="contained"
+        onClick={() => setSnackbarOpen(true)}
+        sx={{ marginTop: 2 }}
+      >
+        Show Notification
+      </Button>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        message="This is a sample notification"
+      />
+    </Box>
+  );
+};
+
+export default DashboardGraph;
