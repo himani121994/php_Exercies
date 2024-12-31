@@ -1,0 +1,974 @@
+// import React, { useEffect, useState } from "react";
+// import { Box, Button, CircularProgress, Snackbar, Typography, Divider, Grid, Card, CardContent, IconButton } from "@mui/material";
+// import { useNavigate, useParams } from "react-router-dom";
+// import { get } from "../../../services/api-services";
+// import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+// import EditIcon from '@mui/icons-material/Edit';
+// import EditProgressBar from "../profileModel-DialogBox/EditProgressBar";
+
+// const WeightProgress = () => {
+//     const [weightData, setWeightData] = useState({
+//         id: null,
+//         startWeight: null,
+//         currentWeight: null,
+//         targetWeight: 0,
+//         startWeightBMI: null,
+//         currentWeightBMI: null,
+//         weightGoalPercent: 0,
+//     });
+//     const [loading, setLoading] = useState(true);
+//     const [snackbar, setSnackbar] = useState({ open: false, message: "" });
+//     const [opneDialog, setOpneDialog] = useState(false)
+//     const navigate = useNavigate();
+//     const { id } = useParams();
+
+//     const getWeightData = async () => {
+//         const url = `/Customers/${id}`;
+//         try {
+//             const response = await get(url);
+//             const data = response.data;
+    
+//             if (data) {
+//                 const startWeight = parseFloat(data.weight) || 0;
+//                 const currentWeight = parseFloat(data.weight) || 0;
+//                 const targetWeight = parseFloat(data.weightGoal) || 0;
+//                 const height = parseFloat(data.height) || 170;
+    
+//                 setWeightData({
+//                     id: data.id,
+//                     startWeight,
+//                     currentWeight,
+//                     targetWeight,
+//                     height,
+//                     startWeightBMI: calculateBMI(startWeight),
+//                     currentWeightBMI: calculateBMI(currentWeight),
+//                     weightGoalPercent: targetWeight > 0 ? ((currentWeight / targetWeight) * 100).toFixed(2) : 0,
+//                 });
+//             } else {
+//                 setWeightData({
+//                     startWeight: 0,
+//                     currentWeight: 0,
+//                     targetWeight: 0,
+//                     startWeightBMI: "N/A",
+//                     currentWeightBMI: "N/A",
+//                     weightGoalPercent: 0,
+//                 });
+//             }
+//         } catch (error) {
+//             if (error.response?.status === 401) {
+//                 setSnackbar({ open: true, message: "Login expired, please login again." });
+//                 localStorage.clear();
+//                 navigate("/login");
+//             } else {
+//                 console.error("Error fetching weight data", error);
+//             }
+//         } finally {
+//             setLoading(false);
+//         }
+//     };
+    
+//     useEffect(() => {
+//         getWeightData();
+//     }, []);
+// console.log(weightData,"gcvghgjhjn")
+    
+//     const calculateBMI = (weight) => {
+//         const height = parseFloat(weightData.height) || 170; // Default height if not available
+//         if (!weight || !height) return "N/A"; // Handle invalid or missing data
+//         const heightInMeters = height / 100;
+//         return (weight / (heightInMeters * heightInMeters)).toFixed(2);
+//     };
+    
+
+//     const handleSnackbarClose = () => setSnackbar({ open: false, message: "" });
+   
+//     if (loading) {
+//         return (
+//             <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh" }}>
+//                 <CircularProgress />
+//             </Box>
+//         );
+//     }
+
+//     return (
+//         <Box>
+//             <Card >
+//                 <CardContent className="">
+//                     {/* <Grid container alignItems="center" justifyContent="space-between" spacing={2}> */}
+//                     <Grid container alignItems="center" justifyContent="space-between" spacing={2}>
+//                         {/* Title on the left */}
+//                         <Grid item>
+//                             <Typography variant="h5" sx={{ fontWeight: 600 }}>
+//                                 Weight Progress
+//                             </Typography>
+//                         </Grid>
+
+//                         {/* Icon on the right */}
+//                         <Grid item>
+//                             <EditIcon
+//                                 onClick={(e) => {
+//                                     setOpneDialog(true);
+//                                 }} />
+//                         </Grid>
+//                     </Grid>
+
+//                     {/* </Grid> */}
+
+//                     {/* <Divider sx={{ mb: 3 }} /> */}
+//                     <Grid container spacing={3} direction="column" alignItems="center" >
+//                         {/* Progress Section */}
+//                         <Grid item xs={12}>
+//                             <Typography variant="h6" align="center">Progress</Typography>
+//                             <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", width: "100%", height: 200 }}>
+//                                 <CircularProgress
+//                                     variant="determinate"
+//                                     value={weightData.weightGoalPercent || 0}
+//                                     size={150}
+//                                     thickness={5}
+//                                     sx={{ color: "#4caf50" }}
+//                                 />
+//                                 <Typography variant="h5">{weightData.weightGoalPercent}%</Typography>
+//                             </Box>
+//                         </Grid>
+
+//                         {/* <Divider sx={{ width: "100%", my: 3 }} /> */}
+
+//                         {/* Start, Current, and Target Sections */}
+//                         <Grid item xs={12}>
+//                             <Grid container spacing={3} justifyContent="center">
+//                                 {/* Start */}
+//                                 <Grid item xs={12} sm={4} textAlign="center">
+//                                     <Typography variant="h6">Start</Typography>
+//                                     <Typography variant="h4">{weightData.startWeight || 0} kgs</Typography>
+//                                     <Typography variant="body2">BMI: {weightData.startWeightBMI}</Typography>
+//                                 </Grid>
+
+//                                 {/* Current */}
+//                                 <Grid item xs={12} sm={4} textAlign="center">
+//                                     <Typography variant="h6">Current</Typography>
+//                                     <Typography variant="h4">{weightData.currentWeight || 0} kgs</Typography>
+//                                     <Typography variant="body2">BMI: {weightData.currentWeightBMI}</Typography>
+//                                 </Grid>
+
+//                                 {/* Target */}
+//                                 <Grid item xs={12} sm={4} textAlign="center">
+//                                     <Typography variant="h6">Target</Typography>
+//                                     <Typography variant="h4">{weightData.weightGoal || 0} kgs</Typography>
+//                                     <Typography variant="body2">
+//                                         Target BMI: {calculateBMI(weightData.weightGoal || 0)}
+//                                     </Typography>
+//                                 </Grid>
+//                             </Grid>
+//                         </Grid>
+//                     </Grid>
+
+//                 </CardContent>
+//             </Card>
+//             <EditProgressBar
+//                 open={opneDialog}
+//                 onClose={() => setOpneDialog(false)}
+//                 id={id}
+//                 data={weightData}
+
+//             />
+//             <Snackbar
+//                 open={snackbar.open}
+//                 autoHideDuration={3000}
+//                 message={snackbar.message}
+//                 onClose={handleSnackbarClose}
+//             />
+//         </Box>
+//     );
+// };
+
+// export default WeightProgress;
+
+
+import React, { useEffect, useState } from "react";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Snackbar,
+  Typography,
+  Grid,
+  Card,
+  CardContent,
+  IconButton,
+} from "@mui/material";
+import { useNavigate, useParams } from "react-router-dom";
+import { get } from "../../../services/api-services";
+import EditIcon from "@mui/icons-material/Edit";
+import EditProgressBar from "../profileModel-DialogBox/EditProgressBar";
+
+const WeightProgress = () => {
+  const [weightData, setWeightData] = useState({
+    id: null,
+    startWeight: null,
+    currentWeight: null,
+    targetWeight: 0,
+    startWeightBMI: null,
+    currentWeightBMI: null,
+    weightGoalPercent: 0,
+  });
+  const [loading, setLoading] = useState(true);
+  const [snackbar, setSnackbar] = useState({ open: false, message: "" });
+  const [openDialog, setOpenDialog] = useState(false);
+  const navigate = useNavigate();
+  const { id } = useParams();
+
+  const getWeightData = async () => {
+    const url = `/Customers/${id}`;
+    try {
+      const response = await get(url);
+      const data = response.data;
+
+      if (data) {
+        const startWeight = parseFloat(data.weight) || 0;
+        const currentWeight = parseFloat(data.weight) || 0;
+        const targetWeight = parseFloat(data.weightGoal) || 0;
+        const height = parseFloat(data.height) || 170;
+
+        setWeightData({
+          id: data.id,
+          startWeight,
+          currentWeight,
+          targetWeight,
+          height,
+          startWeightBMI: calculateBMI(startWeight),
+          currentWeightBMI: calculateBMI(currentWeight),
+          weightGoalPercent:
+            targetWeight > 0 ? ((currentWeight / targetWeight) * 100).toFixed(2) : 0,
+        });
+      } else {
+        setWeightData({
+          startWeight: 0,
+          currentWeight: 0,
+          targetWeight: 0,
+          startWeightBMI: "N/A",
+          currentWeightBMI: "N/A",
+          weightGoalPercent: 0,
+        });
+      }
+    } catch (error) {
+      if (error.response?.status === 401) {
+        setSnackbar({ open: true, message: "Login expired, please login again." });
+        localStorage.clear();
+        navigate("/login");
+      } else {
+        console.error("Error fetching weight data", error);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const calculateBMI = (weight) => {
+    const height = parseFloat(weightData.height) || 170;
+    if (!weight || !height) return "N/A";
+    const heightInMeters = height / 100;
+    return (weight / (heightInMeters * heightInMeters)).toFixed(2);
+  };
+
+  useEffect(() => {
+    getWeightData();
+  }, []);
+
+  const handleSnackbarClose = () => setSnackbar({ open: false, message: "" });
+
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "100vh",
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  return (
+    <Box>
+      <Card>
+        <CardContent>
+          <Grid container alignItems="center" justifyContent="space-between">
+            <Grid item>
+              <Typography variant="h5" sx={{ fontWeight: 600 }}>
+                Weight Progress
+              </Typography>
+            </Grid>
+            <Grid item>
+              <IconButton onClick={() => setOpenDialog(true)}>
+                <EditIcon />
+              </IconButton>
+            </Grid>
+          </Grid>
+
+          <Grid container spacing={3} direction="column" alignItems="center">
+            <Grid item xs={12}>
+              <Typography variant="h6" align="center">
+                Progress
+              </Typography>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: "100%",
+                  height: 200,
+                }}
+              >
+                <CircularProgress
+                  variant="determinate"
+                  value={weightData.weightGoalPercent || 0}
+                  size={150}
+                  thickness={5}
+                  sx={{ color: "#4caf50" }}
+                />
+                <Typography
+                  variant="h5"
+                  sx={{ position: "absolute" }}
+                >
+                  {weightData.weightGoalPercent}%
+                </Typography>
+              </Box>
+            </Grid>
+
+            <Grid item xs={12}>
+              <Grid container spacing={3} justifyContent="center">
+                <Grid item xs={12} sm={4} textAlign="center">
+                  <Typography variant="h6">Start</Typography>
+                  <Typography variant="h4">
+                    {weightData.startWeight || 0} kgs
+                  </Typography>
+                  <Typography variant="body2">
+                    BMI: {weightData.startWeightBMI}
+                  </Typography>
+                </Grid>
+
+                <Grid item xs={12} sm={4} textAlign="center">
+                  <Typography variant="h6">Current</Typography>
+                  <Typography variant="h4">
+                    {weightData.currentWeight || 0} kgs
+                  </Typography>
+                  <Typography variant="body2">
+                    BMI: {weightData.currentWeightBMI}
+                  </Typography>
+                </Grid>
+
+                <Grid item xs={12} sm={4} textAlign="center">
+                  <Typography variant="h6">Target</Typography>
+                  <Typography variant="h4">
+                    {weightData.targetWeight || 0} kgs
+                  </Typography>
+                  <Typography variant="body2">
+                    Target BMI: {calculateBMI(weightData.targetWeight || 0)}
+                  </Typography>
+                </Grid>
+              </Grid>
+            </Grid>
+          </Grid>
+        </CardContent>
+      </Card>
+
+      <EditProgressBar
+        open={openDialog}
+        onClose={() => setOpenDialog(false)}
+        id={id}
+        data={weightData}
+      />
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={3000}
+        message={snackbar.message}
+        onClose={handleSnackbarClose}
+      />
+    </Box>
+  );
+};
+
+export default WeightProgress;
+
+
+
+// import React, { useState, useEffect } from 'react';
+// import { Dialog, DialogActions, DialogContent, DialogTitle, TextField, Button, Typography } from '@mui/material';
+// import { get } from '../../../services/api-services';
+
+// const EditProgressBar = ({ open, onClose, id }) => {
+//     const [targetWeight, setTargetWeight] = useState('');
+//     const [weight, setWeight] = useState(0);
+//     const [cases, setCases] = useState('Normal');
+//     const [loosWeight, setLoosWeight] = useState(0);
+//     const [startWeight, setStartWeight] = useState(0);
+//     const [userCurrentWeight, setUserCurrentWeight] = useState(null);
+
+//     const fetchUserData = async (id) => {
+//         const accessToken = localStorage.getItem("accessToken");
+//         const url = `/Customers/${id}`;
+
+//         try {
+//             const response = await get(url);
+//             const data = await response.json();
+//             console.log(data, "djcduich")
+//             if (data) {
+//                 setTargetWeight(data.currentWeight || '');
+//                 setWeight(data.startWeight || 0);
+//                 setCases(data.cases || 'Normal');
+//                 setLoosWeight(data.startWeight || 0);
+//                 setStartWeight(data.startWeight || 0);
+//             }
+//         } catch (error) {
+//             console.error('Error fetching customer data:', error);
+//         }
+//     };
+
+//     useEffect(() => {
+//         if (id) {
+//             fetchUserData(id);  // Fetch user data when component mounts or id changes
+//         }
+//     }, [id]);
+
+//     const handleTargetWeightChange = (event) => {
+//         setTargetWeight(event.target.value);
+//     };
+
+//     const calculateBMI = (weight, height) => {
+//         return (weight / ((height / 100) * (height / 100))).toFixed(2);
+//     };
+
+//     return (
+//         <Dialog open={open} onClose={onClose}>
+//             <DialogTitle>Weight Goal</DialogTitle>
+//             <DialogContent>
+//                 {weight > 0 ? (
+//                     <>
+//                         <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', gap: '10px' }}>
+//                             <Typography variant="body1">{weight} Kgs. is ideal weight for your height.</Typography>
+//                         </div>
+//                         <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', gap: '10px' }}>
+//                             <Typography
+//                                 variant="body1"
+//                                 color={cases === 'Normal' ? 'primary' : 'error'}
+//                             >
+//                                 You Are {cases},
+//                             </Typography>
+//                             <Typography
+//                                 variant="body1"
+//                                 color={cases === 'Normal' ? 'primary' : 'error'}
+//                             >
+//                                 {cases === 'Underweight' || cases === 'Normal'
+//                                     ? `You need to gain ${loosWeight} Kgs. / ${startWeight} Kgs.`
+//                                     : `You need to lose ${loosWeight} Kgs. / ${startWeight} Kgs.`}
+//                             </Typography>
+//                         </div>
+
+//                         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+//                             <TextField
+//                                 label="Target Weight (In kgs)"
+//                                 type="number"
+//                                 value={targetWeight}
+//                                 onChange={handleTargetWeightChange}
+//                                 fullWidth
+//                                 required
+//                                 error={!targetWeight}
+//                                 helperText={!targetWeight ? 'Target weight is required' : ''}
+//                             />
+//                             <TextField
+//                                 label="BMI"
+//                                 value={calculateBMI(targetWeight, data.height)}
+//                                 fullWidth
+//                                 InputProps={{
+//                                     readOnly: true,
+//                                 }}
+//                             />
+//                         </div>
+//                     </>
+//                 ) : (
+//                     <Typography variant="body1">Please add your weight!</Typography>
+//                 )}
+//             </DialogContent>
+//             <DialogActions>
+//                 <Button onClick={onClose} variant="outlined" color="default">
+//                     Cancel
+//                 </Button>
+//                 <Button onClick={() => onClose()} variant="contained">
+//                     Save
+//                 </Button>
+//             </DialogActions>
+//         </Dialog>
+//     );
+// };
+
+// export default EditProgressBar;
+
+
+import React, { useState, useEffect } from "react";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Button,
+  Snackbar,
+} from "@mui/material";
+import { useSnackbar } from "notistack";
+import { get } from "../../../services/api-services";
+
+const EditProgressBar = ({ open, onClose, data, caseService, router }) => {
+  const { enqueueSnackbar } = useSnackbar();
+  const [formData, setFormData] = useState({ ...data });
+  const [weightInfo, setWeightInfo] = useState({
+    weight: 0,
+    loosWeight: 0,
+    cases: "",
+  });
+
+  useEffect(() => {
+    const calculateBMI = () => {
+      if (!formData.startWeight) {
+        formData.startWeight = 0;
+      }
+
+      const BMIValue =
+        formData.startWeight /
+        ((formData.height / 100) * (formData.height / 100));
+      const needToLose = Math.round(
+        formData.startWeight - 24 * (formData.height / 100) * (formData.height / 100)
+      );
+
+      if (formData.startWeight > 0) {
+        let cases = "";
+
+        if (BMIValue < 18.5) cases = "Underweight";
+        else if (BMIValue < 24.9) cases = "Normal";
+        else if (BMIValue < 30) cases = "Overweight";
+        else if (BMIValue < 35) cases = "Obese";
+        else cases = "Morbidly Obese";
+
+        setWeightInfo({
+          weight: formData.startWeight - needToLose,
+          loosWeight: Math.abs(needToLose),
+          cases,
+        });
+      }
+    };
+
+    calculateBMI();
+  }, [formData]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSave = async () => {
+    try {
+      const url = `/Customers/${data.id}`;
+      const payload = { weightGoal: formData.targetWeight };
+      await caseService.patchData(payload, url);
+      enqueueSnackbar("Weight goal updated successfully!", { variant: "success" });
+      onClose();
+    } catch (error) {
+      console.error("Error updating weight goal", error);
+      if (error.response?.status === 401) {
+        enqueueSnackbar("Login expired. Please log in again.", { variant: "error" });
+        localStorage.clear();
+        onClose();
+        router.navigate("/login");
+      }
+    }
+  };
+
+  return (
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+      <DialogTitle>Weight Goal</DialogTitle>
+      <form>
+        <DialogContent>
+          {weightInfo.weight > 0 ? (
+            <>
+              <div>
+                <p>{weightInfo.weight} Kgs. is the ideal weight for your height.</p>
+                <p>
+                  You are {weightInfo.cases},
+                  {weightInfo.cases === "Underweight" || weightInfo.cases === "Normal"
+                    ? ` You need to gain ${weightInfo.loosWeight} Kgs.`
+                    : ` You need to lose ${weightInfo.loosWeight} Kgs.`}
+                </p>
+              </div>
+
+              <div style={{ display: "flex", gap: "10px" }}>
+                <TextField
+                  fullWidth
+                  name="targetWeight"
+                  label="Target Weight (In kgs)"
+                  value={formData.targetWeight || ""}
+                  onChange={handleChange}
+                  required
+                  error={!formData.targetWeight}
+                  helperText={!formData.targetWeight && "Target weight is required"}
+                />
+                <TextField
+                  fullWidth
+                  label="BMI"
+                  value={
+                    (formData.targetWeight / ((formData.height / 100) * (formData.height / 100))).toFixed(2)
+                  }
+                  InputProps={{ readOnly: true }}
+                />
+              </div>
+            </>
+          ) : (
+            <p>Please add your weight!</p>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={onClose} variant="outlined">
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSave}
+            variant="contained"
+            color="primary"
+            disabled={!formData.targetWeight}
+          >
+            Save
+          </Button>
+        </DialogActions>
+      </form>
+    </Dialog>
+  );
+};
+
+export default EditProgressBar;
+
+
+import React, { useState } from "react";
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Button,
+  TextField,
+  Box,
+} from "@mui/material";
+
+const AddImageDialog = ({ open, onClose }) => {
+  return (
+    <Dialog open={open} onClose={onClose}>
+      <DialogTitle>Add Picture</DialogTitle>
+      <DialogContent>
+        <Box
+          component="form"
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
+            mt: 1,
+          }}
+        >
+          {/* File Input */}
+          <Button variant="outlined" component="label">
+            Choose File
+            <input type="file" hidden />
+          </Button>
+          {/* Date Input */}
+          <TextField
+            type="date"
+            label="Choose Date"
+            InputLabelProps={{ shrink: true }}
+            required
+          />
+        </Box>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose} color="secondary">
+          Cancel
+        </Button>
+        <Button onClick={onClose} variant="contained" color="success">
+          Save
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+};
+
+export default AddImageDialog;
+
+
+
+// import React, { useEffect, useState } from "react";
+// import {
+//     Grid,
+//     Card,
+//     CardContent,
+//     Typography,
+//     Snackbar,
+//     CircularProgress,
+// } from "@mui/material";
+// import { get } from "../../../services/api-services";
+// import { useParams, useNavigate } from "react-router-dom";
+
+// const ImageGallery = ({ images }) => (
+//     <Grid container spacing={2}>
+//         {images.map((image, index) => (
+//             <Grid item xs={12} sm={6} md={4} key={index}>
+//                 <Card>
+//                     <img
+//                         src={image.url}
+//                         alt={image.title || `Image ${index + 1}`}
+//                         style={{
+//                             width: "100%",
+//                             height: "200px",
+//                             objectFit: "cover",
+//                             borderRadius: "4px",
+//                         }}
+//                     />
+//                     <CardContent>
+//                         <Typography variant="body2" color="textSecondary">
+//                             {image.title || `Image ${index + 1}`}
+//                         </Typography>
+//                     </CardContent>
+//                 </Card>
+//             </Grid>
+//         ))}
+//     </Grid>
+// );
+
+// const UserImageLibrary = ({ userId, event }) => {
+//     const [userGallery, setUserGallery] = useState([]);
+//     const [galleryCount, setGalleryCount] = useState(0);
+//     const [loading, setLoading] = useState(true);
+//     const [snackbar, setSnackbar] = useState({ open: false, message: "" });
+//     const { id } = useParams();
+//     useEffect(() => {
+//         const fetchUserImageLibrary = async () => {
+
+
+//             try {
+//                 // let url;
+//                 // if (!event.beginJsDate && !event.endJsDate) {
+//                 const url = `/Galleries?filter={"where":{"customerId":"${id}"},"order":"uploadedDate DESC"}`
+//                 const response = await get(url);
+//                 const data = response.data;
+//                 setGalleryCount(data.length);
+//                 const monthName = [];
+//                 const galleryData = [];
+
+//                 data.forEach((item) => {
+//                     const d = new Date(item.uploadedDate);
+//                     const year = d.getFullYear();
+//                     const month = d.toLocaleString("en-us", { month: "long" }) + ", " + year;
+
+//                     if (!monthName.includes(month)) {
+//                         monthName.push(month);
+//                         galleryData.push({ month, data: [] });
+//                     }
+
+//                     const currentMonth = galleryData[galleryData.length - 1];
+//                     if (currentMonth.month === month) {
+//                         currentMonth.data.push(item);
+//                     }
+//                 });
+
+//                 setUserGallery(galleryData);
+//             } catch (error) {
+//                 console.error("Error fetching user gallery", error);
+//                 if (error.response?.status === 401) {
+//                     setSnackbar({ open: true, message: "Login expired, please login again." });
+//                     localStorage.clear();
+//                     // Navigate to login page if using react-router-dom
+//                 }
+//             } finally {
+//                 setLoading(false);
+//             }
+//         };
+
+//         fetchUserImageLibrary();
+//     }, [userId, event]);
+
+//     const handleSnackbarClose = () => setSnackbar({ open: false, message: "" });
+
+//     if (loading) {
+//         return (
+//             <Grid container justifyContent="center" alignItems="center" style={{ minHeight: "100vh" }}>
+//                 <CircularProgress />
+//             </Grid>
+//         );
+//     }
+
+//     return (
+//         <Grid>
+//             <Card className="flex flex-1 flex-col">
+//                 <CardContent>
+//                     <Grid container alignItems="center" justifyContent="space-between" spacing={2}>
+//                         <Grid item>
+//                             <Typography variant="h5" sx={{ fontWeight: 600 }}>
+//                                 User Image Library
+
+//                             </Typography>
+//                         </Grid>
+//                     </Grid>
+//                     {userGallery?.map((monthData, index) => (
+//                         <div key={index}>
+//                             <Typography variant="h6" gutterBottom>
+//                                 {monthData.month}
+//                             </Typography>
+//                             <ImageGallery images={monthData.data} />
+//                         </div>
+//                     ))}
+//                 </CardContent>
+//             </Card>
+//             <Snackbar
+//                 open={snackbar.open}
+//                 autoHideDuration={3000}
+//                 onClose={handleSnackbarClose}
+//                 message={snackbar.message}
+//             />
+//         </Grid>
+//     );
+// };
+
+// export default UserImageLibrary;
+import React, { useEffect, useState } from "react";
+import {
+  Grid,
+  Card,
+  CardContent,
+  Typography,
+  Snackbar,
+  CircularProgress,
+  Button,
+  Box,
+} from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+import { get } from "../../../services/api-services";
+import { useParams } from "react-router-dom";
+import AddImageDialog from "../profileModel-DialogBox/AddImageLibrary";
+
+const ImageGallery = ({ images }) => (
+  <Grid container spacing={2}>
+    {images.map((image, index) => (
+      <Grid item xs={12} sm={6} md={4} key={index}>
+        <Card>
+          <img
+            src={image.url}
+            alt={image.title || `Image ${index + 1}`}
+            style={{
+              width: "100%",
+              height: "200px",
+              objectFit: "cover",
+              borderRadius: "4px",
+            }}
+          />
+          <CardContent>
+            <Typography variant="body2" color="textSecondary">
+              {image.title || `Image ${index + 1}`}
+            </Typography>
+          </CardContent>
+        </Card>
+      </Grid>
+    ))}
+  </Grid>
+);
+
+const UserImageLibrary = ({ userId, event }) => {
+  const [userGallery, setUserGallery] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [snackbar, setSnackbar] = useState({ open: false, message: "" });
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const { id } = useParams();
+
+  useEffect(() => {
+    const fetchUserImageLibrary = async () => {
+      try {
+        const url = `/Galleries?filter={"where":{"customerId":"${id}"}}`;
+        const response = await get(url);
+        const data = response.data;
+
+        const galleryData = data.reduce((acc, item) => {
+          const d = new Date(item.uploadedDate);
+          const month = `${d.toLocaleString("en-us", { month: "long" })}, ${d.getFullYear()}`;
+          const existingMonth = acc.find((g) => g.month === month);
+          if (existingMonth) {
+            existingMonth.data.push(item);
+          } else {
+            acc.push({ month, data: [item] });
+          }
+          return acc;
+        }, []);
+
+        setUserGallery(galleryData);
+      } catch (error) {
+        console.error("Error fetching user gallery:", error);
+        setSnackbar({ open: true, message: "Error fetching gallery. Please try again." });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserImageLibrary();
+  }, [userId, event]);
+
+  const handleSnackbarClose = () => setSnackbar({ open: false, message: "" });
+
+  if (loading) {
+    return (
+      <Grid container justifyContent="center" alignItems="center" sx={{ minHeight: "100vh" }}>
+        <CircularProgress />
+      </Grid>
+    );
+  }
+
+  return (
+    <Grid>
+      <Card sx={{ position: "relative" }}>
+        <CardContent>
+          <Typography variant="h5" sx={{ fontWeight: 600 }}>
+            User Image Library
+          </Typography>
+          {userGallery.map((monthData, index) => (
+            <div key={index}>
+              <Typography variant="h6" gutterBottom>
+                {monthData.month}
+              </Typography>
+              <ImageGallery images={monthData.data} />
+            </div>
+          ))}
+        </CardContent>
+        {/* Add Button */}
+        <Box sx={{ position: "absolute", bottom: 16, right: 16 }}>
+          <Button
+            sx={{
+              borderRadius: "50%",
+              height: 60,
+              width: 60,
+              backgroundColor: "secondary.main",
+            }}
+            variant="contained"
+            onClick={() => setIsDialogOpen(true)}
+          >
+            <AddIcon sx={{ fontSize: 30 }} />
+          </Button>
+        </Box>
+      </Card>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={3000}
+        onClose={handleSnackbarClose}
+        message={snackbar.message}
+      />
+      {/* Add Picture Dialog */}
+      <AddImageDialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)} />
+    </Grid>
+  );
+};
+
+export default UserImageLibrary;
