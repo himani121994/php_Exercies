@@ -1,137 +1,4 @@
-// import React, { useState, useEffect } from "react";
-// import {
-//     Dialog,
-//     DialogTitle,
-//     DialogContent,
-//     DialogActions,
-//     TextField,
-//     Button,
-//     Grid,
-//     IconButton,
-// } from "@mui/material";
-// import { Autocomplete } from "@mui/material";
-// import Add from "@mui/icons-material/Add";
-// import { api } from '../../Db.connection';
-// import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-// import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-// import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-// import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
-// import AddIcon from '@mui/icons-material/Add';
-// import RemoveIcon from '@mui/icons-material/Remove';
-// import Datepicker from '../DatePicker';
 
-// const EnrollProgramDialog = ({ open, onClose, onSubmit }) => {
-//     const [program, setProgram] = useState(null);
-//     const [programOptions, setProgramOptions] = useState([]);
-//     const [loading, setLoading] = useState(false);
-//     const [programDate, setProgramDate] = useState(new Date());
-//     const [showDiscountFields, setShowDiscountFields] = useState(false);
-
-
-//     const fetchPrograms = async () => {
-//         setLoading(true);
-//         try {
-//             const response = await api.get("/Programs");
-
-//             if (response.status !== 200) {
-//                 throw new Error(`Failed to fetch programs. Status: ${response.status}`);
-//             }
-//             const data = response.data;
-//             setProgramOptions(data);
-//         } catch (error) {
-//             console.error("Error fetching programs:", error);
-//             // alert("Failed to fetch programs. Please try again later.");
-//         } finally {
-//             setLoading(false);
-//         }
-//     };
-
-//     useEffect(() => {
-//         if (open) {
-//             fetchPrograms();
-//         }
-//     }, [open]);
-
-//     const handleDiscountButtonClick = () => {
-//         setShowDiscountFields((prev) => !prev);
-//     };
-//     return (
-//         <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-//             <DialogTitle>Enroll to Program</DialogTitle>
-//             <DialogContent>
-//                 <Grid container spacing={2}>
-//                     <Grid item xs={12}>
-//                         <Autocomplete
-//                             id="choose-program"
-//                             options={programOptions}
-//                             getOptionLabel={(option) => option.title}
-//                             loading={loading}
-//                             value={program}
-//                             onChange={(event, newValue) => setProgram(newValue)}
-//                             renderInput={(params) => (
-//                                 <TextField
-//                                     {...params}
-//                                     label="Choose Program"
-//                                     variant="standard"
-//                                     InputProps={{
-//                                         ...params.InputProps,
-//                                         endAdornment: (
-//                                             <>
-//                                                 {loading
-//                                                     ? <span>Loading...</span>
-//                                                     : params.InputProps.endAdornment}
-//                                             </>
-//                                         ),
-//                                     }}
-//                                 />
-//                             )}
-//                         />
-//                     </Grid>
-//                     <Grid item xs={12} display="flex" justifyContent="space-between" spacing={2}>
-//                         <Datepicker />
-//                         <TextField id="standard-basic" label="Payment Due Date*" variant="standard" />
-//                     </Grid>
-//                 </Grid>
-//                 <Grid>
-//                     <IconButton
-//                         size="small"
-
-//                         onClick={handleDiscountButtonClick}
-//                         variant="standard"
-//                     >
-//                         {showDiscountFields ? <RemoveIcon color="primary" /> : <AddIcon color="secondary" />}
-//                         Discount
-//                     </IconButton>
-//                     {showDiscountFields && (
-//                         <Grid item xs={12} display="flex" justifyContent="space-between">
-//                             <TextField id="fee-discount" label="Fee Discount (in rupees)" variant="standard" />
-//                             <TextField id="discount-note" label="Discount Note" variant="standard" />
-//                         </Grid>
-//                     )}
-//                 </Grid>
-//             </DialogContent>
-//             <DialogActions>
-//                 <Button onClick={onClose} color="secondary">
-//                     Cancel
-//                 </Button>
-//                 <Button
-//                     onClick={() => {
-//                         if (program) {
-//                             onSubmit({ program, programDate });
-//                         }
-//                         onClose();
-//                     }}
-//                     color="primary"
-//                     variant="contained"
-//                 >
-//                     Submit
-//                 </Button>
-//             </DialogActions>
-//         </Dialog>
-//     );
-// };
-
-// export default EnrollProgramDialog;
 
 import React, { useState, useEffect } from "react";
 import {
@@ -142,616 +9,253 @@ import {
     TextField,
     Button,
     Grid,
-    IconButton,
+    Typography,
+    Box,
 } from "@mui/material";
 import { Autocomplete } from "@mui/material";
-import AddIcon from '@mui/icons-material/Add';
-import RemoveIcon from '@mui/icons-material/Remove';
-import Datepicker from '../../date-filed/DatePicker';
-import { api } from '../../../Db.connection';
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
+import Datepicker from "../../date-filed/DatePicker";
+import { StyledButton, StyledCancelButton } from "../../StyledComponent";
+import EditProgram from "./CancleEnroll";
 
-// const EnrollProgramDialog = ({ open, onClose, onSubmit }) => {
-//     const [program, setProgram] = useState(null);
-//     const [programOptions, setProgramOptions] = useState([]);
-//     const [loading, setLoading] = useState(false);
-//     const [programDate, setProgramDate] = useState(new Date().toISOString().split('T')[0]); // Default to today
-//     const [paymentDueDate, setPaymentDueDate] = useState(null);
-//     const [showDiscountFields, setShowDiscountFields] = useState(false);
-
-//     const fetchPrograms = async () => {
-//         setLoading(true);
-//         try {
-//             const response = await api.get("/Programs");
-//             if (response.status !== 200) {
-//                 throw new Error(`Failed to fetch programs. Status: ${response.status}`);
-//             }
-//             const data = response.data;
-//             setProgramOptions(data);
-//         } catch (error) {
-//             console.error("Error fetching programs:", error);
-//         } finally {
-//             setLoading(false);
-//         }
-//     };
-
-//     useEffect(() => {
-//         if (open) {
-//             fetchPrograms();
-//         }
-//     }, [open]);
-
-//     const handleDiscountButtonClick = () => {
-//         setShowDiscountFields((prev) => !prev);
-//     };
-
-//     return (
-//         <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-//             <DialogTitle>Enroll in Program</DialogTitle>
-//             <DialogContent>
-//                 <Grid container spacing={2}>
-//                     {/* Program Selection */}
-//                     <Grid item xs={12}>
-//                         <Autocomplete
-//                             id="choose-program"
-//                             options={programOptions}
-//                             getOptionLabel={(option) => option.title}
-//                             loading={loading}
-//                             value={program}
-//                             onChange={(event, newValue) => setProgram(newValue)}
-//                             renderInput={(params) => (
-//                                 <TextField
-//                                     {...params}
-//                                     label="Choose Program"
-//                                     variant="standard"
-//                                     InputProps={{
-//                                         ...params.InputProps,
-//                                         endAdornment: (
-//                                             <>
-//                                                 {loading
-//                                                     ? <span>Loading...</span>
-//                                                     : params.InputProps.endAdornment}
-//                                             </>
-//                                         ),
-//                                     }}
-//                                 />
-//                             )}
-//                         />
-//                     </Grid>
-
-//                     {/* Date Fields */}
-//                     <Grid item xs={6} className="" >
-//                         <Datepicker
-//                             value={programDate}
-//                             onChange={setProgramDate}
-//                             label="Program Date"
-//                         />
-//                     </Grid>
-//                     <Grid item xs={6} className="">
-//                         <TextField id="standard-basic" label="Payment Due Date*" variant="standard" />
-//                     </Grid>
-//                 </Grid>
-
-//                 {/* Discount Fields */}
-//                 <Grid container spacing={2} alignItems="center" style={{ marginTop: "16px" }}>
-//                     <Grid item xs={12}>
-//                         <IconButton
-//                             size="small"
-//                             onClick={handleDiscountButtonClick}
-//                             variant="standard"
-//                         >
-//                             {showDiscountFields ? <RemoveIcon color="primary" /> : <AddIcon color="secondary" />}
-//                             Discount
-//                         </IconButton>
-//                     </Grid>
-//                     {showDiscountFields && (
-//                         <>
-//                             <Grid item xs={6}>
-//                                 <TextField
-//                                     id="fee-discount"
-//                                     label="Fee Discount (in rupees)"
-//                                     variant="standard"
-//                                     fullWidth
-//                                 />
-//                             </Grid>
-//                             <Grid item xs={6}>
-//                                 <TextField
-//                                     id="discount-note"
-//                                     label="Discount Note"
-//                                     variant="standard"
-//                                     fullWidth
-//                                 />
-//                             </Grid>
-//                         </>
-//                     )}
-//                 </Grid>
-//             </DialogContent>
-
-//             {/* Dialog Actions */}
-//             <DialogActions>
-//                 <Button onClick={onClose} color="secondary">
-//                     Cancel
-//                 </Button>
-//                 <Button
-//                     onClick={() => {
-//                         if (program) {
-//                             onSubmit({ program, programDate, paymentDueDate });
-//                         }
-//                         onClose();
-//                     }}
-//                     color="primary"
-//                     variant="contained"
-//                 >
-//                     Submit
-//                 </Button>
-//             </DialogActions>
-//         </Dialog>
-//     );
-// };
-
-const EnrollProgramDialog = ({ open, onClose, onSubmit, programId, existingProgramData }) => {
-    const [program, setProgram] = useState(existingProgramData || null);
-    const [programOptions, setProgramOptions] = useState([]);
-    const [loading, setLoading] = useState(false);
+const EnrollProgramDialog = ({
+    open,
+    onClose,
+    onSubmit,
+    programId,
+    existingProgramData,
+    allPrograms,
+}) => {
+    const [program, setProgram] = useState(null);
     const [programDate, setProgramDate] = useState(
-        existingProgramData ? existingProgramData.programDate : new Date().toISOString().split('T')[0]
+        existingProgramData ? existingProgramData.programDate : new Date().toISOString().split("T")[0]
     );
-    const [paymentDueDate, setPaymentDueDate] = useState(existingProgramData?.paymentDueDate || null);
-    const [showDiscountFields, setShowDiscountFields] = useState(!!existingProgramData?.discount);
-
-    const fetchPrograms = async () => {
-        setLoading(true);
-        try {
-            const response = await api.get("/Programs");
-            if (response.status !== 200) {
-                throw new Error(`Failed to fetch programs. Status: ${response.status}`);
-            }
-            const data = response.data;
-            setProgramOptions(data);
-        } catch (error) {
-            console.error("Error fetching programs:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
+    const [paymentDueDate, setPaymentDueDate] = useState(existingProgramData?.invoice?.dueDate || null);
+    const [showDiscountFields, setShowDiscountFields] = useState(!!existingProgramData?.invoice?.feeDiscount);
+    const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
+    const isEditMode = !!programId;
 
     useEffect(() => {
-        if (open) {
-            fetchPrograms();
+        if (existingProgramData) {
+            setProgram(existingProgramData?.purchaseProgram || null);
+            setProgramDate(existingProgramData.invoice?.createdAt || new Date().toISOString().split("T")[0]);
+            setPaymentDueDate(existingProgramData.invoice?.dueDate || null);
+            setShowDiscountFields(!!existingProgramData.invoice?.feeDiscount);
         }
-    }, [open]);
+    }, [existingProgramData]);
 
     const handleDiscountButtonClick = () => {
         setShowDiscountFields((prev) => !prev);
     };
 
-    const isEditMode = !!programId;
+    const handleCancelEnrollmentClick = () => {
+        setOpenConfirmDialog(true); // Make sure this sets the dialog state properly
+    };
+    
+    const handleCloseConfirmDialog = () => {
+        setOpenConfirmDialog(false); // Close the confirmation dialog
+    };
+    
+
+    const handleConfirmCancelEnrollment = () => {
+        console.log("Enrollment has been canceled!");
+        setOpenConfirmDialog(false);
+    };
 
     return (
         <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-            <DialogTitle>{isEditMode ? "Edit Program" : "Enroll in Program"}</DialogTitle>
+            <DialogTitle fontWeight="bold">
+                {isEditMode ? "Edit Program" : "Add Program"}
+            </DialogTitle>
             <DialogContent>
-                <Grid container spacing={2}>
-                    {/* Program Information */}
-                    {isEditMode && (
-                        <>
-                            <Grid item xs={12}>
-                                <h4>{program?.title || "Program Title"}</h4>
-                                <p>{program?.description || "Program Description"}</p>
-                                <p style={{ fontWeight: "bold", color: "green" }}>₹ {program?.fee || "0"}</p>
-                            </Grid>
-                        </>
-                    )}
+                {/* Program Information */}
+                {isEditMode && (
+                    <Grid item xs={12}>
+                        <TextField
+                            id="program-title"
+                            label=""
+                            variant="standard"
+                            fullWidth
+                            // disabled
+                            defaultValue={existingProgramData?.invoice?.purchaseProgram?.title || "Program Title"}
+                        />
+                        {existingProgramData?.invoice?.purchaseProgram?.description && (
+                            <Typography variant="body2" marginTop={4}>
+                                {existingProgramData?.invoice?.purchaseProgram?.description}
+                            </Typography>
+                        )}
+                    </Grid>
+                )}
 
-                    {/* Program Selection */}
-                    {!isEditMode && (
-                        <Grid item xs={12}>
-                            <Autocomplete
-                                id="choose-program"
-                                options={programOptions}
-                                getOptionLabel={(option) => option.title}
-                                loading={loading}
-                                value={program}
-                                onChange={(event, newValue) => setProgram(newValue)}
-                                renderInput={(params) => (
-                                    <TextField
-                                        {...params}
-                                        label="Choose Program"
-                                        variant="standard"
-                                        InputProps={{
-                                            ...params.InputProps,
-                                            endAdornment: (
-                                                <>
-                                                    {loading
-                                                        ? <span>Loading...</span>
-                                                        : params.InputProps.endAdornment}
-                                                </>
-                                            ),
-                                        }}
-                                    />
-                                )}
+                {/* Program Selection */}
+                {!isEditMode && (
+                    <Autocomplete
+                        id="choose-program"
+                        options={allPrograms}
+                        getOptionLabel={(option) => option.title}
+                        value={program}
+                        onChange={(event, newValue) => setProgram(newValue)}
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                label="Choose Program"
+                                variant="standard"
+                                required
                             />
-                        </Grid>
-                    )}
+                        )}
+                    />
+                )}
 
-                    {/* Date Fields */}
-                    <Grid item xs={6}>
-                        <Datepicker
-                            value={programDate}
-                            onChange={setProgramDate}
-                            label="Program Date"
-                        />
-                    </Grid>
-                    <Grid item xs={6}>
-                        <Datepicker
-                            value={paymentDueDate}
-                            onChange={setPaymentDueDate}
-                            label="Payment Due Date"
-                        />
-                    </Grid>
-                </Grid>
+                {program?.description && (
+                    <Typography variant="body2" marginTop={4}>
+                        {program.description}
+                    </Typography>
+                )}
+
+                {program?.price !== undefined && (
+                    <Typography
+                        variant="body1"
+                        color="secondary"
+                        marginTop={2}
+                        display="flex"
+                        justifyContent="flex-end"
+                    >
+                        ₹ {program.price}
+                    </Typography>
+                )}
+
+                {/* Date Fields */}
+                <Box display="flex" gap={2} className="w-full mt-4">
+                    <Datepicker
+                        value={programDate}
+                        onChange={setProgramDate}
+                        label="Program Date"
+                        required
+                    />
+                    <Datepicker
+                        value={paymentDueDate}
+                        onChange={setPaymentDueDate}
+                        label="Payment Due Date"
+                        required
+                    />
+                </Box>
 
                 {/* Discount Fields */}
-                <Grid container spacing={2} alignItems="center" style={{ marginTop: "16px" }}>
-                    <Grid item xs={12}>
-                        <IconButton
-                            size="small"
-                            onClick={handleDiscountButtonClick}
+                <Box display="flex" alignItems="center" marginTop={2}>
+                    <Typography
+                        size="small"
+                        onClick={handleDiscountButtonClick}
+                        variant="body2"
+                        color={showDiscountFields ? "error" : "secondary"}
+                        style={{ cursor: "pointer" }}
+                    >
+                        {showDiscountFields ? <RemoveIcon color="error" /> : <AddIcon color="secondary" />} Discount
+                    </Typography>
+                </Box>
+                {showDiscountFields && (
+                    <Box display="flex" gap={2} className="w-full">
+                        <TextField
+                            id="fee-discount"
+                            label="Fee Discount (in rupees)"
                             variant="standard"
-                        >
-                            {showDiscountFields ? <RemoveIcon color="primary" /> : <AddIcon color="secondary" />}
-                            Discount
-                        </IconButton>
-                    </Grid>
-                    {showDiscountFields && (
-                        <>
-                            <Grid item xs={6}>
-                                <TextField
-                                    id="fee-discount"
-                                    label="Fee Discount (in rupees)"
-                                    variant="standard"
-                                    fullWidth
-                                    defaultValue={existingProgramData?.discount || ""}
-                                />
-                            </Grid>
-                            <Grid item xs={6}>
-                                <TextField
-                                    id="discount-note"
-                                    label="Discount Note"
-                                    variant="standard"
-                                    fullWidth
-                                    defaultValue={existingProgramData?.discountNote || ""}
-                                />
-                            </Grid>
-                        </>
-                    )}
-                </Grid>
+                            fullWidth
+                            defaultValue={existingProgramData?.invoice?.feeDiscount || ""}
+                        />
+                        <TextField
+                            id="discount-note"
+                            label="Discount Note"
+                            variant="standard"
+                            fullWidth
+                            defaultValue={existingProgramData?.invoice?.discountNote || ""}
+                        />
+                    </Box>
+                )}
             </DialogContent>
 
-            {/* Dialog Actions */}
+            <DialogActions style={{ display: "flex", justifyContent: "space-between" }}>
+    {isEditMode && (
+        <StyledButton
+            onClick={handleCancelEnrollmentClick}
+            color="secondary"
+            variant="contained"
+        >
+            Cancel Enrollment
+        </StyledButton>
+    )}
+    <div style={{ display: 'flex', justifyContent: 'flex-end', flex: 1 }}>
+        <StyledCancelButton
+            onClick={onClose}
+            color="default"
+            variant="outlined"
+            style={{ marginRight: '10px' }} // Optional: Add some space between Cancel and Save buttons
+        >
+            Cancel
+        </StyledCancelButton>
+        <StyledButton
+            onClick={() => {
+                if (program || isEditMode) {
+                    onSubmit({
+                        program,
+                        programDate,
+                        paymentDueDate,
+                        discount: document.getElementById("fee-discount")?.value || "",
+                        discountNote: document.getElementById("discount-note")?.value || "",
+                    });
+                }
+                onClose();
+            }}
+            color="primary"
+            variant="contained"
+            disabled={
+                isEditMode
+                    ? !programDate || !paymentDueDate
+                    : !program || !programDate || !paymentDueDate
+            }
+        >
+            {isEditMode ? "Save" : "Submit"}
+        </StyledButton>
+    </div>
+</DialogActions>
+{/* Edit Program Dialog */}
+<EditProgram
+    open={openConfirmDialog} // Pass the open state to the EditProgram
+    onClose={handleCloseConfirmDialog}
+    programId={programId}
+/>
+
+        </Dialog>
+        
+    );
+};
+
+export default EnrollProgramDialog;   
+
+
+
+import React, { useState } from "react";
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
+
+const EditProgram = ({ open, onClose, programId }) => { // Fixed typo 'opne' to 'open'
+    return (
+        <Dialog open={open} onClose={onClose} aria-labelledby="confirm-dialog-title" aria-describedby="confirm-dialog-description">
+            <DialogTitle id="confirm-dialog-title">{"Confirm Enrollment Cancellation"}</DialogTitle>
+            <DialogContent>
+                <DialogContentText id="confirm-dialog-description">
+                    Are you sure you want to cancel the enrollment? This action cannot be undone.
+                </DialogContentText>
+            </DialogContent>
             <DialogActions>
-                <Button onClick={onClose} color="secondary">
-                    {isEditMode ? "Cancel" : "Close"}
-                </Button>
-                <Button
-                    onClick={() => {
-                        if (program || isEditMode) {
-                            onSubmit({
-                                program,
-                                programDate,
-                                paymentDueDate,
-                                ...(showDiscountFields && {
-                                    discount: document.getElementById("fee-discount").value,
-                                    discountNote: document.getElementById("discount-note").value,
-                                }),
-                            });
-                        }
-                        onClose();
-                    }}
-                    color="primary"
-                    variant="contained"
-                >
-                    {isEditMode ? "Save" : "Submit"}
+                <Button onClick={onClose} color="primary">No</Button>
+                <Button onClick={() => { console.log("Enrollment canceled!"); onClose(); }} color="secondary" autoFocus>
+                    Yes, Cancel Enrollment
                 </Button>
             </DialogActions>
         </Dialog>
     );
 };
 
-export default EnrollProgramDialog;
-
-
-
-
-import { useState, useEffect } from 'react';
-import { Line } from 'react-chartjs-2';
-import { useParams } from 'react-router-dom';
-import { get } from '../../../services/api-services';
-import { Box, CircularProgress, Typography } from '@mui/material';
-
-// Import the necessary components from Chart.js
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
-
-// Register the components
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
-
-const formatDate = (date) => {
-    const options = { day: 'numeric', month: 'short', year: 'numeric' };
-    return new Intl.DateTimeFormat('en-GB', options).format(new Date(date));
-};
-
-// const filterAlternateDates = (data) => {
-//     return data.filter((_, index) => index % 2 === 0); // Only keep alternate items (1, 3, 5, etc.)
-// };
-
-const NeckSizeGraph = ({ type, showLine }) => {
-    const { id } = useParams();
-    const [labels, setLabels] = useState([]);
-    const [data, setData] = useState([]);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        const fetchData = async () => {
-            const url = `/Measurements?filter={"where":{"customerId":"${id}","type":"${type}"},"order":"recordedAt DESC","limit":30}`;
-            try {
-                const response = await get(url);
-                if (response && response.data) {
-                    const filteredData = response.data;
-                    const reversedData = filteredData.reverse();
-
-                    let labelData = reversedData.map((item) =>
-                        formatDate(item.recordedAt)
-                    );
-                    let valueData = reversedData.map((item) =>
-                        parseFloat(item.value)
-                    );
-                    if (valueData.length === 1) {
-                        labelData.push('');
-                        valueData.push(valueData[0]);
-                    }
-
-                    setLabels(labelData);
-                    setData(valueData);
-                }
-            } catch (error) {
-                console.error('Error fetching graph data:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchData();
-    }, [id, type]);
-
-
-    if (loading) {
-        return (
-            <Box textAlign="center" py={2}>
-                <CircularProgress />
-                <Typography variant="body2" mt={1}>
-                    Loading Graph...
-                </Typography>
-            </Box>
-        );
-    }
-
-    const minValue = Math.min(...data);
-    const maxValue = Math.max(...data);
-
-    // Chart option with line
-    const chartOptionsWithLine = {
-        responsive: true,
-        plugins: {
-            legend: {
-                display: true,
-                position: 'top',
-            },
-            title: {
-                display: true,
-                text: `${type} Measurements Over Time`,
-            },
-        },
-        scales: {
-            x: {
-                display: true,
-                type: 'category', // Use category scale for X-axis
-                labels,
-                title: {
-                    display: true,
-                    text: 'Date',
-                },
-            },
-            y: {
-                display: true,
-                beginAtZero: false,
-                min: minValue,
-                max: maxValue,
-                title: {
-                    display: true,
-                    text: `${type}`,
-                },
-            },
-        },
-    };
-
-    // Chart option without line
-    const chartOptionsWithoutLine = {
-        responsive: true,
-        plugins: {
-            // legend: {
-            //     display: true,
-            //     position: 'top',
-            // },
-            // title: {
-            //     display: true,
-            //     text: `${type} Measurements Over Time (No Line)`,
-            // },
-        },
-        scales: {
-            x: {
-                display: false, // Hide the X-axis line
-                labels,
-                title: {
-                    display: true,
-                    text: 'Date',
-                },
-            },
-            y: {
-                display: false, // Hide the Y-axis line
-                beginAtZero: false,
-                min: minValue,
-                max: maxValue,
-                title: {
-                    display: true,
-                    text: `${type}`,
-                },
-            },
-        },
-    };
-
-
-    const chartData = {
-        labels,
-        datasets: [
-            {
-                label: `${type} Measurements`,
-                data,
-                fill: true, // Enables the background fill under the line
-                borderColor: 'rgba(75, 192, 192, 1)', // Color of the line
-                backgroundColor: 'rgba(75, 192, 192, 0.2)', // Background fill color up to the line
-                pointBackgroundColor: 'rgba(75, 192, 192, 1)',
-                pointBorderColor: 'rgba(75, 192, 192, 1)',
-                pointRadius: 5, // Make the point visible
-                tension: 0.4, // Smooth curves
-            },
-        ],
-    };
-    
-    // Conditionally render the graph based on the `showLine` prop
-    const chartOptions = showLine ? chartOptionsWithLine : chartOptionsWithoutLine;
-
-    return (
-        <Box width="100%" mx="auto" maxWidth="600px" mt={3}>
-            <Typography variant="h6" textAlign="center">
-                {/* {showLine ? 'Graph with Line' : 'Graph without Line'} */}
-            </Typography>
-            <Line data={chartData} options={chartOptions} />
-        </Box>
-    );
-};
-
-export default NeckSizeGraph;
-
-
-
-
-// import { useState, useEffect } from 'react';
-// import { Line } from 'react-chartjs-2';
-// import { useParams } from 'react-router-dom';
-// import { get } from '../../../services/api-services';
-// import { Box, CircularProgress, Typography } from '@mui/material';
-
-// // Import Chart.js components
-// import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
-
-// // Register the components
-// ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
-
-// const formatDate = (date) => {
-//     const options = { day: 'numeric', month: 'short', year: 'numeric' };
-//     return new Intl.DateTimeFormat('en-GB', options).format(new Date(date));
-// };
-
-// const NeckSizeGraph = ({ type }) => {
-//     const { id } = useParams();
-//     const [labels, setLabels] = useState([]);
-//     const [data, setData] = useState([]);
-//     const [loading, setLoading] = useState(true);
-
-//     useEffect(() => {
-//         const fetchData = async () => {
-//             const url = `/Measurements?filter={"where":{"customerId":"${id}","type":"${type}"},"order":"recordedAt DESC","limit":30}`;
-//             try {
-//                 const response = await get(url);
-//                 if (response && response.data) {
-//                     const filteredData = response.data.reverse();
-
-//                     setLabels(filteredData.map((item) => formatDate(item.recordedAt)));
-//                     setData(filteredData.map((item) => parseFloat(item.value)));
-//                 }
-//             } catch (error) {
-//                 console.error('Error fetching graph data:', error);
-//             } finally {
-//                 setLoading(false);
-//             }
-//         };
-
-//         fetchData();
-//     }, [id, type]);
-
-//     if (loading) {
-//         return (
-//             <Box textAlign="center" py={2}>
-//                 <CircularProgress />
-//                 <Typography variant="body2" mt={1}>
-//                     Loading Graph...
-//                 </Typography>
-//             </Box>
-//         );
-//     }
-
-//     const chartOptions = {
-//         responsive: true,
-//         plugins: {
-//             legend: { display: false }, // Hide the legend
-//             title: { display: false }, // Hide the title
-//         },
-//         scales: {
-//             x: {
-//                 grid: { display: false }, // Hide grid lines
-//                 ticks: { display: false }, // Hide x-axis ticks
-//             },
-//             y: {
-//                 grid: { display: false }, // Hide grid lines
-//                 ticks: { display: false }, // Hide y-axis ticks
-//                 beginAtZero: true,
-//             },
-//         },
-//         elements: {
-//             line: {
-//                 tension: 0.4, // Smooth curve
-//                 borderColor: 'rgba(75, 192, 192, 1)', // Line color
-//                 borderWidth: 2,
-//             },
-//             point: { radius: 0 }, // Hide points on the graph
-//         },
-//     };
-
-//     const chartData = {
-//         labels,
-//         datasets: [
-//             {
-//                 data,
-//                 fill: true, // Fill the area under the graph
-//                 backgroundColor: 'rgba(75, 192, 192, 0.2)', // Background color under the graph
-//                 borderColor: 'rgba(75, 192, 192, 1)', // Graph line color
-//             },
-//         ],
-//     };
-
-//     return (
-//         <Box
-//             width="100%"
-//             mx="auto"
-//             maxWidth="600px"
-//             mt={3}
-//             style={{ backgroundColor: '#ffffff', padding: '20px', borderRadius: '10px' }}
-//         >
-//             <Line data={chartData} options={chartOptions} />
-//         </Box>
-//     );
-// };
-
-// export default NeckSizeGraph;
+export default EditProgram;
 
 
 import React, { useEffect, useState } from 'react';
@@ -777,7 +281,9 @@ import EditIcon from '@mui/icons-material/Edit';
 import InfoIcon from '@mui/icons-material/Info';
 import { useNavigate, useParams } from 'react-router-dom';
 import EnrollProgramDialog from '../profileModel-DialogBox/AddEnrollProgramDialog';
-
+import AddIcon from '@mui/icons-material/Add';
+import AddImageDialog from '../profileModel-DialogBox/AddImageLibrary';
+import AddPaymentDialog from '../profileModel-DialogBox/AddPaymentDialog';
 
 const Programs = ({ userId }) => {
     const navigate = useNavigate()
@@ -785,9 +291,57 @@ const Programs = ({ userId }) => {
     const [loading, setLoading] = useState(true);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [selectedProgram, setSelectedProgram] = useState(null);
-    const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+    const [isEditMode, setIsEditMode] = useState(false);
+    const [isPayment, setIsPayment] = useState(false);
     const { id } = useParams();
+    const [allPrograms, setAllPrograms] = useState([]);
 
+    const onGetPrograms = async () => {
+        const res = await get('/Programs');
+        if (res?.statusCode === 200) {
+            setAllPrograms(res?.data)
+        }
+    }
+      const onEnrollProgram = async ({ program, programDate, paymentDueDate, discount, discountNote }) => {
+             try {
+                 const res = await get('/Invoices?filter={"order" : "createdAt DESC", "limit" : "1" }');
+                 if (res?.statusCode === 200) {
+                     let invoice_id = 1
+                     const lastInvoice = res?.data;
+                     if (lastInvoice?.length > 0) {
+                         if (lastInvoice[0].invoiceID && lastInvoice[0].invoiceID != '') {
+                             invoice_id = lastInvoice[0].invoiceID + 1;
+                         }
+                     }
+                     let status = '';
+                     if (discount === program?.price) {
+                         status = 'Paid';
+                     } else {
+                         status = 'Due';
+                     }
+                     let data = { invoiceID: invoice_id, programId: program?.id, purchaseProgram: program, tax: program?.tax, enrollOn: programDate, dueDate: paymentDueDate, feeDiscount: discount, discountNote: discountNote, status: status, createdAt: new Date(), updatedAt: new Date() };
+                     const postRes = await post('/Invoices', data);
+                     if (postRes?.statusCode === 200) {
+                         let date = new Date();
+                         let last = new Date(date.getTime() + (program?.duration * 24 * 60 * 60 * 1000));
+                         let userProgramData = {
+                             invoiceId: postRes?.data?.id, customerId: id, programId: postRes?.data?.programId,
+                             status: 'active', createdAt: new Date(), updatedAt: new Date(), dueAmount: postRes?.data?.purchaseProgram?.price, day: 1, endDate: last
+                         };
+                         const userProgram = await post('/UserPrograms', userProgramData);
+                         if (userProgram?.statusCode === 200) {
+                             setSnackbar({
+                                 openSnackbar: true,
+                                 message: 'Program enrolled successfully!',
+                                 severity: 'success'
+                             })
+                         }
+                     }
+                 }
+             } catch (error) {
+                 console.log("error.....", error)
+             }
+         }
     useEffect(() => {
         const fetchPayments = async () => {
             try {
@@ -802,14 +356,20 @@ const Programs = ({ userId }) => {
                 const userProgramsWithPayments = await Promise.all(
                     userProgramsResponse.data.map(async (enrollProgram) => {
                         const { programId, invoiceId } = enrollProgram;
-
                         if (programId && invoiceId) {
                             const paymentsResponse = await get(
                                 `/Payments?filter={"where": {"customerId": "${id}", "programId": "${programId}", "invoiceId": "${invoiceId}"}, "order": "paidOn"}`
                             );
+
+                            const enrollOnDate = new Date(enrollProgram.invoice?.enrollOn);
+                            const currentDate = new Date();
+                            const totalDuration = enrollProgram.invoice?.purchaseProgram?.duration;
+                            const elapsedDays = Math.floor((currentDate - enrollOnDate) / (1000 * 60 * 60 * 24));
+                            const remainingDays = Math.max(0, totalDuration - elapsedDays);
                             return {
                                 ...enrollProgram,
                                 paymentData: paymentsResponse?.data || [],
+                                remainingDay: remainingDays,
                             };
                         } else {
                             console.error("Missing programId or invoiceId for enrollProgram:", enrollProgram);
@@ -825,375 +385,257 @@ const Programs = ({ userId }) => {
                 setLoading(false);
             }
         };
-
+        onGetPrograms();
         fetchPayments();
     }, [id]);
 
-    const handleEnrolltoProgram = () => setIsDialogOpen(true);
-    const handleDialogClose = () => setIsDialogOpen(false);
 
     const handleViewInvoice = (invoiceId) => {
-        console.log(invoiceId, "invoiceId.....")
+        // console.log(invoiceId, "invoiceId.....")
         navigate(`/admin/invoice/${invoiceId}`)
     };
 
-   
-    const handleEditEnrolltoProgram = (program) => {
-        setSelectedProgram(program); 
+
+    // const handleEditEnrolltoProgram = (program) => {
+    //     setSelectedProgram(program);
+    //     setIsDialogOpen(true);
+    // };
+
+    const handleDialogOpen = (program = null) => {
+        setSelectedProgram(program);
+        setIsEditMode(!!program);
         setIsDialogOpen(true);
     };
+
+    const handleDialogClose = () => {
+        setIsDialogOpen(false);
+        setSelectedProgram(null);
+    };
+
+    const handlePaymentDialog = (program = null) => {
+        setSelectedProgram(program);
+        setIsPayment(true);
+    }
+   
+    const handlePaymentClose = () => {
+        setIsPayment(false);
+        setSelectedProgram(null);
+    };
+    const handleSubmit = async (data) => {
+        try {
+            if (isEditMode) {
+                // console.log('Edit Program Data:', data);
+                // Update program API logic here
+            } else {
+                // console.log('Add Program Data:', data);
+                // Add program API logic here
+            }
+            // Refresh user programs list after submission
+            handleDialogClose();
+        } catch (error) {
+            console.error('Error submitting program data:', error);
+        }
+    };
+// console.log("merghe")
     if (loading) {
         return <Typography>Loading...</Typography>;
     }
-    
+    // console.log(selectedProgram, "selectedProgram")
     return (
         <Box sx={{ marginLeft: '20px', marginRight: '10px' }}>
-        <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ marginBottom: 2 }}>
-            <Typography variant="h6" sx={{ fontWeight: 500 }}>
-                Enrolled Programs
-            </Typography>
-            <Button variant="text" color="secondary" onClick={handleEnrolltoProgram}>
-                Enroll new programs
-            </Button>
-        </Box>
-    
-        {userPrograms.length === 0 && (
-            <Typography align="center">Enroll program for the user!</Typography>
-        )}
-    
-        {userPrograms.map((enrollProgram) => (
-            <Card
-                key={enrollProgram.id}
-                sx={{
-                    marginBottom: 2,
-                    backgroundColor: enrollProgram.status === 'active' ? '#fff' : '#f5f5f5',
-                    boxShadow: 1,
-                }}
-            >
-                <CardContent>
-                    <Box display="flex" justifyContent="space-between" alignItems="center">
-                        <Typography variant="h6">
-                            {enrollProgram.invoice?.purchaseProgram?.title} (₹
-                            {enrollProgram.invoice?.purchaseProgram?.price})
+            <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ marginBottom: 2 }}>
+                <Typography variant="h6" sx={{ fontWeight: 500 }}>
+                    Enrolled Programs
+                </Typography>
+                <Button variant="text" color="secondary" onClick={() => handleDialogOpen()}>
+                    Enroll new programs
+                </Button>
+            </Box>
+
+            {userPrograms.length === 0 && (
+                <Typography align="center">Enroll program for the user!</Typography>
+            )}
+
+            {userPrograms.map((enrollProgram) => (
+                <Card
+                    key={enrollProgram.id}
+                    sx={{
+
+                        marginBottom: 2,
+                        backgroundColor: enrollProgram.status === 'active' ? '#fff' : '#f5f5f5',
+                        boxShadow: 1,
+                    }}
+                >
+                    <CardContent>
+                        <Box display="flex" justifyContent="space-between" alignItems="center">
+                            <Typography variant="h6" >
+                                {enrollProgram.invoice?.purchaseProgram?.title} (₹
+                                {enrollProgram.invoice?.purchaseProgram?.price})
+                            </Typography>
+                            <IconButton
+                                onClick={() => handleDialogOpen(enrollProgram)}
+                            >
+                                <EditIcon color="action" />
+                            </IconButton>
+                        </Box>
+
+                        <Typography variant="body2" color="textSecondary">
+                            {enrollProgram.invoice?.purchaseProgram?.duration} Days
                         </Typography>
-                        <IconButton 
-                        // onClick={() => console.log("Edit Program:", enrollProgram.id)}
-                        onClick={handleEditEnrolltoProgram}
-                        >
-                            <EditIcon color="action" />
-                        </IconButton>
-                    </Box>
-    
-                    <Typography variant="body2" color="textSecondary">
-                        {enrollProgram.invoice?.purchaseProgram?.duration} Days
-                    </Typography>
-                    <Typography variant="body2" color="textSecondary">
-                        {new Date(enrollProgram.invoice?.enrollOn).toLocaleDateString()} To{' '}
-                        {new Date(enrollProgram.invoice?.completedOn).toLocaleDateString()}
-                    </Typography>
-    
-                    <Typography
-                        variant="body2"
-                        color={enrollProgram.remainingDay === 0 ? 'primary' : 'textSecondary'}
-                    >
-                        {enrollProgram.remainingDay === 0 ? 'Completed' : 'In Progress'}
-                    </Typography>
-    
-                    <LinearProgress
-                        variant="determinate"
-                        value={
-                            enrollProgram.remainingDay === 0
-                                ? 100
-                                : ((enrollProgram.invoice?.purchaseProgram?.duration - enrollProgram.remainingDay) /
-                                    enrollProgram.invoice?.purchaseProgram?.duration) *
-                                    100
-                        }
-                        color="secondary"
-                        sx={{ height: 8, borderRadius: 4 }}
-                    />
-    
-                    <Typography variant="body2" color="primary" sx={{ marginTop: 1 }}>
-                        {enrollProgram.remainingDay}d Remaining
-                    </Typography>
-    
-                    <Box display="flex" flexWrap="wrap" sx={{ gap: 2, marginTop: 2 }}>
-                        <Typography variant="body2">
-                            Discount: ₹{enrollProgram.invoice?.feeDiscount || '0'}
-                            <Tooltip title={enrollProgram.invoice?.discountNote || ''} arrow>
-                                <InfoIcon color="action" sx={{ marginLeft: 1 }} />
-                            </Tooltip>
+                        <Typography variant="body2" color="textSecondary">
+                            {new Date(enrollProgram.invoice?.enrollOn).toLocaleDateString()} To{' '}
+                            {new Date(enrollProgram.invoice?.completedOn).toLocaleDateString()}
                         </Typography>
-    
-                        <Typography variant="body2">
-                            Net Fee: ₹{enrollProgram.programNetAmt}
-                        </Typography>
-    
+
                         <Typography
                             variant="body2"
-                            color={enrollProgram.remainingAmount <= 1 ? 'primary' : 'error'}
+                            color={enrollProgram.remainingDay === 0 ? 'primary' : 'textSecondary'}
                         >
-                            Fee Status:{' '}
-                            {enrollProgram.remainingAmount <= 1
-                                ? '✔ Paid'
-                                : `(₹${enrollProgram.remainingAmount}) Due`}
+                            {enrollProgram.remainingDay === 0 ? 'Completed' : 'In Progress'}
                         </Typography>
-    
-                        <Button
-                            variant="text"
-                            color="primary"
-                            onClick={() => handleViewInvoice(enrollProgram.invoiceId)}
-                            sx={{ padding: 0 }}
-                        >
-                            VIEW INVOICE
-                        </Button>
-                    </Box>
-    
-                    {enrollProgram.paymentData && enrollProgram.paymentData.length > 0 && (
-                        <Box mt={4}>
-                            <Typography variant="h6" sx={{ mb: 2 }}>
-                                Payment History
-                            </Typography>
-                            <TableContainer component={Paper}>
-                                <Table>
-                                    <TableHead>
-                                        <TableRow>
-                                            <TableCell>Paid On</TableCell>
-                                            <TableCell>Paid Amount</TableCell>
-                                            <TableCell>Payment Mode</TableCell>
-                                            <TableCell>Comments</TableCell>
-                                            <TableCell>Action</TableCell>
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        {enrollProgram.paymentData.map((payment) => (
-                                            <TableRow key={payment.id}>
-                                                <TableCell>
-                                                    {new Date(payment.paidOn).toLocaleDateString()}
-                                                </TableCell>
-                                                <TableCell>₹{payment.amount}</TableCell>
-                                                <TableCell>{payment.paymentMode}</TableCell>
-                                                <TableCell>{payment.comment || '-'}</TableCell>
-                                                <TableCell>
-                                                    <IconButton>
-                                                        <EditIcon />
-                                                    </IconButton>
-                                                </TableCell>
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            </TableContainer>
-                        </Box>
-                    )}
-                </CardContent>
-            </Card>
-        ))}
-    
-        {/* <EnrollProgramDialog open={isDialogOpen} onClose={handleDialogClose} /> */}
-        <EnrollProgramDialog
-    open={isEditDialogOpen}
-    onClose={() => setIsEditDialogOpen(false)}
-    onSubmit={(data) => {
-        console.log("Updated Program Data:", data);
-        setIsEditDialogOpen(false);
-    }}
-    programId={selectedProgram?.id}
-    existingProgramData={selectedProgram}
-/>
 
-    </Box>
-    
+                        <LinearProgress
+                            variant="determinate"
+                            value={
+                                enrollProgram?.remainingDay === 0
+                                    ? 100
+                                    : ((enrollProgram?.invoice?.purchaseProgram?.duration - enrollProgram?.remainingDay) /
+                                        enrollProgram?.invoice?.purchaseProgram?.duration) *
+                                    100
+                            }
+                            color="secondary"
+                            sx={{ height: 8, borderRadius: 4 }}
+                        />
+
+
+                        <Box display="flex" justifyContent="flex-end" sx={{ marginTop: 1 }}>
+                            <Typography variant="body2" color="primary">
+                                {enrollProgram?.remainingDay}d Remaining
+                            </Typography>
+                        </Box>
+
+                        <Box display="flex" flexWrap="wrap" sx={{ gap: 2, marginTop: 2 }}>
+                            <Typography variant="body2">
+                                Discount: ₹{enrollProgram?.invoice?.feeDiscount || '0'}
+                                <Tooltip title={enrollProgram?.invoice?.discountNote || ''} arrow>
+                                    <InfoIcon color="action" sx={{ marginLeft: 1 }} />
+                                </Tooltip>
+                            </Typography>
+
+                            <Typography variant="body2">
+                                Net Fee: ₹{enrollProgram?.programNetAmt}
+                            </Typography>
+
+                            <Typography
+                                variant="body2"
+                                color={enrollProgram?.invoice?.status === 'Paid' ? '#4caf50' : 'error'}
+                            >
+                                Fee Status:
+                                {enrollProgram?.invoice?.status === 'Paid'
+                                    ? '✔ Paid'
+                                    : `(₹${enrollProgram?.dueAmount}) Due`}
+                            </Typography>
+
+                            {/* Conditionally render AddIcon if payment status is not Paid */}
+                            {enrollProgram?.invoice?.status !== 'Paid' && (
+                                <IconButton
+                                    variant="text"
+                                    color="primary"
+                                    onClick={() => handlePaymentDialog(enrollProgram)}
+                                    sx={{ padding: 0, color: '#3f51b5' }}
+                                >
+                                    <AddIcon />
+                                </IconButton>
+                            )}
+
+                            <Button
+                                variant="text"
+                                color="primary"
+                                onClick={() => handleViewInvoice(enrollProgram?.invoiceId)}
+                                sx={{ padding: 0, color: '#3f51b5' }}
+                            >
+                                VIEW INVOICE
+                            </Button>
+                        </Box>
+
+
+                        {enrollProgram?.paymentData && enrollProgram?.paymentData?.length > 0 && (
+                            <Box mt={4}>
+                                <Typography variant="h6" sx={{ mb: 2 }}>
+                                    Payment History
+                                </Typography>
+                                <TableContainer component={Paper}>
+                                    <Table>
+                                        <TableHead>
+                                            <TableRow>
+                                                <TableCell>Paid On</TableCell>
+                                                <TableCell>Paid Amount</TableCell>
+                                                <TableCell>Payment Mode</TableCell>
+                                                <TableCell>Comments</TableCell>
+                                                <TableCell>Action</TableCell>
+                                            </TableRow>
+                                        </TableHead>
+                                        <TableBody>
+                                            {enrollProgram?.paymentData.map((payment) => (
+                                                <TableRow key={payment.id}>
+                                                    <TableCell>
+                                                        {new Date(payment.paidOn).toLocaleDateString()}
+                                                    </TableCell>
+                                                    <TableCell>₹{payment.amount}</TableCell>
+                                                    <TableCell>{payment.paymentMode}</TableCell>
+                                                    <TableCell>{payment.comment || '-'}</TableCell>
+                                                    <TableCell>
+                                                        <IconButton>
+                                                            <EditIcon />
+                                                        </IconButton>
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
+                            </Box>
+                        )}
+                    </CardContent>
+                </Card>
+            ))}
+
+            {/* Dialog for Add/Edit Program */}
+            {/* <EnrollProgramDialog
+                open={isDialogOpen}
+                onClose={handleDialogClose}
+                onSubmit={handleSubmit}
+                programId={isEditMode ? selectedProgram?.customerId : null}
+                existingProgramData={selectedProgram}
+
+            /> */}
+              <EnrollProgramDialog
+                    open={isDialogOpen}
+                    onClose={handleDialogClose}
+                    allPrograms={allPrograms}
+                    onSubmit={onEnrollProgram}
+                    programId={isEditMode ? selectedProgram?.customerId : null}
+                    existingProgramData={selectedProgram}
+                    
+                />
+            <AddPaymentDialog
+                open={isPayment}
+                onClose={handlePaymentClose}
+                onSubmit={handleSubmit}
+                existingProgramData={selectedProgram || null} 
+                // existingProgramData={selectedProgram}
+                // existingProgramData={{
+                //     programDate: "2024-01-01",
+                //     amount: "5000",
+                //     // program: { title: "Cheque" },
+                //     // comments: "Payment for the new program",
+                // }}
+
+            />
+
+        </Box>
+
     );
 };
 
 export default Programs;
-
-
-import React, { useEffect, useState } from "react";
-import {
-    Box,
-    Button,
-    CircularProgress,
-    Snackbar,
-    Typography,
-    Container,
-    Card,
-    CardContent,
-    Grid,
-    Avatar,
-    Divider,
-    IconButton
-} from "@mui/material";
-import { useNavigate, useParams } from "react-router-dom";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-// import { api } from "../../Db.connection"; // Assuming this is the API connection file
-import { get } from "../../services/api-services";
-import EditIcon from '@mui/icons-material/Edit';
-import Switch from '@mui/material/Switch';
-import EnrollProgramDialog from "../../component/Case-Detail/profileModel-DialogBox/AddEnrollProgramDialog";
-import Measurement from "../../component/Case-Detail/profileModel/Measurement";
-import Programs from "../../component/Case-Detail/profileModel/Programs";
-import GeneralInfo from "../../component/Case-Detail/profileModel/GeneralInfo"
-import Timeline from "../../component/Case-Detail/ViewTimeLine/TimeLine";
-import { useLocation } from 'react-router-dom';
-import PersonIcon from '@mui/icons-material/Person';
-
-const CaseDetails = () => {
-    const [userData, setUserData] = useState({});
-    const [loading, setLoading] = useState(true);
-    const [snackbar, setSnackbar] = useState({ open: false, message: "" });
-    const navigate = useNavigate();
-    const { id } = useParams();
-    const [isDialogOpen, setIsDialogOpen] = useState(false);
-    const [activeSection, setActiveSection] = useState("generalInfo");
-    const [showTimeline, setShowTimeline] = useState(false);
-    const { state } = useLocation();
-    const { userId, data_user } = state || {};
-    // Close Snackbar
-    const handleSnackbarClose = () => setSnackbar({ open: false, message: "" });
-    // Handle Back Navigation
-    const handleGoBack = () => {
-        navigate(-1);
-    };
-
-    // Fetch user data on component mount
-    useEffect(() => {
-        const fetchUserData = async () => {
-
-            try {
-                const response = await get(`/Customers/${id}`);
-                console.log("response.data....", response.data);
-                setUserData(response.data);
-                setLoading(false);
-            } catch (error) {
-                console.error("Error fetching data", error);
-                setSnackbar({ open: true, message: "Failed to load case data" });
-                setLoading(false);
-            }
-        };
-        fetchUserData();
-        // fetchPayments();
-    }, [id]);  // Corrected dependency array
-
-    // const programId = data_user.program[0].programId;
-    // console.log("Program ID:", programId);
-
-    if (loading) {
-        return (
-            <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh" }}>
-                <CircularProgress />
-            </Box>
-        );
-    }
-    const handleEnrolltoProgram = () => setIsDialogOpen(true);
-    const handleDialogClose = () => setIsDialogOpen(false);
-    const handleSectionChange = (section) => setActiveSection(section);
-
-    const handleViewTimeline = () => {
-        setShowTimeline((prev) => !prev);
-    };
-
-    return (
-        <Box>
-            <Container maxWidth={false}>
-                {/* Top Section */}
-                <Grid container alignItems="center" justifyContent="space-between" spacing={2} sx={{ mb: 3 }}>
-                    {/* Left Side - Back Button and Title */}
-                    <Grid item>
-                        <Box display="flex" alignItems="center">
-                            <IconButton onClick={handleGoBack}>
-                                <ArrowBackIcon fontSize="large" />
-                            </IconButton>
-                            <Typography variant="h5" sx={{ ml: 1, fontWeight: 600 }}>
-                                Case Detail
-                            </Typography>
-                        </Box>
-                    </Grid>
-
-                    {/* Right Side - Buttons */}
-                    <Grid item>
-                        <Box display="flex" gap={2}>
-                            <Button
-                                variant="standered"
-                                color="primary"
-                                onClick={handleViewTimeline}
-                            >
-                                {showTimeline ? (
-                                    <>
-                                        <PersonIcon />
-                                        View Profile
-                                    </>
-                                ) : (
-                                    "View Timeline"
-                                )}
-                            </Button>
-                            <Button variant="contained" color="primary" onClick={handleEnrolltoProgram}>
-                                Enroll to Program
-                            </Button>
-                        </Box>
-                    </Grid>
-                </Grid>
-
-                {!showTimeline ? (
-                    <>
-                        {/* Section Buttons */}
-                        <Box display="flex" justifyContent="flex-start" gap={3}>
-                            <Button
-                                variant={activeSection === "generalInfo" ? "contained" : "text"}
-                                color="primary"
-                                onClick={() => handleSectionChange("generalInfo")}
-                                sx={{ fontWeight: 500 }}
-                            >
-                                General Info
-                            </Button>
-                            <Button
-                                variant={activeSection === "measurement" ? "contained" : "text"}
-                                color="primary"
-                                onClick={() => handleSectionChange("measurement")}
-                                sx={{ fontWeight: 500 }}
-                            >
-                                Measurement
-                            </Button>
-                            <Button
-                                variant={activeSection === "programs" ? "contained" : "text"}
-                                color="primary"
-                                onClick={() => handleSectionChange("programs")}
-                                sx={{ fontWeight: 500 }}
-                            >
-                                Programs
-                            </Button>
-                        </Box>
-
-                        <Divider sx={{ mb: 3 }} />
-
-                        {/* Conditional Rendering of Sections */}
-                        {activeSection === "generalInfo" && <GeneralInfo userData={userData} />}
-                        {activeSection === "measurement" && <Measurement />}
-                        {activeSection === "programs" && <Programs />}
-                    </>
-                ) : (
-
-                    <Timeline userData={userData} />
-                )}
-
-                <Snackbar
-                    open={snackbar.open}
-                    autoHideDuration={3000}
-                    onClose={handleSnackbarClose}
-                    message={snackbar.message}
-                />
-
-                <EnrollProgramDialog
-                    open={isDialogOpen}
-                    onClose={handleDialogClose}
-                />
-            </Container>
-            {/* Enroll Program Dialog */}
-
-        </Box>
-    );
-};
-
-export default CaseDetails;
-
-
