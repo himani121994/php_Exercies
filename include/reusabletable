@@ -1,641 +1,663 @@
+// import React, { useEffect, useState } from "react";
+// import { get,post } from "../../services/api-services";
+// import { useParams } from "react-router-dom";
+// import { Box, Button, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Grid, Card, Divider } from "@mui/material";
+// import ModuleHeading from "../../component/ModuleHeading";
+// import AccessTimeIcon from '@mui/icons-material/AccessTime';
+
+// const InvoicePage = () => {
+//     const [invoiceData, setInvoiceData] = useState(null);
+//     const [paymentData, setPaymentData] = useState([]);
+//     const { invoiceId } = useParams();
 
 
-import React, { useState, useEffect } from "react";
-import {
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    TextField,
-    Button,
-    Grid,
-    Typography,
-    Box,
+//     useEffect(() => {
+//         const fetchData = async () => {
+//             if (!invoiceId) return;
+
+//             try {
+//                 // First API call
+//                 const url = `/UserPrograms?filter={"where":{"invoiceId":"${invoiceId}"},"include":["customer","invoice"]}`;
+//                 const response = await get(url);
+
+//                 if (response?.data) {
+//                     const programData = response.data[0];
+//                     setInvoiceData(programData);
+
+//                     // Extract programId from the first response
+//                     const programId = programData?.programId;
+//                     const id = programData?.customerId;
+
+//                     // If programId is available, make the second API call
+//                     if (programId, id) {
+//                         const url1 = `/Payments?filter={"where":{"customerId":"${id}","programId":"${programId}","invoiceId":"${invoiceId}"},"order":"paidOn"}`;
+//                         const paymentResponse = await get(url1);
+
+//                         if (paymentResponse?.data) {
+//                             setPaymentData(paymentResponse.data);
+//                         }
+//                     }
+//                 }
+//             } catch (error) {
+//                 console.error("Error fetching data:", error);
+//             }
+//         };
+
+//         fetchData();
+//     }, [invoiceId]);
+
+//     const sendEmail = async () => {
+//         if (!invoiceData || !invoiceData.customer || !invoiceData.invoice) {
+//             alert("Unable to send email. Missing invoice or customer details.");
+//             return;
+//         }
+
+//         try {
+//             const payload = {
+//                 to: invoiceData.customer.email,
+//                 subject: `Invoice #WW241200${invoiceData.invoice.invoiceID}`,
+//                 body: `Dear ${invoiceData.customer.name},\n\nPlease find the details of your invoice attached.\n\nThank you.`,
+//                 invoiceId: invoiceData.invoice.invoiceID,
+//             };
+
+//             const response = await post("/sendEmail", payload);
+
+//             if (response?.status === 200) {
+//                 alert("Email sent successfully!");
+//             } else {
+//                 alert("Failed to send email. Please try again.");
+//             }
+//         } catch (error) {
+//             console.error("Error sending email:", error);
+//             alert("An error occurred while sending the email.");
+//         }
+//     };
+
+//     if (!invoiceData) return <Typography align="center">Loading...</Typography>;
+
+//     const { customer, invoice } = invoiceData;
+//     const payment = paymentData[0] || {};
+    
+// // console.log(invoice,"djcjashfcudehfuedjhfewisufid")
+// // console.log(invoice?.status, typeof invoice?.status);
+
+//     return (
+//         <Box
+//             sx={{
+//                 // fontFamily: "Arial, sans-serif",
+//                 // border: "1px solid #ddd",
+//                 // borderRadius: "8px",
+//                 // background: "#f9f9f9",
+//             }}
+//         >
+//             <ModuleHeading title="Invoice details" navigateTo="/admin/dashboard" />
+
+//             {/* Invoice Details */}
+//             <Card>
+//                 <Box
+//                     sx={{
+//                         display: "flex",
+//                         justifyContent: "space-between",
+//                         alignItems: "center",
+//                         padding: "16px",
+//                         // marginBottom: "20px",
+//                         backgroundColor: "#fff",
+//                         // border: "1px solid #ddd",
+//                         // borderRadius: "6px",
+//                     }}
+//                 >
+//                     <Box>
+//                         <Typography variant="subtitle1"><strong>Invoice:</strong>WW241200{invoice?.invoiceID}</Typography>
+//                         <Typography variant="subtitle2"> {new Date(invoice?.createdAt).toLocaleDateString()}</Typography>
+                      
+//                         {invoice?.status === "Paid" ? (
+//     <Typography variant="h6" color="green">✓ PAID</Typography>
+// ) : (
+//     <Typography variant="h6" color="red" className="w-400">
+//         <AccessTimeIcon /> PAYMENT DUE 
+//     </Typography>
+// )}
+
+//                     </Box>
+//                     <Box textAlign="right">
+//                         <img
+//                             src={invoice?.purchaseProgram?.icon}
+//                             alt="Program Icon"
+//                         />
+//                         <Typography variant="subtitle2"> <strong color="gray">Payment Due Date:</strong> {new Date(invoice?.dueDate).toLocaleDateString()}</Typography>
+
+//                     </Box>
+//                 </Box>
+//                 <Divider />
+//                 {/* Customer Details */}
+//                 <Box
+//                     sx={{
+//                         display: "flex",
+//                         justifyContent: "space-between",
+//                         alignItems: "center",
+//                         padding: "16px",
+//                         // marginBottom: "20px",
+//                         backgroundColor: "#fff",
+//                         // border: "1px solid #ddd",
+//                         // borderRadius: "6px",
+//                     }}
+//                 >
+//                     <Box>
+//                         <Typography variant="subtitle1"><strong>{customer?.name}</strong></Typography>
+//                         <Typography variant="body2">Mobile: {customer?.mobile}</Typography>
+//                         <Typography variant="body2">Email: {customer?.email}</Typography>
+//                     </Box>
+//                     <Box textAlign="right">
+//                         <Typography variant="body2">WeightWonder™</Typography>
+//                         <Typography variant="body2">+915588779933</Typography>
+//                         <Typography variant="body2">info@weightwonder.com</Typography>
+//                         <Typography variant="subtitle2">27-Noble Plaza, MP Nagar Bhopal</Typography>
+
+//                     </Box>
+//                 </Box>
+//                 <Divider />
+
+
+//                 {/* Program Details */}
+//                 <Box
+//                     sx={{
+//                         display: "flex",
+//                         justifyContent: "space-between",
+//                         alignItems: "center",
+//                         padding: "16px",
+//                         // marginBottom: "20px",
+//                         backgroundColor: "#fff",
+//                         // border: "1px solid #ddd",
+//                         // borderRadius: "6px",
+//                     }}
+//                 >
+//                     <Box>
+//                         <Typography variant="subtitle1"><strong>WeightWonder™{invoice?.purchaseProgram?.title}</strong></Typography>
+
+//                     </Box>
+//                     <Box textAlign="right">
+//                         <Typography variant="body2">Price: ₹{invoice?.purchaseProgram?.price}</Typography>
+//                     </Box>
+//                 </Box>
+//                 <Divider />
+
+
+//                 <Box
+//                     sx={{
+//                         display: "flex",
+//                         justifyContent: "space-between",
+//                         alignItems: "center",
+//                         padding: "16px",
+//                         // marginBottom: "20px",
+//                         backgroundColor: "#fff",
+//                         // border: "1px solid #ddd",
+//                         // borderRadius: "6px",
+//                     }}
+//                 >
+//                     <Box>
+//                         <Typography variant="h6"><strong>Net Amount{invoiceData?.price}</strong></Typography>
+
+//                     </Box>
+//                     <Box textAlign="right">
+//                         <Typography variant="body2"><strong>₹{invoice?.purchaseProgram?.price}</strong> </Typography>
+//                     </Box>
+//                 </Box>
+//                 <Divider />
+
+
+//                 {/* Buttons */}
+
+//                 <Box
+//                     sx={{
+//                         display: "flex",
+//                         justifyContent: "space-between",
+//                         padding: "16px",
+//                     }}
+//                 >
+//                     <Box>
+//                     </Box>
+//                     <Box textAlign="right" sx={{ display: "flex", gap: 2, marginBottom: "20px" }}>
+//                         <Button variant="outlined" color="primary">
+//                             Print
+//                         </Button>
+//                         <Button variant="outlined" color="primary" onClick={sendEmail}>
+//                             E-mail
+//                         </Button>
+//                     </Box>
+
+//                 </Box>
+//                 <Divider />
+
+//             </Card >
+
+//             {/* Payment Table */}
+//             {/* <Paper elevation={2}  > */}
+//             <Typography variant="h6" gutterBottom paddingTop={5}>
+//                 <strong>Invoice Summary</strong>
+//             </Typography>
+//             <TableContainer>
+//                 <Table
+//                     sx={{
+//                         border: '1px solid rgba(0, 0, 0, 0.12)',
+//                     }}
+//                 >
+//                     <TableHead>
+//                         <TableRow>
+//                             <TableCell
+//                                 sx={{
+//                                     borderRight: '1px solid rgba(0, 0, 0, 0.12)',
+//                                 }}
+//                             >
+//                                 Paid On
+//                             </TableCell>
+//                             <TableCell
+//                                 sx={{
+//                                     borderRight: '1px solid rgba(0, 0, 0, 0.12)',
+//                                 }}
+//                             >
+//                                 Paid Amount
+//                             </TableCell>
+//                             <TableCell
+//                                 sx={{
+//                                     borderRight: '1px solid rgba(0, 0, 0, 0.12)',
+//                                 }}
+//                             >
+//                                 Remaining Amount
+//                             </TableCell>
+//                             <TableCell
+//                                 sx={{
+//                                     borderRight: '1px solid rgba(0, 0, 0, 0.12)',
+//                                 }}
+//                             >
+//                                 Payment Mode
+//                             </TableCell>
+//                             <TableCell>Comment</TableCell>
+//                         </TableRow>
+//                     </TableHead>
+//                     <TableBody>
+//                         <TableRow>
+//                             <TableCell
+//                                 sx={{
+//                                     borderRight: '1px solid rgba(0, 0, 0, 0.12)',
+//                                     borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
+//                                 }}
+//                             >
+//                                 {new Date(payment?.paidOn).toLocaleDateString()}
+//                             </TableCell>
+//                             <TableCell
+//                                 sx={{
+//                                     borderRight: '1px solid rgba(0, 0, 0, 0.12)',
+//                                     borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
+//                                 }}
+//                             >
+//                                 ₹{payment?.amount || '0'}
+//                             </TableCell>
+//                             <TableCell
+//                                 sx={{
+//                                     borderRight: '1px solid rgba(0, 0, 0, 0.12)',
+//                                     borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
+//                                 }}
+//                             >
+//                                 ₹{payment?.remainingAmount || '0'}
+//                             </TableCell>
+//                             <TableCell
+//                                 sx={{
+//                                     borderRight: '1px solid rgba(0, 0, 0, 0.12)',
+//                                     borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
+//                                 }}
+//                             >
+//                                 {payment?.paymentMode || 'N/A'}
+//                             </TableCell>
+//                             <TableCell
+//                                 sx={{
+//                                     borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
+//                                 }}
+//                             >
+//                                 {payment?.comment || '-'}
+//                             </TableCell>
+//                         </TableRow>
+//                     </TableBody>
+//                 </Table>
+//             </TableContainer>
+
+//             {/* </Paper> */}
+//         </Box >
+//     );
+// };
+
+// export default InvoicePage;
+
+// import React, { useEffect, useRef, useState } from "react";
+// import { get, post } from "../../services/api-services";
+// import { useParams } from "react-router-dom";
+// import {
+//     Box, Button, Typography, Table, TableBody, TableCell,
+//     TableContainer, TableHead, TableRow, Card, Divider
+// } from "@mui/material";
+// import ModuleHeading from "../../component/ModuleHeading";
+// import AccessTimeIcon from '@mui/icons-material/AccessTime';
+
+// const InvoicePage = () => {
+//     const [invoiceData, setInvoiceData] = useState(null);
+//     const [paymentData, setPaymentData] = useState([]);
+//     const { invoiceId } = useParams();
+//     const printRef = useRef(); // Reference to the printable content
+
+//     useEffect(() => {
+//         const fetchData = async () => {
+//             if (!invoiceId) return;
+
+//             try {
+//                 const url = `/UserPrograms?filter={"where":{"invoiceId":"${invoiceId}"},"include":["customer","invoice"]}`;
+//                 const response = await get(url);
+
+//                 if (response?.data) {
+//                     const programData = response.data[0];
+//                     setInvoiceData(programData);
+
+//                     const programId = programData?.programId;
+//                     const id = programData?.customerId;
+
+//                     if (programId && id) {
+//                         const url1 = `/Payments?filter={"where":{"customerId":"${id}","programId":"${programId}","invoiceId":"${invoiceId}"},"order":"paidOn"}`;
+//                         const paymentResponse = await get(url1);
+
+//                         if (paymentResponse?.data) {
+//                             setPaymentData(paymentResponse.data);
+//                         }
+//                     }
+//                 }
+//             } catch (error) {
+//                 console.error("Error fetching data:", error);
+//             }
+//         };
+
+//         fetchData();
+//     }, [invoiceId]);
+
+//     const sendEmail = async () => {
+//         if (!invoiceData || !invoiceData.customer || !invoiceData.invoice) {
+//             alert("Unable to send email. Missing invoice or customer details.");
+//             return;
+//         }
+
+//         try {
+//             const payload = {
+//                 to: invoiceData.customer.email,
+//                 subject: `Invoice #WW241200${invoiceData.invoice.invoiceID}`,
+//                 body: `Dear ${invoiceData.customer.name},\n\nPlease find the details of your invoice attached.\n\nThank you.`,
+//                 invoiceId: invoiceData.invoice.invoiceID,
+//             };
+
+//             const response = await post("/sendEmail", payload);
+
+//             if (response?.status === 200) {
+//                 alert("Email sent successfully!");
+//             } else {
+//                 alert("Failed to send email. Please try again.");
+//             }
+//         } catch (error) {
+//             console.error("Error sending email:", error);
+//             alert("An error occurred while sending the email.");
+//         }
+//     };
+
+//     const handlePrint = () => {
+//         const content = printRef.current;
+//         const printWindow = window.open("", "_blank", "width=800,height=600");
+//         printWindow.document.write(`
+//             <html>
+//                 <head>
+//                     <title>Invoice</title>
+//                     <style>
+//                         @media print {
+//                             body {
+//                                 font-family: Arial, sans-serif;
+//                             }
+//                         }
+//                     </style>
+//                 </head>
+//                 <body>${content.outerHTML}</body>
+//             </html>
+//         `);
+//         printWindow.document.close();
+//         printWindow.focus();
+//         printWindow.print();
+//         printWindow.close();
+//     };
+
+//     if (!invoiceData) return <Typography align="center">Loading...</Typography>;
+
+//     const { customer, invoice } = invoiceData;
+//     const payment = paymentData[0] || {};
+
+//     return (
+//         <Box>
+//             <ModuleHeading title="Invoice details" navigateTo="/admin/dashboard" />
+
+//             {/* Printable Content */}
+//             <Box ref={printRef}>
+//                 <Card>
+//                     <Box sx={{ display: "flex", justifyContent: "space-between", padding: "16px" }}>
+//                         <Box>
+//                             <Typography variant="subtitle1"><strong>Invoice:</strong> WW241200{invoice?.invoiceID}</Typography>
+//                             <Typography variant="subtitle2">{new Date(invoice?.createdAt).toLocaleDateString()}</Typography>
+//                             {invoice?.status === "Paid" ? (
+//                                 <Typography variant="h6" color="green">✓ PAID</Typography>
+//                             ) : (
+//                                 <Typography variant="h6" color="red" className="w-400">
+//                                     <AccessTimeIcon /> PAYMENT DUE
+//                                 </Typography>
+//                             )}
+//                         </Box>
+//                         <Box textAlign="right">
+//                             <Typography variant="subtitle2">
+//                                 <strong>Payment Due Date:</strong> {new Date(invoice?.dueDate).toLocaleDateString()}
+//                             </Typography>
+//                         </Box>
+//                     </Box>
+//                     <Divider />
+
+//                     <Box sx={{ display: "flex", justifyContent: "space-between", padding: "16px" }}>
+//                         <Box>
+//                             <Typography variant="subtitle1"><strong>{customer?.name}</strong></Typography>
+//                             <Typography variant="body2">Mobile: {customer?.mobile}</Typography>
+//                             <Typography variant="body2">Email: {customer?.email}</Typography>
+//                         </Box>
+//                         <Box textAlign="right">
+//                             <Typography variant="body2">WeightWonder™</Typography>
+//                             <Typography variant="body2">+915588779933</Typography>
+//                             <Typography variant="body2">info@weightwonder.com</Typography>
+//                         </Box>
+//                     </Box>
+//                     <Divider />
+
+//                     <Typography variant="h6" gutterBottom paddingTop={5}>
+//                         <strong>Invoice Summary</strong>
+//                     </Typography>
+//                     {/* Payment Table */}
+//                     <TableContainer>
+//                         <Table>
+//                             <TableHead>
+//                                 <TableRow>
+//                                     <TableCell>Paid On</TableCell>
+//                                     <TableCell>Paid Amount</TableCell>
+//                                     <TableCell>Remaining Amount</TableCell>
+//                                     <TableCell>Payment Mode</TableCell>
+//                                     <TableCell>Comment</TableCell>
+//                                 </TableRow>
+//                             </TableHead>
+//                             <TableBody>
+//                                 <TableRow>
+//                                     <TableCell>{new Date(payment?.paidOn).toLocaleDateString()}</TableCell>
+//                                     <TableCell>₹{payment?.amount || '0'}</TableCell>
+//                                     <TableCell>₹{payment?.remainingAmount || '0'}</TableCell>
+//                                     <TableCell>{payment?.paymentMode || 'N/A'}</TableCell>
+//                                     <TableCell>{payment?.comment || '-'}</TableCell>
+//                                 </TableRow>
+//                             </TableBody>
+//                         </Table>
+//                     </TableContainer>
+//                 </Card>
+//             </Box>
+
+//             {/* Buttons */}
+//             <Box sx={{ display: "flex", justifyContent: "space-between", padding: "16px" }}>
+//                 <Button variant="outlined" color="primary" onClick={handlePrint}>
+//                     Print
+//                 </Button>
+//                 <Button variant="outlined" color="primary" onClick={sendEmail}>
+//                     E-mail
+//                 </Button>
+//             </Box>
+//         </Box>
+//     );
+// };
+
+// export default InvoicePage;
+
+
+
+import React, { useEffect, useState } from "react";
+import { get, post } from "../../services/api-services";
+import { useParams } from "react-router-dom";
+import { 
+    Box, Button, Typography, Table, TableBody, TableCell, 
+    TableContainer, TableHead, TableRow, Card, Divider 
 } from "@mui/material";
-import { Autocomplete } from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
-import RemoveIcon from "@mui/icons-material/Remove";
-import Datepicker from "../../date-filed/DatePicker";
-import { StyledButton, StyledCancelButton } from "../../StyledComponent";
-import EditProgram from "./CancleEnroll";
+import ModuleHeading from "../../component/ModuleHeading";
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
 
-const EnrollProgramDialog = ({
-    open,
-    onClose,
-    onSubmit,
-    programId,
-    existingProgramData,
-    allPrograms,
-}) => {
-    const [program, setProgram] = useState(null);
-    const [programDate, setProgramDate] = useState(
-        existingProgramData ? existingProgramData.programDate : new Date().toISOString().split("T")[0]
-    );
-    const [paymentDueDate, setPaymentDueDate] = useState(existingProgramData?.invoice?.dueDate || null);
-    const [showDiscountFields, setShowDiscountFields] = useState(!!existingProgramData?.invoice?.feeDiscount);
-    const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
-    const isEditMode = !!programId;
+const InvoicePage = () => {
+    const [invoiceData, setInvoiceData] = useState(null);
+    const [paymentData, setPaymentData] = useState([]);
+    const { invoiceId } = useParams();
 
     useEffect(() => {
-        if (existingProgramData) {
-            setProgram(existingProgramData?.purchaseProgram || null);
-            setProgramDate(existingProgramData.invoice?.createdAt || new Date().toISOString().split("T")[0]);
-            setPaymentDueDate(existingProgramData.invoice?.dueDate || null);
-            setShowDiscountFields(!!existingProgramData.invoice?.feeDiscount);
-        }
-    }, [existingProgramData]);
+        const fetchData = async () => {
+            if (!invoiceId) return;
 
-    const handleDiscountButtonClick = () => {
-        setShowDiscountFields((prev) => !prev);
-    };
-
-    const handleCancelEnrollmentClick = () => {
-        setOpenConfirmDialog(true); // Make sure this sets the dialog state properly
-    };
-    
-    const handleCloseConfirmDialog = () => {
-        setOpenConfirmDialog(false); // Close the confirmation dialog
-    };
-    
-
-    const handleConfirmCancelEnrollment = () => {
-        console.log("Enrollment has been canceled!");
-        setOpenConfirmDialog(false);
-    };
-
-    return (
-        <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-            <DialogTitle fontWeight="bold">
-                {isEditMode ? "Edit Program" : "Add Program"}
-            </DialogTitle>
-            <DialogContent>
-                {/* Program Information */}
-                {isEditMode && (
-                    <Grid item xs={12}>
-                        <TextField
-                            id="program-title"
-                            label=""
-                            variant="standard"
-                            fullWidth
-                            // disabled
-                            defaultValue={existingProgramData?.invoice?.purchaseProgram?.title || "Program Title"}
-                        />
-                        {existingProgramData?.invoice?.purchaseProgram?.description && (
-                            <Typography variant="body2" marginTop={4}>
-                                {existingProgramData?.invoice?.purchaseProgram?.description}
-                            </Typography>
-                        )}
-                    </Grid>
-                )}
-
-                {/* Program Selection */}
-                {!isEditMode && (
-                    <Autocomplete
-                        id="choose-program"
-                        options={allPrograms}
-                        getOptionLabel={(option) => option.title}
-                        value={program}
-                        onChange={(event, newValue) => setProgram(newValue)}
-                        renderInput={(params) => (
-                            <TextField
-                                {...params}
-                                label="Choose Program"
-                                variant="standard"
-                                required
-                            />
-                        )}
-                    />
-                )}
-
-                {program?.description && (
-                    <Typography variant="body2" marginTop={4}>
-                        {program.description}
-                    </Typography>
-                )}
-
-                {program?.price !== undefined && (
-                    <Typography
-                        variant="body1"
-                        color="secondary"
-                        marginTop={2}
-                        display="flex"
-                        justifyContent="flex-end"
-                    >
-                        ₹ {program.price}
-                    </Typography>
-                )}
-
-                {/* Date Fields */}
-                <Box display="flex" gap={2} className="w-full mt-4">
-                    <Datepicker
-                        value={programDate}
-                        onChange={setProgramDate}
-                        label="Program Date"
-                        required
-                    />
-                    <Datepicker
-                        value={paymentDueDate}
-                        onChange={setPaymentDueDate}
-                        label="Payment Due Date"
-                        required
-                    />
-                </Box>
-
-                {/* Discount Fields */}
-                <Box display="flex" alignItems="center" marginTop={2}>
-                    <Typography
-                        size="small"
-                        onClick={handleDiscountButtonClick}
-                        variant="body2"
-                        color={showDiscountFields ? "error" : "secondary"}
-                        style={{ cursor: "pointer" }}
-                    >
-                        {showDiscountFields ? <RemoveIcon color="error" /> : <AddIcon color="secondary" />} Discount
-                    </Typography>
-                </Box>
-                {showDiscountFields && (
-                    <Box display="flex" gap={2} className="w-full">
-                        <TextField
-                            id="fee-discount"
-                            label="Fee Discount (in rupees)"
-                            variant="standard"
-                            fullWidth
-                            defaultValue={existingProgramData?.invoice?.feeDiscount || ""}
-                        />
-                        <TextField
-                            id="discount-note"
-                            label="Discount Note"
-                            variant="standard"
-                            fullWidth
-                            defaultValue={existingProgramData?.invoice?.discountNote || ""}
-                        />
-                    </Box>
-                )}
-            </DialogContent>
-
-            <DialogActions style={{ display: "flex", justifyContent: "space-between" }}>
-    {isEditMode && (
-        <StyledButton
-            onClick={handleCancelEnrollmentClick}
-            color="secondary"
-            variant="contained"
-        >
-            Cancel Enrollment
-        </StyledButton>
-    )}
-    <div style={{ display: 'flex', justifyContent: 'flex-end', flex: 1 }}>
-        <StyledCancelButton
-            onClick={onClose}
-            color="default"
-            variant="outlined"
-            style={{ marginRight: '10px' }} // Optional: Add some space between Cancel and Save buttons
-        >
-            Cancel
-        </StyledCancelButton>
-        <StyledButton
-            onClick={() => {
-                if (program || isEditMode) {
-                    onSubmit({
-                        program,
-                        programDate,
-                        paymentDueDate,
-                        discount: document.getElementById("fee-discount")?.value || "",
-                        discountNote: document.getElementById("discount-note")?.value || "",
-                    });
-                }
-                onClose();
-            }}
-            color="primary"
-            variant="contained"
-            disabled={
-                isEditMode
-                    ? !programDate || !paymentDueDate
-                    : !program || !programDate || !paymentDueDate
-            }
-        >
-            {isEditMode ? "Save" : "Submit"}
-        </StyledButton>
-    </div>
-</DialogActions>
-{/* Edit Program Dialog */}
-<EditProgram
-    open={openConfirmDialog} // Pass the open state to the EditProgram
-    onClose={handleCloseConfirmDialog}
-    programId={programId}
-/>
-
-        </Dialog>
-        
-    );
-};
-
-export default EnrollProgramDialog;   
-
-
-
-import React, { useState } from "react";
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
-
-const EditProgram = ({ open, onClose, programId }) => { // Fixed typo 'opne' to 'open'
-    return (
-        <Dialog open={open} onClose={onClose} aria-labelledby="confirm-dialog-title" aria-describedby="confirm-dialog-description">
-            <DialogTitle id="confirm-dialog-title">{"Confirm Enrollment Cancellation"}</DialogTitle>
-            <DialogContent>
-                <DialogContentText id="confirm-dialog-description">
-                    Are you sure you want to cancel the enrollment? This action cannot be undone.
-                </DialogContentText>
-            </DialogContent>
-            <DialogActions>
-                <Button onClick={onClose} color="primary">No</Button>
-                <Button onClick={() => { console.log("Enrollment canceled!"); onClose(); }} color="secondary" autoFocus>
-                    Yes, Cancel Enrollment
-                </Button>
-            </DialogActions>
-        </Dialog>
-    );
-};
-
-export default EditProgram;
-
-
-import React, { useEffect, useState } from 'react';
-import { get } from '../../../services/api-services';
-import {
-    Box,
-    Typography,
-    Button,
-    LinearProgress,
-    Card,
-    CardContent,
-    IconButton,
-    Tooltip,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    Paper,
-} from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
-import InfoIcon from '@mui/icons-material/Info';
-import { useNavigate, useParams } from 'react-router-dom';
-import EnrollProgramDialog from '../profileModel-DialogBox/AddEnrollProgramDialog';
-import AddIcon from '@mui/icons-material/Add';
-import AddImageDialog from '../profileModel-DialogBox/AddImageLibrary';
-import AddPaymentDialog from '../profileModel-DialogBox/AddPaymentDialog';
-
-const Programs = ({ userId }) => {
-    const navigate = useNavigate()
-    const [userPrograms, setUserPrograms] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [isDialogOpen, setIsDialogOpen] = useState(false);
-    const [selectedProgram, setSelectedProgram] = useState(null);
-    const [isEditMode, setIsEditMode] = useState(false);
-    const [isPayment, setIsPayment] = useState(false);
-    const { id } = useParams();
-    const [allPrograms, setAllPrograms] = useState([]);
-
-    const onGetPrograms = async () => {
-        const res = await get('/Programs');
-        if (res?.statusCode === 200) {
-            setAllPrograms(res?.data)
-        }
-    }
-      const onEnrollProgram = async ({ program, programDate, paymentDueDate, discount, discountNote }) => {
-             try {
-                 const res = await get('/Invoices?filter={"order" : "createdAt DESC", "limit" : "1" }');
-                 if (res?.statusCode === 200) {
-                     let invoice_id = 1
-                     const lastInvoice = res?.data;
-                     if (lastInvoice?.length > 0) {
-                         if (lastInvoice[0].invoiceID && lastInvoice[0].invoiceID != '') {
-                             invoice_id = lastInvoice[0].invoiceID + 1;
-                         }
-                     }
-                     let status = '';
-                     if (discount === program?.price) {
-                         status = 'Paid';
-                     } else {
-                         status = 'Due';
-                     }
-                     let data = { invoiceID: invoice_id, programId: program?.id, purchaseProgram: program, tax: program?.tax, enrollOn: programDate, dueDate: paymentDueDate, feeDiscount: discount, discountNote: discountNote, status: status, createdAt: new Date(), updatedAt: new Date() };
-                     const postRes = await post('/Invoices', data);
-                     if (postRes?.statusCode === 200) {
-                         let date = new Date();
-                         let last = new Date(date.getTime() + (program?.duration * 24 * 60 * 60 * 1000));
-                         let userProgramData = {
-                             invoiceId: postRes?.data?.id, customerId: id, programId: postRes?.data?.programId,
-                             status: 'active', createdAt: new Date(), updatedAt: new Date(), dueAmount: postRes?.data?.purchaseProgram?.price, day: 1, endDate: last
-                         };
-                         const userProgram = await post('/UserPrograms', userProgramData);
-                         if (userProgram?.statusCode === 200) {
-                             setSnackbar({
-                                 openSnackbar: true,
-                                 message: 'Program enrolled successfully!',
-                                 severity: 'success'
-                             })
-                         }
-                     }
-                 }
-             } catch (error) {
-                 console.log("error.....", error)
-             }
-         }
-    useEffect(() => {
-        const fetchPayments = async () => {
             try {
-                setLoading(true);
+                const url = `/UserPrograms?filter={"where":{"invoiceId":"${invoiceId}"},"include":["customer","invoice"]}`;
+                const response = await get(url);
 
-                // Fetch User Programs
-                const userProgramsResponse = await get(
-                    `/UserPrograms?filter={"where" : {"customerId" : "${id}"}, "include" : "invoice", "order" : "createdAt DESC"}`
-                );
+                if (response?.data) {
+                    const programData = response.data[0];
+                    setInvoiceData(programData);
 
-                // Fetch payments for each program
-                const userProgramsWithPayments = await Promise.all(
-                    userProgramsResponse.data.map(async (enrollProgram) => {
-                        const { programId, invoiceId } = enrollProgram;
-                        if (programId && invoiceId) {
-                            const paymentsResponse = await get(
-                                `/Payments?filter={"where": {"customerId": "${id}", "programId": "${programId}", "invoiceId": "${invoiceId}"}, "order": "paidOn"}`
-                            );
+                    const programId = programData?.programId;
+                    const id = programData?.customerId;
 
-                            const enrollOnDate = new Date(enrollProgram.invoice?.enrollOn);
-                            const currentDate = new Date();
-                            const totalDuration = enrollProgram.invoice?.purchaseProgram?.duration;
-                            const elapsedDays = Math.floor((currentDate - enrollOnDate) / (1000 * 60 * 60 * 24));
-                            const remainingDays = Math.max(0, totalDuration - elapsedDays);
-                            return {
-                                ...enrollProgram,
-                                paymentData: paymentsResponse?.data || [],
-                                remainingDay: remainingDays,
-                            };
-                        } else {
-                            console.error("Missing programId or invoiceId for enrollProgram:", enrollProgram);
-                            return enrollProgram;
+                    if (programId && id) {
+                        const url1 = `/Payments?filter={"where":{"customerId":"${id}","programId":"${programId}","invoiceId":"${invoiceId}"},"order":"paidOn"}`;
+                        const paymentResponse = await get(url1);
+
+                        if (paymentResponse?.data) {
+                            setPaymentData(paymentResponse.data);
                         }
-                    })
-                );
-
-                setUserPrograms(userProgramsWithPayments);
+                    }
+                }
             } catch (error) {
-                console.error("Error fetching payment data:", error);
-            } finally {
-                setLoading(false);
+                console.error("Error fetching data:", error);
             }
         };
-        onGetPrograms();
-        fetchPayments();
-    }, [id]);
 
+        fetchData();
+    }, [invoiceId]);
 
-    const handleViewInvoice = (invoiceId) => {
-        // console.log(invoiceId, "invoiceId.....")
-        navigate(`/admin/invoice/${invoiceId}`)
-    };
+    const sendEmail = async () => {
+        if (!invoiceData || !invoiceData.customer || !invoiceData.invoice) {
+            alert("Unable to send email. Missing invoice or customer details.");
+            return;
+        }
 
-
-    // const handleEditEnrolltoProgram = (program) => {
-    //     setSelectedProgram(program);
-    //     setIsDialogOpen(true);
-    // };
-
-    const handleDialogOpen = (program = null) => {
-        setSelectedProgram(program);
-        setIsEditMode(!!program);
-        setIsDialogOpen(true);
-    };
-
-    const handleDialogClose = () => {
-        setIsDialogOpen(false);
-        setSelectedProgram(null);
-    };
-
-    const handlePaymentDialog = (program = null) => {
-        setSelectedProgram(program);
-        setIsPayment(true);
-    }
-   
-    const handlePaymentClose = () => {
-        setIsPayment(false);
-        setSelectedProgram(null);
-    };
-    const handleSubmit = async (data) => {
         try {
-            if (isEditMode) {
-                // console.log('Edit Program Data:', data);
-                // Update program API logic here
+            const payload = {
+                to: invoiceData.customer.email,
+                subject: `Invoice #WW241200${invoiceData.invoice.invoiceID}`,
+                body: `Dear ${invoiceData.customer.name},\n\nPlease find the details of your invoice attached.\n\nThank you.`,
+                invoiceId: invoiceData.invoice.invoiceID,
+            };
+
+            const response = await post("/sendEmail", payload);
+
+            if (response?.status === 200) {
+                alert("Email sent successfully!");
             } else {
-                // console.log('Add Program Data:', data);
-                // Add program API logic here
+                alert("Failed to send email. Please try again.");
             }
-            // Refresh user programs list after submission
-            handleDialogClose();
         } catch (error) {
-            console.error('Error submitting program data:', error);
+            console.error("Error sending email:", error);
+            alert("An error occurred while sending the email.");
         }
     };
-// console.log("merghe")
-    if (loading) {
-        return <Typography>Loading...</Typography>;
-    }
-    // console.log(selectedProgram, "selectedProgram")
+
+    const addPayment = () => {
+        alert("Redirecting to Add Payment page...");
+        // Add your logic to navigate to the Add Payment page or open a dialog
+    };
+
+    if (!invoiceData) return <Typography align="center">Loading...</Typography>;
+
+    const { customer, invoice } = invoiceData;
+    const payment = paymentData[0] || {};
+
     return (
-        <Box sx={{ marginLeft: '20px', marginRight: '10px' }}>
-            <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ marginBottom: 2 }}>
-                <Typography variant="h6" sx={{ fontWeight: 500 }}>
-                    Enrolled Programs
-                </Typography>
-                <Button variant="text" color="secondary" onClick={() => handleDialogOpen()}>
-                    Enroll new programs
-                </Button>
-            </Box>
+        <Box>
+            <ModuleHeading title="Invoice details" navigateTo="/admin/dashboard" />
 
-            {userPrograms.length === 0 && (
-                <Typography align="center">Enroll program for the user!</Typography>
-            )}
-
-            {userPrograms.map((enrollProgram) => (
-                <Card
-                    key={enrollProgram.id}
-                    sx={{
-
-                        marginBottom: 2,
-                        backgroundColor: enrollProgram.status === 'active' ? '#fff' : '#f5f5f5',
-                        boxShadow: 1,
-                    }}
-                >
-                    <CardContent>
-                        <Box display="flex" justifyContent="space-between" alignItems="center">
-                            <Typography variant="h6" >
-                                {enrollProgram.invoice?.purchaseProgram?.title} (₹
-                                {enrollProgram.invoice?.purchaseProgram?.price})
+            {/* Invoice Details */}
+            <Card>
+                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px" }}>
+                    <Box>
+                        <Typography variant="subtitle1"><strong>Invoice:</strong> WW241200{invoice?.invoiceID}</Typography>
+                        <Typography variant="subtitle2">{new Date(invoice?.createdAt).toLocaleDateString()}</Typography>
+                      
+                        {invoice?.status === "Paid" ? (
+                            <Typography variant="h6" color="green">✓ PAID</Typography>
+                        ) : (
+                            <Typography variant="h6" color="red" className="w-400">
+                                <AccessTimeIcon /> PAYMENT DUE
                             </Typography>
-                            <IconButton
-                                onClick={() => handleDialogOpen(enrollProgram)}
-                            >
-                                <EditIcon color="action" />
-                            </IconButton>
-                        </Box>
-
-                        <Typography variant="body2" color="textSecondary">
-                            {enrollProgram.invoice?.purchaseProgram?.duration} Days
-                        </Typography>
-                        <Typography variant="body2" color="textSecondary">
-                            {new Date(enrollProgram.invoice?.enrollOn).toLocaleDateString()} To{' '}
-                            {new Date(enrollProgram.invoice?.completedOn).toLocaleDateString()}
-                        </Typography>
-
-                        <Typography
-                            variant="body2"
-                            color={enrollProgram.remainingDay === 0 ? 'primary' : 'textSecondary'}
-                        >
-                            {enrollProgram.remainingDay === 0 ? 'Completed' : 'In Progress'}
-                        </Typography>
-
-                        <LinearProgress
-                            variant="determinate"
-                            value={
-                                enrollProgram?.remainingDay === 0
-                                    ? 100
-                                    : ((enrollProgram?.invoice?.purchaseProgram?.duration - enrollProgram?.remainingDay) /
-                                        enrollProgram?.invoice?.purchaseProgram?.duration) *
-                                    100
-                            }
-                            color="secondary"
-                            sx={{ height: 8, borderRadius: 4 }}
-                        />
-
-
-                        <Box display="flex" justifyContent="flex-end" sx={{ marginTop: 1 }}>
-                            <Typography variant="body2" color="primary">
-                                {enrollProgram?.remainingDay}d Remaining
-                            </Typography>
-                        </Box>
-
-                        <Box display="flex" flexWrap="wrap" sx={{ gap: 2, marginTop: 2 }}>
-                            <Typography variant="body2">
-                                Discount: ₹{enrollProgram?.invoice?.feeDiscount || '0'}
-                                <Tooltip title={enrollProgram?.invoice?.discountNote || ''} arrow>
-                                    <InfoIcon color="action" sx={{ marginLeft: 1 }} />
-                                </Tooltip>
-                            </Typography>
-
-                            <Typography variant="body2">
-                                Net Fee: ₹{enrollProgram?.programNetAmt}
-                            </Typography>
-
-                            <Typography
-                                variant="body2"
-                                color={enrollProgram?.invoice?.status === 'Paid' ? '#4caf50' : 'error'}
-                            >
-                                Fee Status:
-                                {enrollProgram?.invoice?.status === 'Paid'
-                                    ? '✔ Paid'
-                                    : `(₹${enrollProgram?.dueAmount}) Due`}
-                            </Typography>
-
-                            {/* Conditionally render AddIcon if payment status is not Paid */}
-                            {enrollProgram?.invoice?.status !== 'Paid' && (
-                                <IconButton
-                                    variant="text"
-                                    color="primary"
-                                    onClick={() => handlePaymentDialog(enrollProgram)}
-                                    sx={{ padding: 0, color: '#3f51b5' }}
-                                >
-                                    <AddIcon />
-                                </IconButton>
-                            )}
-
-                            <Button
-                                variant="text"
-                                color="primary"
-                                onClick={() => handleViewInvoice(enrollProgram?.invoiceId)}
-                                sx={{ padding: 0, color: '#3f51b5' }}
-                            >
-                                VIEW INVOICE
-                            </Button>
-                        </Box>
-
-
-                        {enrollProgram?.paymentData && enrollProgram?.paymentData?.length > 0 && (
-                            <Box mt={4}>
-                                <Typography variant="h6" sx={{ mb: 2 }}>
-                                    Payment History
-                                </Typography>
-                                <TableContainer component={Paper}>
-                                    <Table>
-                                        <TableHead>
-                                            <TableRow>
-                                                <TableCell>Paid On</TableCell>
-                                                <TableCell>Paid Amount</TableCell>
-                                                <TableCell>Payment Mode</TableCell>
-                                                <TableCell>Comments</TableCell>
-                                                <TableCell>Action</TableCell>
-                                            </TableRow>
-                                        </TableHead>
-                                        <TableBody>
-                                            {enrollProgram?.paymentData.map((payment) => (
-                                                <TableRow key={payment.id}>
-                                                    <TableCell>
-                                                        {new Date(payment.paidOn).toLocaleDateString()}
-                                                    </TableCell>
-                                                    <TableCell>₹{payment.amount}</TableCell>
-                                                    <TableCell>{payment.paymentMode}</TableCell>
-                                                    <TableCell>{payment.comment || '-'}</TableCell>
-                                                    <TableCell>
-                                                        <IconButton>
-                                                            <EditIcon />
-                                                        </IconButton>
-                                                    </TableCell>
-                                                </TableRow>
-                                            ))}
-                                        </TableBody>
-                                    </Table>
-                                </TableContainer>
-                            </Box>
                         )}
-                    </CardContent>
-                </Card>
-            ))}
+                    </Box>
+                    <Box textAlign="right">
+                        <Typography variant="subtitle2">
+                            <strong>Payment Due Date:</strong> {new Date(invoice?.dueDate).toLocaleDateString()}
+                        </Typography>
+                    </Box>
+                </Box>
+                <Divider />
 
-            {/* Dialog for Add/Edit Program */}
-            {/* <EnrollProgramDialog
-                open={isDialogOpen}
-                onClose={handleDialogClose}
-                onSubmit={handleSubmit}
-                programId={isEditMode ? selectedProgram?.customerId : null}
-                existingProgramData={selectedProgram}
+                {/* Customer Details */}
+                <Box sx={{ display: "flex", justifyContent: "space-between", padding: "16px" }}>
+                    <Box>
+                        <Typography variant="subtitle1"><strong>{customer?.name}</strong></Typography>
+                        <Typography variant="body2">Mobile: {customer?.mobile}</Typography>
+                        <Typography variant="body2">Email: {customer?.email}</Typography>
+                    </Box>
+                    <Box textAlign="right">
+                        <Typography variant="body2">WeightWonder™</Typography>
+                        <Typography variant="body2">+915588779933</Typography>
+                        <Typography variant="body2">info@weightwonder.com</Typography>
+                    </Box>
+                </Box>
+                <Divider />
 
-            /> */}
-              <EnrollProgramDialog
-                    open={isDialogOpen}
-                    onClose={handleDialogClose}
-                    allPrograms={allPrograms}
-                    onSubmit={onEnrollProgram}
-                    programId={isEditMode ? selectedProgram?.customerId : null}
-                    existingProgramData={selectedProgram}
-                    
-                />
-            <AddPaymentDialog
-                open={isPayment}
-                onClose={handlePaymentClose}
-                onSubmit={handleSubmit}
-                existingProgramData={selectedProgram || null} 
-                // existingProgramData={selectedProgram}
-                // existingProgramData={{
-                //     programDate: "2024-01-01",
-                //     amount: "5000",
-                //     // program: { title: "Cheque" },
-                //     // comments: "Payment for the new program",
-                // }}
-
-            />
-
+                {/* Buttons */}
+                <Box sx={{ display: "flex", justifyContent: "flex-end", padding: "16px", gap: 2 }}>
+                    {invoice?.status === "Due" && (
+                        <Button variant="contained" color="primary" onClick={addPayment}>
+                            Add Payment
+                        </Button>
+                    )}
+                    <Button variant="outlined" color="primary" onClick={sendEmail}>
+                        E-mail
+                    </Button>
+                </Box>
+            </Card>
         </Box>
-
     );
 };
 
-export default Programs;
+export default InvoicePage;
