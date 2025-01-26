@@ -1,663 +1,1462 @@
-// import React, { useEffect, useState } from "react";
-// import { get,post } from "../../services/api-services";
-// import { useParams } from "react-router-dom";
-// import { Box, Button, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Grid, Card, Divider } from "@mui/material";
-// import ModuleHeading from "../../component/ModuleHeading";
-// import AccessTimeIcon from '@mui/icons-material/AccessTime';
-
-// const InvoicePage = () => {
-//     const [invoiceData, setInvoiceData] = useState(null);
-//     const [paymentData, setPaymentData] = useState([]);
-//     const { invoiceId } = useParams();
-
-
-//     useEffect(() => {
-//         const fetchData = async () => {
-//             if (!invoiceId) return;
-
-//             try {
-//                 // First API call
-//                 const url = `/UserPrograms?filter={"where":{"invoiceId":"${invoiceId}"},"include":["customer","invoice"]}`;
-//                 const response = await get(url);
-
-//                 if (response?.data) {
-//                     const programData = response.data[0];
-//                     setInvoiceData(programData);
-
-//                     // Extract programId from the first response
-//                     const programId = programData?.programId;
-//                     const id = programData?.customerId;
-
-//                     // If programId is available, make the second API call
-//                     if (programId, id) {
-//                         const url1 = `/Payments?filter={"where":{"customerId":"${id}","programId":"${programId}","invoiceId":"${invoiceId}"},"order":"paidOn"}`;
-//                         const paymentResponse = await get(url1);
-
-//                         if (paymentResponse?.data) {
-//                             setPaymentData(paymentResponse.data);
-//                         }
-//                     }
-//                 }
-//             } catch (error) {
-//                 console.error("Error fetching data:", error);
-//             }
-//         };
-
-//         fetchData();
-//     }, [invoiceId]);
-
-//     const sendEmail = async () => {
-//         if (!invoiceData || !invoiceData.customer || !invoiceData.invoice) {
-//             alert("Unable to send email. Missing invoice or customer details.");
-//             return;
-//         }
-
-//         try {
-//             const payload = {
-//                 to: invoiceData.customer.email,
-//                 subject: `Invoice #WW241200${invoiceData.invoice.invoiceID}`,
-//                 body: `Dear ${invoiceData.customer.name},\n\nPlease find the details of your invoice attached.\n\nThank you.`,
-//                 invoiceId: invoiceData.invoice.invoiceID,
-//             };
-
-//             const response = await post("/sendEmail", payload);
-
-//             if (response?.status === 200) {
-//                 alert("Email sent successfully!");
-//             } else {
-//                 alert("Failed to send email. Please try again.");
-//             }
-//         } catch (error) {
-//             console.error("Error sending email:", error);
-//             alert("An error occurred while sending the email.");
-//         }
-//     };
-
-//     if (!invoiceData) return <Typography align="center">Loading...</Typography>;
-
-//     const { customer, invoice } = invoiceData;
-//     const payment = paymentData[0] || {};
-    
-// // console.log(invoice,"djcjashfcudehfuedjhfewisufid")
-// // console.log(invoice?.status, typeof invoice?.status);
-
-//     return (
-//         <Box
-//             sx={{
-//                 // fontFamily: "Arial, sans-serif",
-//                 // border: "1px solid #ddd",
-//                 // borderRadius: "8px",
-//                 // background: "#f9f9f9",
-//             }}
-//         >
-//             <ModuleHeading title="Invoice details" navigateTo="/admin/dashboard" />
-
-//             {/* Invoice Details */}
-//             <Card>
-//                 <Box
-//                     sx={{
-//                         display: "flex",
-//                         justifyContent: "space-between",
-//                         alignItems: "center",
-//                         padding: "16px",
-//                         // marginBottom: "20px",
-//                         backgroundColor: "#fff",
-//                         // border: "1px solid #ddd",
-//                         // borderRadius: "6px",
-//                     }}
-//                 >
-//                     <Box>
-//                         <Typography variant="subtitle1"><strong>Invoice:</strong>WW241200{invoice?.invoiceID}</Typography>
-//                         <Typography variant="subtitle2"> {new Date(invoice?.createdAt).toLocaleDateString()}</Typography>
-                      
-//                         {invoice?.status === "Paid" ? (
-//     <Typography variant="h6" color="green">✓ PAID</Typography>
-// ) : (
-//     <Typography variant="h6" color="red" className="w-400">
-//         <AccessTimeIcon /> PAYMENT DUE 
-//     </Typography>
-// )}
-
-//                     </Box>
-//                     <Box textAlign="right">
-//                         <img
-//                             src={invoice?.purchaseProgram?.icon}
-//                             alt="Program Icon"
-//                         />
-//                         <Typography variant="subtitle2"> <strong color="gray">Payment Due Date:</strong> {new Date(invoice?.dueDate).toLocaleDateString()}</Typography>
-
-//                     </Box>
-//                 </Box>
-//                 <Divider />
-//                 {/* Customer Details */}
-//                 <Box
-//                     sx={{
-//                         display: "flex",
-//                         justifyContent: "space-between",
-//                         alignItems: "center",
-//                         padding: "16px",
-//                         // marginBottom: "20px",
-//                         backgroundColor: "#fff",
-//                         // border: "1px solid #ddd",
-//                         // borderRadius: "6px",
-//                     }}
-//                 >
-//                     <Box>
-//                         <Typography variant="subtitle1"><strong>{customer?.name}</strong></Typography>
-//                         <Typography variant="body2">Mobile: {customer?.mobile}</Typography>
-//                         <Typography variant="body2">Email: {customer?.email}</Typography>
-//                     </Box>
-//                     <Box textAlign="right">
-//                         <Typography variant="body2">WeightWonder™</Typography>
-//                         <Typography variant="body2">+915588779933</Typography>
-//                         <Typography variant="body2">info@weightwonder.com</Typography>
-//                         <Typography variant="subtitle2">27-Noble Plaza, MP Nagar Bhopal</Typography>
-
-//                     </Box>
-//                 </Box>
-//                 <Divider />
-
-
-//                 {/* Program Details */}
-//                 <Box
-//                     sx={{
-//                         display: "flex",
-//                         justifyContent: "space-between",
-//                         alignItems: "center",
-//                         padding: "16px",
-//                         // marginBottom: "20px",
-//                         backgroundColor: "#fff",
-//                         // border: "1px solid #ddd",
-//                         // borderRadius: "6px",
-//                     }}
-//                 >
-//                     <Box>
-//                         <Typography variant="subtitle1"><strong>WeightWonder™{invoice?.purchaseProgram?.title}</strong></Typography>
-
-//                     </Box>
-//                     <Box textAlign="right">
-//                         <Typography variant="body2">Price: ₹{invoice?.purchaseProgram?.price}</Typography>
-//                     </Box>
-//                 </Box>
-//                 <Divider />
-
-
-//                 <Box
-//                     sx={{
-//                         display: "flex",
-//                         justifyContent: "space-between",
-//                         alignItems: "center",
-//                         padding: "16px",
-//                         // marginBottom: "20px",
-//                         backgroundColor: "#fff",
-//                         // border: "1px solid #ddd",
-//                         // borderRadius: "6px",
-//                     }}
-//                 >
-//                     <Box>
-//                         <Typography variant="h6"><strong>Net Amount{invoiceData?.price}</strong></Typography>
-
-//                     </Box>
-//                     <Box textAlign="right">
-//                         <Typography variant="body2"><strong>₹{invoice?.purchaseProgram?.price}</strong> </Typography>
-//                     </Box>
-//                 </Box>
-//                 <Divider />
-
-
-//                 {/* Buttons */}
-
-//                 <Box
-//                     sx={{
-//                         display: "flex",
-//                         justifyContent: "space-between",
-//                         padding: "16px",
-//                     }}
-//                 >
-//                     <Box>
-//                     </Box>
-//                     <Box textAlign="right" sx={{ display: "flex", gap: 2, marginBottom: "20px" }}>
-//                         <Button variant="outlined" color="primary">
-//                             Print
-//                         </Button>
-//                         <Button variant="outlined" color="primary" onClick={sendEmail}>
-//                             E-mail
-//                         </Button>
-//                     </Box>
-
-//                 </Box>
-//                 <Divider />
-
-//             </Card >
-
-//             {/* Payment Table */}
-//             {/* <Paper elevation={2}  > */}
-//             <Typography variant="h6" gutterBottom paddingTop={5}>
-//                 <strong>Invoice Summary</strong>
-//             </Typography>
-//             <TableContainer>
-//                 <Table
-//                     sx={{
-//                         border: '1px solid rgba(0, 0, 0, 0.12)',
-//                     }}
-//                 >
-//                     <TableHead>
-//                         <TableRow>
-//                             <TableCell
-//                                 sx={{
-//                                     borderRight: '1px solid rgba(0, 0, 0, 0.12)',
-//                                 }}
-//                             >
-//                                 Paid On
-//                             </TableCell>
-//                             <TableCell
-//                                 sx={{
-//                                     borderRight: '1px solid rgba(0, 0, 0, 0.12)',
-//                                 }}
-//                             >
-//                                 Paid Amount
-//                             </TableCell>
-//                             <TableCell
-//                                 sx={{
-//                                     borderRight: '1px solid rgba(0, 0, 0, 0.12)',
-//                                 }}
-//                             >
-//                                 Remaining Amount
-//                             </TableCell>
-//                             <TableCell
-//                                 sx={{
-//                                     borderRight: '1px solid rgba(0, 0, 0, 0.12)',
-//                                 }}
-//                             >
-//                                 Payment Mode
-//                             </TableCell>
-//                             <TableCell>Comment</TableCell>
-//                         </TableRow>
-//                     </TableHead>
-//                     <TableBody>
-//                         <TableRow>
-//                             <TableCell
-//                                 sx={{
-//                                     borderRight: '1px solid rgba(0, 0, 0, 0.12)',
-//                                     borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
-//                                 }}
-//                             >
-//                                 {new Date(payment?.paidOn).toLocaleDateString()}
-//                             </TableCell>
-//                             <TableCell
-//                                 sx={{
-//                                     borderRight: '1px solid rgba(0, 0, 0, 0.12)',
-//                                     borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
-//                                 }}
-//                             >
-//                                 ₹{payment?.amount || '0'}
-//                             </TableCell>
-//                             <TableCell
-//                                 sx={{
-//                                     borderRight: '1px solid rgba(0, 0, 0, 0.12)',
-//                                     borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
-//                                 }}
-//                             >
-//                                 ₹{payment?.remainingAmount || '0'}
-//                             </TableCell>
-//                             <TableCell
-//                                 sx={{
-//                                     borderRight: '1px solid rgba(0, 0, 0, 0.12)',
-//                                     borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
-//                                 }}
-//                             >
-//                                 {payment?.paymentMode || 'N/A'}
-//                             </TableCell>
-//                             <TableCell
-//                                 sx={{
-//                                     borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
-//                                 }}
-//                             >
-//                                 {payment?.comment || '-'}
-//                             </TableCell>
-//                         </TableRow>
-//                     </TableBody>
-//                 </Table>
-//             </TableContainer>
-
-//             {/* </Paper> */}
-//         </Box >
-//     );
-// };
-
-// export default InvoicePage;
-
-// import React, { useEffect, useRef, useState } from "react";
-// import { get, post } from "../../services/api-services";
-// import { useParams } from "react-router-dom";
-// import {
-//     Box, Button, Typography, Table, TableBody, TableCell,
-//     TableContainer, TableHead, TableRow, Card, Divider
-// } from "@mui/material";
-// import ModuleHeading from "../../component/ModuleHeading";
-// import AccessTimeIcon from '@mui/icons-material/AccessTime';
-
-// const InvoicePage = () => {
-//     const [invoiceData, setInvoiceData] = useState(null);
-//     const [paymentData, setPaymentData] = useState([]);
-//     const { invoiceId } = useParams();
-//     const printRef = useRef(); // Reference to the printable content
-
-//     useEffect(() => {
-//         const fetchData = async () => {
-//             if (!invoiceId) return;
-
-//             try {
-//                 const url = `/UserPrograms?filter={"where":{"invoiceId":"${invoiceId}"},"include":["customer","invoice"]}`;
-//                 const response = await get(url);
-
-//                 if (response?.data) {
-//                     const programData = response.data[0];
-//                     setInvoiceData(programData);
-
-//                     const programId = programData?.programId;
-//                     const id = programData?.customerId;
-
-//                     if (programId && id) {
-//                         const url1 = `/Payments?filter={"where":{"customerId":"${id}","programId":"${programId}","invoiceId":"${invoiceId}"},"order":"paidOn"}`;
-//                         const paymentResponse = await get(url1);
-
-//                         if (paymentResponse?.data) {
-//                             setPaymentData(paymentResponse.data);
-//                         }
-//                     }
-//                 }
-//             } catch (error) {
-//                 console.error("Error fetching data:", error);
-//             }
-//         };
-
-//         fetchData();
-//     }, [invoiceId]);
-
-//     const sendEmail = async () => {
-//         if (!invoiceData || !invoiceData.customer || !invoiceData.invoice) {
-//             alert("Unable to send email. Missing invoice or customer details.");
-//             return;
-//         }
-
-//         try {
-//             const payload = {
-//                 to: invoiceData.customer.email,
-//                 subject: `Invoice #WW241200${invoiceData.invoice.invoiceID}`,
-//                 body: `Dear ${invoiceData.customer.name},\n\nPlease find the details of your invoice attached.\n\nThank you.`,
-//                 invoiceId: invoiceData.invoice.invoiceID,
-//             };
-
-//             const response = await post("/sendEmail", payload);
-
-//             if (response?.status === 200) {
-//                 alert("Email sent successfully!");
-//             } else {
-//                 alert("Failed to send email. Please try again.");
-//             }
-//         } catch (error) {
-//             console.error("Error sending email:", error);
-//             alert("An error occurred while sending the email.");
-//         }
-//     };
-
-//     const handlePrint = () => {
-//         const content = printRef.current;
-//         const printWindow = window.open("", "_blank", "width=800,height=600");
-//         printWindow.document.write(`
-//             <html>
-//                 <head>
-//                     <title>Invoice</title>
-//                     <style>
-//                         @media print {
-//                             body {
-//                                 font-family: Arial, sans-serif;
-//                             }
-//                         }
-//                     </style>
-//                 </head>
-//                 <body>${content.outerHTML}</body>
-//             </html>
-//         `);
-//         printWindow.document.close();
-//         printWindow.focus();
-//         printWindow.print();
-//         printWindow.close();
-//     };
-
-//     if (!invoiceData) return <Typography align="center">Loading...</Typography>;
-
-//     const { customer, invoice } = invoiceData;
-//     const payment = paymentData[0] || {};
-
-//     return (
-//         <Box>
-//             <ModuleHeading title="Invoice details" navigateTo="/admin/dashboard" />
-
-//             {/* Printable Content */}
-//             <Box ref={printRef}>
-//                 <Card>
-//                     <Box sx={{ display: "flex", justifyContent: "space-between", padding: "16px" }}>
-//                         <Box>
-//                             <Typography variant="subtitle1"><strong>Invoice:</strong> WW241200{invoice?.invoiceID}</Typography>
-//                             <Typography variant="subtitle2">{new Date(invoice?.createdAt).toLocaleDateString()}</Typography>
-//                             {invoice?.status === "Paid" ? (
-//                                 <Typography variant="h6" color="green">✓ PAID</Typography>
-//                             ) : (
-//                                 <Typography variant="h6" color="red" className="w-400">
-//                                     <AccessTimeIcon /> PAYMENT DUE
-//                                 </Typography>
-//                             )}
-//                         </Box>
-//                         <Box textAlign="right">
-//                             <Typography variant="subtitle2">
-//                                 <strong>Payment Due Date:</strong> {new Date(invoice?.dueDate).toLocaleDateString()}
-//                             </Typography>
-//                         </Box>
-//                     </Box>
-//                     <Divider />
-
-//                     <Box sx={{ display: "flex", justifyContent: "space-between", padding: "16px" }}>
-//                         <Box>
-//                             <Typography variant="subtitle1"><strong>{customer?.name}</strong></Typography>
-//                             <Typography variant="body2">Mobile: {customer?.mobile}</Typography>
-//                             <Typography variant="body2">Email: {customer?.email}</Typography>
-//                         </Box>
-//                         <Box textAlign="right">
-//                             <Typography variant="body2">WeightWonder™</Typography>
-//                             <Typography variant="body2">+915588779933</Typography>
-//                             <Typography variant="body2">info@weightwonder.com</Typography>
-//                         </Box>
-//                     </Box>
-//                     <Divider />
-
-//                     <Typography variant="h6" gutterBottom paddingTop={5}>
-//                         <strong>Invoice Summary</strong>
-//                     </Typography>
-//                     {/* Payment Table */}
-//                     <TableContainer>
-//                         <Table>
-//                             <TableHead>
-//                                 <TableRow>
-//                                     <TableCell>Paid On</TableCell>
-//                                     <TableCell>Paid Amount</TableCell>
-//                                     <TableCell>Remaining Amount</TableCell>
-//                                     <TableCell>Payment Mode</TableCell>
-//                                     <TableCell>Comment</TableCell>
-//                                 </TableRow>
-//                             </TableHead>
-//                             <TableBody>
-//                                 <TableRow>
-//                                     <TableCell>{new Date(payment?.paidOn).toLocaleDateString()}</TableCell>
-//                                     <TableCell>₹{payment?.amount || '0'}</TableCell>
-//                                     <TableCell>₹{payment?.remainingAmount || '0'}</TableCell>
-//                                     <TableCell>{payment?.paymentMode || 'N/A'}</TableCell>
-//                                     <TableCell>{payment?.comment || '-'}</TableCell>
-//                                 </TableRow>
-//                             </TableBody>
-//                         </Table>
-//                     </TableContainer>
-//                 </Card>
-//             </Box>
-
-//             {/* Buttons */}
-//             <Box sx={{ display: "flex", justifyContent: "space-between", padding: "16px" }}>
-//                 <Button variant="outlined" color="primary" onClick={handlePrint}>
-//                     Print
-//                 </Button>
-//                 <Button variant="outlined" color="primary" onClick={sendEmail}>
-//                     E-mail
-//                 </Button>
-//             </Box>
-//         </Box>
-//     );
-// };
-
-// export default InvoicePage;
-
-
-
-import React, { useEffect, useState } from "react";
-import { get, post } from "../../services/api-services";
-import { useParams } from "react-router-dom";
-import { 
-    Box, Button, Typography, Table, TableBody, TableCell, 
-    TableContainer, TableHead, TableRow, Card, Divider 
-} from "@mui/material";
-import ModuleHeading from "../../component/ModuleHeading";
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
-
-const InvoicePage = () => {
-    const [invoiceData, setInvoiceData] = useState(null);
-    const [paymentData, setPaymentData] = useState([]);
-    const { invoiceId } = useParams();
-
-    useEffect(() => {
-        const fetchData = async () => {
-            if (!invoiceId) return;
-
-            try {
-                const url = `/UserPrograms?filter={"where":{"invoiceId":"${invoiceId}"},"include":["customer","invoice"]}`;
-                const response = await get(url);
-
-                if (response?.data) {
-                    const programData = response.data[0];
-                    setInvoiceData(programData);
-
-                    const programId = programData?.programId;
-                    const id = programData?.customerId;
-
-                    if (programId && id) {
-                        const url1 = `/Payments?filter={"where":{"customerId":"${id}","programId":"${programId}","invoiceId":"${invoiceId}"},"order":"paidOn"}`;
-                        const paymentResponse = await get(url1);
-
-                        if (paymentResponse?.data) {
-                            setPaymentData(paymentResponse.data);
-                        }
-                    }
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Box, CircularProgress, IconButton, TextField, Tooltip, Typography } from '@mui/material';
+import AddButton from '../../component/AddButton';
+import AddUser from '../../component/Case/AddUser';
+import EditIcon from '@mui/icons-material/Edit';
+import AddIcon from '@mui/icons-material/Add';
+import DataTable from '../../component/DataTable';
+import SwitchButton from '../../component/SwitchButton';
+import { get, patch, post } from '../../services/api-services';
+import ModuleHeading from '../../component/ModuleHeading';
+import { useCommon } from '../../context/CommonContext';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+import { formatDate, formatDatecase, formatFullDate, getCurrentDateTime } from '../../modules/ConvertDate';
+import StatusDialog from '../../dialogs/StatusDialog';
+import debounce from 'lodash/debounce';
+import AddWeight from '../../component/Case-Detail/AddWeight';
+const Case = () => {
+    const [enrollments, setEnrollments] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [openUserDialog, setOpenUserDialog] = useState(false);
+    const [openStatus, setOpenStatus] = useState(false);
+    const [rowCount, setRowCount] = useState(0);
+    const [allPrograms, setAllPrograms] = useState([]);
+    const [openWeightDialog, setOpenWeightDialog] = useState(false);
+    const [paginationModel, setPaginationModel] = useState({ pageSize: 15, page: 0 });
+    const [userId, setUserId] = useState(null);
+    const [selectedProgram, setSelectedProgram] = useState([]);
+    const [search, setSearch] = useState("");
+    const [statusData, setStatusData] = useState({});
+    const containerRef = useRef(null);
+    const [maxHeight, setMaxHeight] = useState(0);
+    const [weight, setWeight] = useState({ type: 'weight', value: "", userComment: "", unit: 'Kgs', recordedAt: getCurrentDateTime(), createdAt: new Date(), updatedAt: new Date(), customerId: '' })
+    const [userData, setUserData] = useState({
+        mobile: '',
+        name: '',
+        email: ''
+    });
+    const { currentUser, setSnackbar } = useCommon();
+    const onClickStatus = (user) => {
+        setStatusData(user)
+        setOpenStatus(true);
+    }
+
+    const columns = [
+        {
+            field: 'no',
+            headerName: 'No',
+            minWidth: 20,
+            // flex: 1,
+            headerClassName: 'super-app-theme--header',
+            sortable: false,
+            renderCell: (params) => {
+                if (params?.id && params?.api) {
+                    const sortedRowIds = params?.api.getSortedRowIds();
+                    const rowIndex = sortedRowIds.indexOf(params?.id);
+                    return <div className='flex gap-2 items-center'>{rowIndex + 1}</div>;
                 }
-            } catch (error) {
-                console.error("Error fetching data:", error);
+                return null;
             }
-        };
+        },
+        {
+            field: 'name',
+            headerName: 'User Name',
+            minWidth: 100,
+            flex: 1,
+            headerClassName: 'super-app-theme--header',
+            sortable: false,
+            renderCell: (params) => {
+                return <div className='flex gap-2  items-center truncate' >
+                    {params?.row?.name}
 
-        fetchData();
-    }, [invoiceId]);
-
-    const sendEmail = async () => {
-        if (!invoiceData || !invoiceData.customer || !invoiceData.invoice) {
-            alert("Unable to send email. Missing invoice or customer details.");
-            return;
-        }
-
-        try {
-            const payload = {
-                to: invoiceData.customer.email,
-                subject: `Invoice #WW241200${invoiceData.invoice.invoiceID}`,
-                body: `Dear ${invoiceData.customer.name},\n\nPlease find the details of your invoice attached.\n\nThank you.`,
-                invoiceId: invoiceData.invoice.invoiceID,
-            };
-
-            const response = await post("/sendEmail", payload);
-
-            if (response?.status === 200) {
-                alert("Email sent successfully!");
-            } else {
-                alert("Failed to send email. Please try again.");
+                </div>
             }
-        } catch (error) {
-            console.error("Error sending email:", error);
-            alert("An error occurred while sending the email.");
-        }
-    };
 
-    const addPayment = () => {
-        alert("Redirecting to Add Payment page...");
-        // Add your logic to navigate to the Add Payment page or open a dialog
-    };
+        },
+        {
+            field: 'mobile',
+            headerName: 'Mobile',
+            minWidth: 120,
+            flex: 1,
+            headerClassName: 'super-app-theme--header',
+            sortable: false,
+            renderCell: (params) => {
+                return <div className='flex gap-2  items-center' >
+                    {params?.row?.mobile}
+                </div>
 
-    if (!invoiceData) return <Typography align="center">Loading...</Typography>;
+            }
+        },
+        {
+            field: 'email',
+            headerName: 'Email',
+            minWidth: 200,
+            flex: 1,
+            headerClassName: 'super-app-theme--header',
+            sortable: false,
+            renderCell: (params) => {
+                const email = params?.row?.email || '';
+                const maxLength = 30; 
+                return (
+                    <Tooltip title={email}>
+                        <div
+                            className="truncate max-w-[300px] cursor-pointer"
+                            style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                        >
+                            {email.length > maxLength ? `${email.slice(0, maxLength)}...` : email}
+                        </div>
+                    </Tooltip>
+                );
+            }
+        },
+        {
+            field: 'Enrolled',
+            headerName: 'Enrolled Programs',
+            minWidth: 120,
+            flex: 1,
+            headerClassName: 'super-app-theme--header',
+            sortable: false,
+            renderCell: (params) => {
+                const programTitles = params?.row?.programTitle || [];
+                const firstTitle = programTitles[0] || '';
+                const remainingCount = programTitles.length - 1;
 
-    const { customer, invoice } = invoiceData;
-    const payment = paymentData[0] || {};
-
-    return (
-        <Box>
-            <ModuleHeading title="Invoice details" navigateTo="/admin/dashboard" />
-
-            {/* Invoice Details */}
-            <Card>
-                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px" }}>
-                    <Box>
-                        <Typography variant="subtitle1"><strong>Invoice:</strong> WW241200{invoice?.invoiceID}</Typography>
-                        <Typography variant="subtitle2">{new Date(invoice?.createdAt).toLocaleDateString()}</Typography>
-                      
-                        {invoice?.status === "Paid" ? (
-                            <Typography variant="h6" color="green">✓ PAID</Typography>
-                        ) : (
-                            <Typography variant="h6" color="red" className="w-400">
-                                <AccessTimeIcon /> PAYMENT DUE
-                            </Typography>
+                return (
+                    <div className="flex gap-2 items-center">
+                        {firstTitle}
+                        {remainingCount > 0 && (
+                            <Tooltip title={programTitles.slice(1).join(', ')}>
+                                <Typography color='secondary'>+{remainingCount}</Typography>
+                            </Tooltip>
                         )}
-                    </Box>
-                    <Box textAlign="right">
-                        <Typography variant="subtitle2">
-                            <strong>Payment Due Date:</strong> {new Date(invoice?.dueDate).toLocaleDateString()}
-                        </Typography>
-                    </Box>
-                </Box>
-                <Divider />
+                    </div>
+                );
+            },
+        },
 
-                {/* Customer Details */}
-                <Box sx={{ display: "flex", justifyContent: "space-between", padding: "16px" }}>
-                    <Box>
-                        <Typography variant="subtitle1"><strong>{customer?.name}</strong></Typography>
-                        <Typography variant="body2">Mobile: {customer?.mobile}</Typography>
-                        <Typography variant="body2">Email: {customer?.email}</Typography>
-                    </Box>
-                    <Box textAlign="right">
-                        <Typography variant="body2">WeightWonder™</Typography>
-                        <Typography variant="body2">+915588779933</Typography>
-                        <Typography variant="body2">info@weightwonder.com</Typography>
-                    </Box>
-                </Box>
-                <Divider />
+        {
+            field: 'registered',
+            headerName: 'Registered On',
+            minWidth: 120,
+            flex: 1,
+            headerClassName: 'super-app-theme--header',
+            sortable: false,
+            renderCell: (params) => {
+                return <div className='flex gap-2  items-center' >
+                    {formatDatecase(params?.row?.createdAt)}
+                </div>
+            }
+        },
+        {
+            field: 'enrolledDate',
+            headerName: 'Enrollment Date',
+            minWidth: 120,
+            flex: 1,
+            headerClassName: 'super-app-theme--header',
+            sortable: false,
+            renderCell: (params) => {
+                return <div className='flex gap-2  items-center' >
+                    {params?.row?.enrollDate?.length > 0 ? formatFullDate(params?.row?.enrollDate[params?.row?.enrollDate?.length - 1]) : 'Not Enroll Yet'}
+                    {/* <DateShow date={latestEnrollDate} /> */}
+                </div>
+            }
+        },
+        {
+            field: 'status',
+            headerName: 'Status',
+            minWidth: 120,
+            flex: 1,
+            headerClassName: 'super-app-theme--header',
+            sortable: false,
+            renderCell: (params) => {
+                const isActive = params.row.status === "active";
+                return (
+                    <div className="flex gap-2 items-center">
 
-                {/* Buttons */}
-                <Box sx={{ display: "flex", justifyContent: "flex-end", padding: "16px", gap: 2 }}>
-                    {invoice?.status === "Due" && (
-                        <Button variant="contained" color="primary" onClick={addPayment}>
-                            Add Payment
-                        </Button>
-                    )}
-                    <Button variant="outlined" color="primary" onClick={sendEmail}>
-                        E-mail
-                    </Button>
+                        <SwitchButton color='secondary.main' isActive={isActive} status={params?.row?.status} onClick={() => onClickStatus(params?.row)} />
+                        <span className=' capitalize'>{params.row.status}</span>
+                    </div>
+                );
+            }
+        },
+        {
+            field: 'editUser',
+            headerName: 'Edit User',
+            minWidth: 80,
+            flex: 1,
+            headerClassName: 'super-app-theme--header',
+            sortable: false,
+            renderCell: (params) => {
+                return <IconButton 
+                size='small'
+                onClick={(e) => {
+                    e.stopPropagation();
+                    onUpdateUser(params?.row)
+                }}>
+                  <EditIcon sx={{ color: (theme) => theme.palette.iconBlack }} />
+                </IconButton>
+            }
+        },
+        {
+            field: 'addWeight',
+            headerName: 'Add Weight',
+            minWidth: 120,
+            headerClassName: 'super-app-theme--header',
+            sortable: false,
+            renderCell: (params) => {
+                return <IconButton size='small'   
+                //  onClick={(e) => {e.stopPropagation();
+                    onClick={(e) => {e.stopPropagation();
+                    setOpenWeightDialog(true);
+                    setWeight((prev) => ({ ...prev, customerId: params?.row?._id }));
+                    {console.log( params?.row?._id,"customerid")}
+                }}>
+                
+                    <AddIcon color='secondary' 
+                    />
+                    </IconButton>
+            }
+        },
+    ];
+
+    const onOpenUser = () => {
+        setOpenUserDialog(true);
+    }
+    const handleChange = (event) => {
+        const value = event.target.value?.includes('All')? ['All']: event.target.value;
+        setSelectedProgram(value);
+        caseDelay(currentUser, paginationModel, search, value);
+    };
+    const onUpdateUser = (user) => {
+        setUserId(user._id);
+        setOpenUserDialog(true)
+        setUserData({
+            mobile: user?.mobile,
+            name: user?.name,
+            email: user?.email
+        })
+    }
+    const handleChangeStatus = async () => {
+        const response = await patch(`/Customers/${statusData._id}`, { status: statusData?.status === 'active' ? 'inactive' : 'active' });
+        if (response?.statusCode === 200) {
+            setSnackbar({
+                openSnackbar: true,
+                message: 'Status updated successfully',
+                severity: 'success'
+            })
+            caseDelay(currentUser, paginationModel, search, selectedProgram);
+            setOpenStatus(false);
+        } else {
+            setSnackbar({
+                openSnackbar: true,
+                message: 'Something went wrong!',
+                severity: 'error'
+            })
+        }
+    }
+    const fetchPrograms = async () => {
+        try {
+            const response = await get("/Programs");
+            if (response?.statusCode !== 200) {
+                throw new Error(`Failed to fetch programs. Status: ${response?.status}`);
+            }
+            const data = response.data;
+            setAllPrograms(data);
+        } catch (error) {
+            console.error("Error fetching programs:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const onGetCases = async (currentUser, paginationModel, search, selectedProgram) => {
+        setLoading(true);
+        try {
+            const url = `/GuestMeasures/getCases?userId=${currentUser?.userId}`;
+            const res = await post(url, { page: paginationModel, userId: currentUser?.userId, search: search, program: selectedProgram?.includes('All')?[]:selectedProgram });
+            if (res?.statusCode === 200) {
+                setEnrollments(res?.data?.data);
+                setRowCount(res?.data?.totalCount);
+                setLoading(false);
+            }
+
+        } catch (error) {
+            console.log(error);
+            setLoading(false);
+        }
+    }
+    const caseDelay = useCallback(debounce(onGetCases, 300), []);
+    useEffect(() => {
+        caseDelay(currentUser, paginationModel, search, selectedProgram);
+    }, [paginationModel,selectedProgram]);
+   
+    useEffect(() => {
+        setPaginationModel({ pageSize: 15, page: 0 })
+        caseDelay(currentUser, { pageSize: 15, page: 0 }, search, selectedProgram);
+    }, [search]);
+  
+    useEffect(() => {
+        fetchPrograms();
+    }, []);
+  
+    useEffect(() => {
+        const updateMaxHeight = () => {
+            const height = window.innerHeight - 160;
+            setMaxHeight(height);
+        };
+        updateMaxHeight();
+        window.addEventListener('resize', updateMaxHeight);
+        return () => {
+            window.removeEventListener('resize', updateMaxHeight);
+        };
+    }, []);
+    return (
+        <div className='flex-1 flex flex-col gap-3'>
+            <div className="flex flex-col md:justify-between md:items-center md:flex-row">
+                <ModuleHeading title="Cases" navigateTo="/admin/dashboard" />
+                <div className="flex space-x-4 md:items-center">
+                    <TextField
+                        fullWidth
+                        id="standard-basic"
+                        label="Search"
+                        variant="standard"
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                    />
+                    <FormControl variant="standard" fullWidth>
+                        <InputLabel id="demo-simple-select-standard-label">Enrolled Programs</InputLabel>
+                        <Select
+                            labelId="demo-simple-select-standard-label"
+                            id="demo-simple-select-standard"
+                            value={selectedProgram}
+                            onChange={handleChange}
+                            label="Enrolled In"
+                            multiple
+                        >
+                            <MenuItem value="All">
+                                All
+                            </MenuItem>
+                            {allPrograms?.map((item) => (
+                                <MenuItem key={item?.id} value={item?.id}>
+                                    {item?.title}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                </div>
+            </div>
+            {loading
+                ?
+                <Box container display='flex' justifyContent="center" alignItems="center" flex={1}>
+                    <CircularProgress />
                 </Box>
-            </Card>
-        </Box>
+                : enrollments?.length > 0 ?
+                <Box ref={containerRef} className="flex flex-1 flex-col" sx={{ maxHeight: maxHeight }}>
+                        <DataTable
+                            rows={enrollments}
+                            rowCount={rowCount}
+                            columns={columns}
+                            paginationModel={paginationModel}
+                            onPaginationModelChange={setPaginationModel}
+                            navigate={`caseDetails`}
+                        />
+                    </Box> :
+                    <Typography className="flex-1 flex justify-center items-center"> No users yet</Typography>
+            }
+
+            <AddButton onOpen={onOpenUser} />
+            <StatusDialog open={openStatus} setOpen={setOpenStatus} onSubmit={handleChangeStatus} status={statusData?.status} name="User" />
+            <AddUser
+                open={openUserDialog}
+                setOpen={setOpenUserDialog}
+                onGetCases={caseDelay}
+                userData={userData}
+                setUserData={setUserData}
+                userId={userId}
+                paginationModel={paginationModel}
+                search={search}
+                selectedProgram={selectedProgram}
+                GetCases={onGetCases}
+            />
+            <AddWeight
+                openAddWeight={openWeightDialog}
+                setOpenAddWeight={setOpenWeightDialog}
+                weight={weight}
+                setWeight={setWeight}
+                source={"casePage"}
+                userData={userData}
+            />
+        </div>
+
     );
 };
 
-export default InvoicePage;
+export default Case;
+
+
+
+import React, { useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { get } from "../../../services/api-services";
+import WeightProgress from "./Weight";
+import UserSupportTopics from "./Support";
+import UserImageLibrary from "./Gallery";
+import BasicInfo from "./BasicInfo";
+import { useCommon } from "../../../context/CommonContext";
+
+const GenrelInfo = ({ userData, fetchUserData, userEnrollment }) => {
+    const [loading, setLoading] = useState(true);
+    const { setSnackbar } = useCommon();
+    const navigate = useNavigate();
+    const [weightData, setWeightData] = useState({
+        id: null,
+        height: null,
+        startWeight: null,
+        currentWeight: null,
+        targetWeight: null,
+        startWeightBMI: null,
+        currentWeightBMI: null,
+        targetWeightBMI: null,
+        weightGoalPercent: 0,
+    });
+    const weightGoalParcent = async (height, gender, dob, newTarget, startWeight, currentWeight) => {
+        let targetWeight = 0;
+        let userWeightParcent = 0;
+       
+        if (height != undefined && gender != undefined && startWeight != undefined && startWeight != 0 && currentWeight != undefined && currentWeight != 0) {
+            var BMIValue = startWeight / ((height / 100) * (height / 100));
+            if (BMIValue < 18.5) {
+                var needToLose = Math.round(currentWeight - (18.5 * ((height / 100) * (height / 100))));
+            } else if (BMIValue > 18.5 && BMIValue < 24.9) {
+                var needToLose = Math.round(currentWeight - (22.5 * ((height / 100) * (height / 100))));
+            } else {
+                var needToLose = Math.round(currentWeight - (24.9 * ((height / 100) * (height / 100))));
+            }
+            var BMRValue = 0;
+            var today = new Date();
+            var nowyear = today.getFullYear();
+            var db = new Date(dob);
+            var birthyear = db.getFullYear();
+            var age = nowyear - birthyear;
+            age = age - 1;
+            if (gender == "Male") {
+                BMRValue = (10 * startWeight) + (6.25 * height) - (5 * age) + 5;
+            }
+            else {
+                BMRValue = (10 * startWeight) + (6.25 * height) - (5 * age) - 161;
+            }
+            if (newTarget == undefined || newTarget == '') {
+               
+                targetWeight = startWeight - needToLose;
+             
+            } else {
+                targetWeight = Number(newTarget);
+            }
+            if (targetWeight === startWeight) {
+                userWeightParcent = 0; 
+            } else {
+                userWeightParcent = Math.round(((currentWeight - startWeight) / (targetWeight - startWeight)) * 100);
+            }
+            if (userWeightParcent > 100) {
+                userWeightParcent = userWeightParcent - 100;
+            }
+        }
+        return {targetWeight,userWeightParcent}
+    }
+    const getWeightData = async () => {
+        const url = `/Customers/${id}`;
+        try {
+            const response = await get(url);
+            const data = response.data;
+            if (data) {
+                const startWeight = parseFloat(data.weight) || 0;
+                const targetWeight = parseFloat(data.weightGoal);
+                const height = parseFloat(data.height);
+                const heightInMeters = height / 100;
+                if (isNaN(heightInMeters) || heightInMeters === 0) {
+                    return;
+                }
+                const startBMI = calculateBMI(startWeight, height);
+                const currentBMI = startBMI;
+                // setWeightData((prev) => ({
+                //     ...prev,
+                //     id: data.id,
+                //     startWeight,
+                //     currentWeight: startWeight,
+                //     targetWeight,
+                //     height,
+                //     startWeightBMI: startBMI,
+                //     currentWeightBMI: currentBMI,
+                //     dateOfBirth: data?.dateOfBirth,
+                //     gender: data?.gender,
+                // }));
+            } else {
+                setWeightData({
+                    startWeight: 0,
+                    currentWeight: 0,
+                    targetWeight: 0,
+                    startWeightBMI: 0,
+                    currentWeightBMI: 0,
+                    weightGoalPercent: 0,
+                });
+            }
+        } catch (error) {
+            if (error.response?.status === 401) {
+                setSnackbar({
+                    openSnackbar: true,
+                    message: 'Login expired, please login again.',
+                    severity: 'error'
+                });
+                localStorage.clear();
+                navigate("/login");
+            } else {
+                console.error("Error fetching weight data", error);
+            }
+        }
+    };
+    const getCurrentWeight = async () => {
+        try {
+            const url = `/Measurements?filter={"where": {"customerId": "${id}", "type": "weight"}, "order" : "recordedAt DESC"}`;
+            const response = await get(url);
+            const customerUrl = `/Customers/${id}`;
+            const customerRes = await get(customerUrl);
+
+            if (response.data && response.data.length > 0) {
+                let comments = response.data[0].userComment;
+                let startWeight = response.data.slice(-1)[0].value;
+                let startWeightId = response.data.slice(-1)[0].id;
+                let currentWeight = response.data[0].value;
+                let weightId = response.data[0].id;
+                let gender = customerRes?.data?.gender;
+                let dob = customerRes?.data?.dateOfBirth;
+                let newTarget = customerRes?.data?.weightGoal;
+                let height = customerRes?.data?.height;
+                let weightGoalPercent = 0;
+                const {targetWeight,userWeightParcent}=await weightGoalParcent(height, gender, dob, newTarget, Number(startWeight), currentWeight);
+                const { currentWeightBMI, startWeightBMI } =calculateBMI(startWeight, currentWeight, height);
+                setWeightData((prev) => ({
+                    ...prev,
+                    customerId:customerRes?.data?.id,
+                    currentWeight,
+                    startWeight,
+                    currentWeightBMI,
+                    startWeightBMI,
+                    weightGoalPercent:userWeightParcent,
+                    targetWeight,
+                    height
+
+                }));
+            } else {
+                console.log("No current weight data found");
+            }
+        } catch (error) {
+            console.error("Error fetching current weight", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+    const calculateBMI = (startWeight,currentWeight, height) => {
+        if (!startWeight || !currentWeight || !height) return 0;
+        let num1 = (currentWeight / ((height/100) * (height/100)));
+        let currentWeightBMI = parseFloat(num1.toString()).toFixed(1);
+        let num = (startWeight / ((height/100) * (height/100)));
+        let startWeightBMI = parseFloat(num.toString()).toFixed(1);
+        return {currentWeightBMI,startWeightBMI }
+    };
+    const { id } = useParams();
+    const [openAddWeight, setOpenAddWeight] = useState(false);
+    return (
+        <div className="flex flex-col xl:flex-row flex-1 gap-4">
+            <div className="xl:w-[40%] w-full">
+                <BasicInfo weightGoalParcent={weightGoalParcent} customerId={id} userData={userData} fetchUserData={fetchUserData} userEnrollment={userEnrollment} setWeightData={setWeightData}  getCurrentWeight={getCurrentWeight}  getWeightData={getWeightData}/>
+            </div>
+            <div className="flex flex-col xl:w-[60%] w-full">
+                <div className="flex flex-col xl:flex-row mb-5 gap-4">
+                    <WeightProgress
+                        openAddWeight={openAddWeight}
+                        userData={userData}
+                        setOpenAddWeight={setOpenAddWeight} weightData={weightData} setWeightData={setWeightData} calculateBMI={calculateBMI}
+                         getCurrentWeight={getCurrentWeight} 
+                         fetchUserData={fetchUserData}
+                         weightGoalParcent={weightGoalParcent}/>
+                    <UserSupportTopics />
+                </div>
+
+                <UserImageLibrary />
+
+
+            </div>
+        </div>
+    )
+}
+
+export default GenrelInfo; 
+
+import React, { useState } from 'react'
+import {
+    Box,
+    Typography,
+    Card,
+    CardContent,
+    Avatar,
+    Divider,
+    Table,
+    TableBody,
+    TableRow,
+    TableCell,
+    IconButton
+
+} from "@mui/material";
+import { deepPurple } from "@mui/material/colors";
+import EditIcon from '@mui/icons-material/Edit';
+import SwitchButton from '../../SwitchButton';
+import PhotoIcon from '@mui/icons-material/Photo';
+import { convertToTime, convertToTimeFormat, formatDate,convertToTimeFormatuserprofile } from '../../../modules/ConvertDate';
+import { baseUrl, get, patch, post } from '../../../services/api-services';
+import AddProfile from './AddProfile';
+import { useCommon } from '../../../context/CommonContext';
+import StatusDialog from '../../../dialogs/StatusDialog';
+import EditBasicInfoDialog from '../profileModel-DialogBox/EditBasicDetail';
+import { StyledButton } from '../../StyledComponent';
+import { useParams } from 'react-router-dom';
+
+export default function BasicInfo({ getCurrentWeight,userData, fetchUserData, userEnrollment, getWeightData, setWeightData ,weightGoalParcent,}) {
+    const {id} = useParams()
+
+    console.log("userData",userData )
+
+    const [openAddProfile, setOpenAddProfile] = useState(false);
+    const [openStatus, setOpenStatus] = useState(false);
+    const { setSnackbar, currentUser } = useCommon();
+    const [infoOperation, setInfoOperation] = useState("");
+    const [openEditUser, setOpenEditUser] = useState(false);
+    const [editData, setEditData] = useState({
+        dateOfBirth: '',
+        height: '',
+        mobile: '',
+        gender: '',
+        address: '',
+        alternativeContact: '',
+        occupation: '',
+        organization: '',
+        clinicalIssues: [],
+        wakeUpTime: '',
+    });
+    const onClickStatus = () => {
+        setOpenStatus(true);
+    }
+    const onEditClose = () => {
+        setEditData({
+            dateOfBirth: '',
+            height: '',
+            mobile: '',
+            gender: '',
+            address: '',
+            alternativeContact: '',
+            occupation: '',
+            organization: '',
+            clinicalIssues: [],
+            wakeUpTime: '',
+        })
+        setOpenEditUser(false);
+    }
+    const onEditUser = (op) => {
+        setInfoOperation(op);
+        setOpenEditUser(true);
+        setEditData({
+            dateOfBirth: userData?.dateOfBirth,
+            height: userData?.height,
+            mobile: userData?.mobile,
+            gender: userData?.gender,
+            address: userData?.address,
+            alternativeContact: '',
+            occupation: userData?.occupation,
+            organization: userData?.organization,
+            clinicalIssues: [...(userData?.clinicalIssues || [])],
+            wakeUpTime: userData?.wakeUpTime,
+            ...(userData?.gender === 'Female' && {
+                menstrualHistory: {
+                    lastMenstrualPhase: userData?.menstrualHistory?.lastMenstrualPhase,
+                    avarageCycleLength: userData?.menstrualHistory?.avarageCycleLength,
+                    periodFlowLength: userData?.menstrualHistory?.periodFlowLength,
+                    regular: userData?.menstrualHistory?.regular,
+                    notes: userData?.menstrualHistory?.notes,
+                },
+            }),
+        });
+    }
+
+    const handleChangeStatus = async () => {
+        const response = await patch(`/Customers/${userData.id}`, { status: userData?.status === 'active' ? 'inactive' : 'active' });
+        if (response?.statusCode === 200) {
+            setSnackbar({
+                openSnackbar: true,
+                message: 'Status updated successfully',
+                severity: 'success'
+            })
+            fetchUserData();
+            setOpenStatus(false);
+        } else {
+            setSnackbar({
+                openSnackbar: true,
+                message: 'Something went wrong!',
+                severity: 'error'
+            })
+        }
+    }
+
+    // const onEditSubmit = async () => {
+    //   if(userData.weight){
+    //      const url = `/Measurements?filter={"where": {"customerId": "${id}", "type": "weight"}, "order" : "recordedAt DESC"}`;
+    //      const response = await get(url);
+    //      if (response.data && response.data.length > 0) {
+    //         let startWeight = response.data.slice(-1)[0].value;
+    //         let currentWeight = response.data[0].value;
+    //         let weightGoalPercent = 0;}
+
+    //     const { targetWeight } = await weightGoalParcent(editData.height, editData.gender, editData.dateOfBirth,newTarget,startWeight,currentWeight);  
+    //                     const res = await patch(`/Customers/${id}`, {
+    //                         editData,
+    //                         weight: weight.value,
+    //                         weightGoal: targetWeight,
+    //      });
+    //   }
+
+
+    //     // const res = await patch(`/Customers/${userData?.id}`, editData);
+    //     if (res?.statusCode === 200) {
+    //         fetchUserData();
+    //         // if (editData?.height) { 
+    //         if ((editData?.height && parseFloat(editData?.height) !== parseFloat(userData?.height))){
+    //             getWeightData();
+
+    //             const heightData = {
+    //                 type: "height",
+    //                 value: parseFloat(editData?.height),
+    //                 unit: "Cm",
+    //                 recordedAt: new Date().toISOString(),
+    //                 createdAt: new Date().toISOString(),
+    //                 updatedAt: new Date().toISOString(),
+    //                 customerId: userData?.id,
+    //             };
+
+    //             try {
+    //                 const measurementRes = await post(`/Measurements`, heightData);
+    //                 if (measurementRes?.statusCode === 200) {
+
+    //                     setSnackbar({
+    //                         openSnackbar: true,
+    //                         message: 'User info updated successfully',
+    //                         severity: 'success'
+    //                     });
+    //                 } else {
+    //                     console.error('Measurement API response:', measurementRes);
+    //                     setSnackbar({
+    //                         openSnackbar: true,
+    //                         message: 'User info updated but failed to save height measurement.',
+    //                         severity: 'warning'
+    //                     });
+    //                 }
+    //             } catch (error) {
+    //                 console.error('Error while saving height measurement:', error);
+    //                 setSnackbar({
+    //                     openSnackbar: true,
+    //                     message: 'Error occurred while saving height measurement.',
+    //                     severity: 'error'
+    //                 });
+    //             }
+    //         } else {
+    //             setSnackbar({
+    //                 openSnackbar: true,
+    //                 message: 'User info updated successfully',
+    //                 severity: 'success'
+    //             });
+    //         }
+    //     } else {
+    //         console.error('Patch API response:', res);
+    //         setSnackbar({
+    //             openSnackbar: true,
+    //             message: 'Failed to update user info.',
+    //             severity: 'error'
+    //         });
+    //     }
+    // }
+
+    const onEditSubmit = async () => {
+        try {
+            console.log(userData,"userdata")
+            // Check if the user has weight data
+            if (userData?.weight) {
+                console.log(userData?.weight,"userData?.weight")
+                const url = `/Measurements?filter={"where": {"customerId": "${userData.id}", "type": "weight"}, "order" : "recordedAt DESC"}`;
+                const response = await get(url);
+                console.log(response.data,"response.data")
+                const newTarget = 0;
+                let userWeightParcent = 0;
+                if (response?.data && response.data.length > 0) {
+                    const startWeight = response.data.slice(-1)[0].value; 
+                    const currentWeight = response.data[0].value; 
+                    const { targetWeight,userWeightParcent } = await weightGoalParcent(
+                        editData.height,
+                        editData.gender,
+                        editData.dateOfBirth,
+                        newTarget,
+                        startWeight,
+                        currentWeight
+                    );
+
+                    console.log( editData.height, editData.gender, editData.dateOfBirth,startWeight, currentWeight,newTarget,"targetnew")
+
+                    // Update user data with weight and target weight
+                    const res = await patch(`/Customers/${userData.id}`, {
+                        ...editData,
+                        weightGoal: targetWeight,
+                    });
+    
+                    if (res?.statusCode === 200) {
+                        await getCurrentWeight();
+                        fetchUserData();
+                    } else {
+                        throw new Error("Failed to update user info.");
+                    }
+                } else {
+                    console.error("No weight data found.");
+                    throw new Error("Weight data not available for this user.");
+                }
+            } else {
+                // Proceed with PATCH if weight data is not required
+                const res = await patch(`/Customers/${userData.id}`, editData);
+    
+                if (res?.statusCode !== 200) {
+                    throw new Error("Failed to update user info.");
+                }
+    
+                fetchUserData();
+            }
+    
+            // Check if height needs to be updated
+            if (editData?.height && parseFloat(editData.height) !== parseFloat(userData?.height)) {
+                const heightData = {
+                    type: "height",
+                    value: parseFloat(editData.height),
+                    unit: "Cm",
+                    recordedAt: new Date().toISOString(),
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    customerId: userData?.id,
+                };
+    
+                try {
+                    const measurementRes = await post(`/Measurements`, heightData);
+                    if (measurementRes?.statusCode === 200) {
+                        setSnackbar({
+                            openSnackbar: true,
+                            message: "User info and height measurement updated successfully.",
+                            severity: "success",
+                        });
+                    } else {
+                        throw new Error("Failed to save height measurement.");
+                    }
+                } catch (error) {
+                    console.error("Error while saving height measurement:", error);
+                    setSnackbar({
+                        openSnackbar: true,
+                        message: "Error occurred while saving height measurement.",
+                        severity: "error",
+                    });
+                }
+            } else {
+                setSnackbar({
+                    openSnackbar: true,
+                    message: "User info updated successfully.",
+                    severity: "success",
+                });
+            }
+        } catch (error) {
+            console.error("Error in onEditSubmit:", error);
+            setSnackbar({
+                openSnackbar: true,
+                message: error.message || "An error occurred while updating user info.",
+                severity: "error",
+            });
+        }
+    };
+    
+
+
+    return (
+        <Card className='h-full'>
+            <CardContent className="text-center p-2">
+                <Box className="flex items-center justify-between gap-2">
+                    <Box item>
+                        <Typography color="secondary" className=" accent-text pointer" variant='body2' fontWeight={600}>
+                            {userEnrollment.length > 0 ? `WeightWonder™ ${userEnrollment[0]?.invoice?.purchaseProgram?.title}` : 'Free'} {(userEnrollment.length - 1) > 0 ? '+' + (userEnrollment.length - 1) : ''}
+                        </Typography>
+                    </Box>
+                    <Box item>
+                        <SwitchButton status={userData.status} onClick={onClickStatus} /><span className="capitalize"> {userData?.status}</span>
+                    </Box>
+                </Box>
+                <Box sx={{ position: "relative", textAlign: "center" }}>
+                    <Avatar
+                        sx={{ width: 100, height: 100, mx: "auto", bgcolor: deepPurple[500], mb: 2 }}
+                        src={userData?.image ? `${baseUrl}/Uploads/profile-pic/download/${userData.image}` : `http://apps.eulogik.com/weightwonder-web/assets/img/userProfile.png`}
+                    >
+                        {userData?.name && userData?.name?.charAt(0)}
+                    </Avatar>
+                    <IconButton
+                        onClick={(e) => { setOpenAddProfile(true) }}
+                        variant="contained"
+                        color="primary"
+                        size="small"
+                        sx={{
+                            boxShadow: '2px 2px 40px 2px ',
+                            backgroundColor: '#ffffff',
+                            ":hover": { backgroundColor: '#ffffff' },
+                            position: "absolute",
+                            bottom: 10,
+                            right: "calc(50% - 45px)",
+                            transform: "translateX(50%)",
+                            zIndex: 2,
+                        }}
+                    >
+                        <PhotoIcon sx={{ color: (theme) => theme.palette.icon }} />
+                    </IconButton>
+                </Box>
+                <Typography variant="h6" fontWeight={600}>{userData.name}</Typography>
+                <Typography variant="body2">
+                    +91 {userData.mobile}
+                </Typography>
+                <Typography variant="body2">
+                    {userData.email}
+                </Typography>
+                <Divider className="py-2" />
+                <Box container className="flex items-center justify-between gap-2 ">
+                    <Box item marginTop={2}>
+                        <Typography variant="h6" fontWeight={'bold'}>
+                            Basic Detail
+                        </Typography>
+                    </Box>
+                    <Box item>
+                        {userData?.dateOfBirth || userData?.height || userData?.gender || userData?.address || userData?.occupation || userData?.organization || userData?.clinicalIssues?.length > 0 || userData.wakeUpTime ? (
+                            <IconButton size='small' onClick={() => onEditUser("update")}>
+                                <EditIcon className='text-slate-950' />
+                            </IconButton>
+                        ) : (
+                            <Box textAlign="" marginTop={2}>
+                                <StyledButton
+                                    onClick={() => onEditUser("add")}
+                                >
+                                    Add Info
+                                </StyledButton>
+                            </Box>
+                        )}
+                    </Box>
+                </Box>
+                {(userData.dateOfBirth || userData.height || userData.gender || userData.address || userData.occupation || userData.organization || userData.clinicalIssues?.length > 0 || userData.wakeUpTime) ? (
+                    <Table>
+                        <TableBody>
+                            <TableRow>
+                                <TableCell sx={{ pb: 1, border: "none", color: "gray" }}>
+                                    DOB
+                                </TableCell>
+                                <TableCell sx={{ pb: 1, border: "none", fontWeight: 600 }}>
+                                    {formatDate(userData.dateOfBirth)}
+                                </TableCell>
+                            </TableRow>
+                            <TableRow>
+                                <TableCell sx={{ pb: 1, border: "none", color: "gray" }}>
+                                    Gender
+                                </TableCell>
+                                <TableCell sx={{ pb: 1, border: "none", fontWeight: 600 }}>{userData.gender}</TableCell>
+                            </TableRow>
+                            <TableRow>
+                                <TableCell sx={{ pb: 1, border: "none", color: "gray" }}>
+                                    Alternative Contact No.
+                                </TableCell>
+                                <TableCell sx={{ pb: 1, border: "none", fontWeight: 600 }}>{userData?.alternateContact}</TableCell>
+                            </TableRow>
+                            <TableRow>
+                                <TableCell sx={{ pb: 1, border: "none", color: "gray" }}>
+                                    Height (in cms)
+                                </TableCell>
+                                <TableCell sx={{ pb: 1, border: "none", fontWeight: 600 }}>{userData.height} Cms</TableCell>
+                            </TableRow>
+                            <TableRow>
+                                <TableCell sx={{ pb: 1, border: "none", color: "gray" }}>
+                                    Address
+                                </TableCell>
+                                <TableCell sx={{ pb: 1, border: "none", fontWeight: 600 }}>{userData.address}</TableCell>
+                            </TableRow>
+                            <TableRow>
+                                <TableCell sx={{ pb: 1, border: "none", color: "gray" }}>
+                                    Occupation
+                                </TableCell>
+                                <TableCell sx={{ pb: 1, border: "none", fontWeight: 600 }}>{userData.occupation}</TableCell>
+                            </TableRow>
+                            <TableRow>
+                                <TableCell sx={{ pb: 1, border: "none", color: "gray" }}>
+                                    Organization
+                                </TableCell>
+                                <TableCell sx={{ pb: 1, border: "none", fontWeight: 600 }}>{userData.organization}</TableCell>
+                            </TableRow>
+                            <TableRow>
+                                <TableCell sx={{ pb: 1, border: "none", color: "gray" }}>
+                                    Clinical Issues
+                                </TableCell>
+                                <TableCell sx={{ pb: 1, border: "none", fontWeight: 600 }}>
+                                    {userData.clinicalIssues || "No clinical issue"}
+                                </TableCell>
+                            </TableRow>
+                            <TableRow>
+                                <TableCell sx={{ pb: 1, border: "none", color: "gray" }}>
+                                    Wake up time
+                                </TableCell>
+                                <TableCell sx={{ pb: 1, border: "none", fontWeight: 600 }}>{convertToTimeFormatuserprofile(userData.wakeUpTime)}</TableCell>
+                            </TableRow>
+                        </TableBody>
+                    </Table>
+                ) : (
+                    null
+                )}
+            </CardContent>
+            <AddProfile open={openAddProfile} setOpen={setOpenAddProfile} customerId={userData?.id} fetchUserData={fetchUserData} />
+            <StatusDialog open={openStatus} setOpen={setOpenStatus} onSubmit={handleChangeStatus} status={userData?.status} name="User" />
+            <EditBasicInfoDialog open={openEditUser} onClose={onEditClose} userData={editData} setUserData={setEditData} onSubmit={onEditSubmit} getWeightData={getWeightData} />
+        </Card>
+    )
+}
+
+
+// import * as React from 'react';
+// import TextField from '@mui/material/TextField';
+// import Dialog from '@mui/material/Dialog';
+// import DialogActions from '@mui/material/DialogActions';
+// import DialogContent from '@mui/material/DialogContent';
+// import DialogTitle from '@mui/material/DialogTitle';
+// import { StyledButton, StyledCancelButton } from '../StyledComponent';
+// import { weightRegex } from '../../regex/regex';
+// import { post, patch, get } from '../../services/api-services';
+// import { useCommon } from '../../context/CommonContext';
+// import { getCurrentDateTime } from '../../modules/ConvertDate';
+// import { useParams } from 'react-router-dom';
+
+// export default function AddWeight({ openAddWeight, setOpenAddWeight, weight, setWeight, setWeightData, weightData, getWeightData, getCurrentWeight, weightGoalParcent, userData, fetchUserData }) {
+//     const { id } = useParams();
+
+//     const { setSnackbar } = useCommon();
+
+//     const handleClickOpen = () => {
+//         setOpenAddWeight(true);
+//     };
+
+//     const handleClose = () => {
+//         setOpenAddWeight(false);
+//     };
+
+
+//     const handleSubmitWeightCase = async () => {
+//         //event.preventDefault();
+//         try {
+//                 const res = await post("/Measurements", weight);
+//                 if (res?.statusCode === 200) {
+//                     setSnackbar({
+//                         openSnackbar: true,
+//                         message: "Weight added successfully!",
+//                         severity: "success",
+//                     });
+//                 } else {
+//                     throw new Error("Failed to add weight.");
+//                 }
+//         } catch (error) {
+//             console.error("Error in handleSubmit:", error);
+//             setSnackbar({
+//                 openSnackbar: true,
+//                 message: error.message || "An error occurred!",
+//                 severity: "error",
+//             });
+//         } finally {
+//             setWeight((prev) => ({
+//                 ...prev,
+//                 value: "",
+//                 userComment: "",
+//                 recordedAt: getCurrentDateTime(),
+//                 customerId: "",
+//             }));
+//             handleClose();
+//         }
+//     };
+
+//     const handleSubmit = async (event) => {
+//         event.preventDefault();
+//         try {
+//             if (userData && userData.weight) {
+//                 console.log("userData", userData)
+//                 const res = await post("/Measurements", weight);
+//                 if (res?.statusCode === 200) {
+
+//                     await getCurrentWeight();
+
+//                     setSnackbar({
+//                         openSnackbar: true,
+//                         message: "Weight added successfully!",
+//                         severity: "success",
+//                     });
+//                 } else {
+//                     throw new Error("Failed to add weight.");
+//                 }
+//             } else {
+//                 const { targetWeight } = await weightGoalParcent(userData?.height, userData?.gender, userData?.dateOfBirth, userData?.weightGoal, weight?.value, weight?.value);
+//                 const patchWeightResponse = await patch(`/Customers/${id}`, {
+//                     weight: weight.value,
+//                     weightGoal: targetWeight,
+//                 });
+//                 if (patchWeightResponse?.statusCode === 200) {
+//                     const res = await post("/Measurements", weight);
+//                     if (res?.statusCode === 200) {
+//                         setSnackbar({
+//                             openSnackbar: true,
+//                             message: "Weight added successfully!",
+//                             severity: "success",
+//                         });
+//                         await getCurrentWeight();
+//                         await fetchUserData();
+
+//                     } else {
+//                         throw new Error("Failed to add weight.");
+//                     }
+//                 } else {
+//                     throw new Error("Failed to update customer weight.");
+//                 }
+//             }
+//         } catch (error) {
+//             console.error("Error in handleSubmit:", error);
+//             setSnackbar({
+//                 openSnackbar: true,
+//                 message: error.message || "An error occurred!",
+//                 severity: "error",
+//             });
+//         } finally {
+//             setWeight((prev) => ({
+//                 ...prev,
+//                 value: "",
+//                 userComment: "",
+//                 recordedAt: getCurrentDateTime(),
+//                 customerId: "",
+//             }));
+//             handleClose();
+//         }
+//     };
+
+
+//     const calculateBMI = (weight, height) => {
+//         if (!weight || !height) return "N/A";
+//         const heightInMeters = height / 100;
+//         return (weight / (heightInMeters * heightInMeters)).toFixed(1);
+//     };
+
+//     const calculateTargetWeightBMI = (bmi, heightInCm) => {
+//         if (!bmi || !heightInCm) return 0;
+//         const heightInMeters = heightInCm / 100;
+//         if (bmi < 18.5) return 18.5;
+//         if (bmi > 24.9) return 24.9;
+//         if (bmi >= 18.5 && bmi <= 24.9) return 22.5;
+//         const weight = bmi * (heightInMeters * heightInMeters);
+//         return weight.toFixed(1);
+//     };
+//     return (
+//         <React.Fragment>
+//             <Dialog
+//                 open={openAddWeight}
+//                 onClose={handleClose}
+//                 fullWidth
+//                 PaperProps={{
+//                     component: 'form',
+//                     onSubmit: handleSubmit,
+//                 }}
+//             >
+//                 <DialogTitle>Add Weight</DialogTitle>
+//                 <DialogContent className='flex flex-col gap-5'>
+//                     <TextField
+//                         autoFocus
+//                         required
+//                         margin="dense"
+//                         id="weight"
+//                         name="weight"
+//                         label="Weight (In kgs)"
+//                         type="number"
+//                         fullWidth
+//                         variant="standard"
+//                         value={weight?.value}
+//                         onChange={(e) => setWeight((prev) => ({ ...prev, value: Number(e.target.value) }))}
+//                         onInput={(e) => {
+//                             if (e.target.value.length > 5) {
+//                                 e.target.value = e.target.value.slice(0, 5);
+//                             }
+//                         }}
+//                         error={weight?.value && (!weightRegex.test(weight?.value) || (weight?.value >= 220 || weight?.value <= 20))}
+//                         helperText={
+//                             (weight?.value && (weight?.value >= 220 || weight?.value <= 20)) ?
+//                                 "Weight should be between 20 to 220 kgs" : ''
+//                         }
+//                     />
+
+//                     <textarea
+//                         autoFocus
+//                         placeholder='Comment'
+//                         className='w-full border-b border-black focus:outline-none'
+//                         value={weight?.userComment}
+//                         onChange={(e) => setWeight((prev) => ({ ...prev, userComment: e.target.value }))}
+//                     />
+//                     <TextField
+//                         autoFocus
+//                         required
+//                         margin="dense"
+//                         id="name"
+//                         name="email"
+//                         label="Choose date and time"
+//                         type="datetime-local"
+//                         fullWidth
+//                         variant="standard"
+//                         value={weight?.recordedAt}
+//                         onChange={(e) => setWeight((prev) => ({ ...prev, recordedAt: e.target.value }))}
+//                     />
+//                 </DialogContent>
+//                 <DialogActions>
+//                     <StyledCancelButton onClick={handleClose}>Cancel</StyledCancelButton>
+//                     <StyledButton type="submit" disabled={!weight?.value || !weightRegex.test(weight?.value) || !weight?.recordedAt}>ADD</StyledButton>
+//                 </DialogActions>
+//             </Dialog>
+//         </React.Fragment>
+//     );
+// }
+
+
+import * as React from 'react';
+import TextField from '@mui/material/TextField';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import { StyledButton, StyledCancelButton } from '../StyledComponent';
+import { weightRegex } from '../../regex/regex';
+import { post, patch, get } from '../../services/api-services';
+import { useCommon } from '../../context/CommonContext';
+import { getCurrentDateTime } from '../../modules/ConvertDate';
+import { useParams } from 'react-router-dom';
+
+export default function AddWeight({ 
+    openAddWeight, 
+    setOpenAddWeight, 
+    weight, 
+    setWeight, 
+    setWeightData, 
+    weightData, 
+    getWeightData, 
+    getCurrentWeight, 
+    weightGoalParcent, 
+    userData, 
+    fetchUserData, 
+    source
+}) {
+    const { id } = useParams();
+    const { setSnackbar } = useCommon();
+
+    const handleClickOpen = () => {
+        setOpenAddWeight(true);
+    };
+
+    const handleClose = () => {
+        setOpenAddWeight(false);
+    };
+   
+
+
+    const handleSubmitWeightCase = async () => {
+        try {
+
+            const res = await post("/Measurements", weight);
+            if (res?.statusCode === 200) {
+               
+                const customerData = await get(`/Customers/${weight.customerId}`);
+                console.log(customerData,"res")
+
+                if (!customerData.data?.weight) {
+                    console.log("userData?.weight",customerData?.weight)
+
+                    const patchWeightResponse = await patch(`/Customers/${weight.customerId}`, {
+                        weight: weight.value,
+                    });
+                    if (patchWeightResponse?.statusCode !== 200) {
+                        throw new Error("Failed to update customer weight.");
+                    }
+                }
+                setSnackbar({
+                    openSnackbar: true,
+                    message: "Weight added successfully!",
+                    severity: "success",
+                });
+            } else {
+                throw new Error("Failed to add weight.");
+            }
+        } catch (error) {
+            console.error("Error in handleSubmit:", error);
+            setSnackbar({
+                openSnackbar: true,
+                message: error.message || "An error occurred!",
+                severity: "error",
+            });
+        } finally {
+            setWeight((prev) => ({
+                ...prev,
+                value: "",
+                userComment: "",
+                recordedAt: getCurrentDateTime(),
+                customerId: "",
+            }));
+            handleClose();
+        }
+    };
+
+
+
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        try {
+            if (userData && userData.weight) {
+                const res = await post("/Measurements", weight);
+                if (res?.statusCode === 200) {
+                    await getCurrentWeight();
+
+                    setSnackbar({
+                        openSnackbar: true,
+                        message: "Weight added successfully!",
+                        severity: "success",
+                    });
+                } else {
+                    throw new Error("Failed to add weight.");
+                }
+            } else {
+                const { targetWeight } = await weightGoalParcent(userData?.height, userData?.gender, userData?.dateOfBirth, userData?.weightGoal, weight?.value, weight?.value);
+                const patchWeightResponse = await patch(`/Customers/${id}`, {
+                    weight: weight.value,
+                    weightGoal: targetWeight,
+                });
+                if (patchWeightResponse?.statusCode === 200) {
+                    const res = await post("/Measurements", weight);
+                    if (res?.statusCode === 200) {
+                        setSnackbar({
+                            openSnackbar: true,
+                            message: "Weight added successfully!",
+                            severity: "success",
+                        });
+                        await getCurrentWeight();
+                        await fetchUserData();
+                    } else {
+                        throw new Error("Failed to add weight.");
+                    }
+                } else {
+                    throw new Error("Failed to update customer weight.");
+                }
+            }
+        } catch (error) {
+            console.error("Error in handleSubmit:", error);
+            setSnackbar({
+                openSnackbar: true,
+                message: error.message || "An error occurred!",
+                severity: "error",
+            });
+        } finally {
+            setWeight((prev) => ({
+                ...prev,
+                value: "",
+                userComment: "",
+                recordedAt: getCurrentDateTime(),
+                customerId: "",
+            }));
+            handleClose();
+        }
+    };
+
+    // Use the appropriate submit function based on the source
+    const handleSubmitBasedOnSource = (event) => {
+        event.preventDefault(); 
+        if (source === "casePage") {
+            handleSubmitWeightCase();
+        } else {
+            handleSubmit(event);
+        }
+    };
+
+    return (
+        <React.Fragment>
+            <Dialog
+                open={openAddWeight}
+                onClose={handleClose}
+                fullWidth
+                PaperProps={{
+                    component: 'form',
+                    onSubmit: handleSubmitBasedOnSource,
+                }}
+            >
+                <DialogTitle>Add Weight</DialogTitle>
+                <DialogContent className='flex flex-col gap-5'>
+                    <TextField
+                        autoFocus
+                        required
+                        margin="dense"
+                        id="weight"
+                        name="weight"
+                        label="Weight (In kgs)"
+                        type="number"
+                        fullWidth
+                        variant="standard"
+                        value={weight?.value}
+                        onChange={(e) => setWeight((prev) => ({ ...prev, value: Number(e.target.value) }))}
+                        onInput={(e) => {
+                            if (e.target.value.length > 5) {
+                                e.target.value = e.target.value.slice(0, 5);
+                            }
+                        }}
+                        error={weight?.value && (!weightRegex.test(weight?.value) || (weight?.value >= 220 || weight?.value <= 20))}
+                        helperText={
+                            (weight?.value && (weight?.value >= 220 || weight?.value <= 20)) ?
+                                "Weight should be between 20 to 220 kgs" : ''
+                        }
+                    />
+
+                    <textarea
+                        autoFocus
+                        placeholder='Comment'
+                        className='w-full border-b border-black focus:outline-none'
+                        value={weight?.userComment}
+                        onChange={(e) => setWeight((prev) => ({ ...prev, userComment: e.target.value }))}
+                    />
+                    <TextField
+                        autoFocus
+                        required
+                        margin="dense"
+                        id="name"
+                        name="email"
+                        label="Choose date and time"
+                        type="datetime-local"
+                        fullWidth
+                        variant="standard"
+                        value={weight?.recordedAt}
+                        onChange={(e) => setWeight((prev) => ({ ...prev, recordedAt: e.target.value }))}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <StyledCancelButton onClick={handleClose}>Cancel</StyledCancelButton>
+                    <StyledButton type="submit" disabled={!weight?.value || !weightRegex.test(weight?.value) || !weight?.recordedAt}>ADD</StyledButton>
+                </DialogActions>
+            </Dialog>
+        </React.Fragment>
+    );
+}
+
+
